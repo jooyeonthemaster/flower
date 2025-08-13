@@ -71,7 +71,7 @@ export default function TestimonialSection() {
 
                 {/* 후기 내용 */}
                 <p className="text-gray-700 leading-relaxed font-medium">
-                  "{testimonial.review}"
+                  &quot;{testimonial.review}&quot;
                 </p>
 
                 {/* 구분선 */}

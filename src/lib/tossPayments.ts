@@ -1,22 +1,31 @@
 // 토스페이먼츠 클라이언트 키
 const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 
+// 전역 TossPayments 타입 선언
+declare global {
+  interface Window {
+    TossPayments: (clientKey: string) => {
+      requestPayment: (method: string, paymentData: Record<string, unknown>) => Promise<void>;
+    };
+  }
+}
+
 // 토스페이먼츠 SDK 초기화 (결제창 방식)
 export const initTossPayments = async () => {
   // script 태그로 동적 로드
-  if (typeof window !== 'undefined' && !(window as any).TossPayments) {
-    await new Promise((resolve, reject) => {
+  if (typeof window !== 'undefined' && !window.TossPayments) {
+    await new Promise<void>((resolve, reject) => {
       const script = document.createElement('script');
       script.src = 'https://js.tosspayments.com/v1/payment';
-      script.onload = resolve;
+      script.onload = () => resolve();
       script.onerror = reject;
       document.head.appendChild(script);
     });
   }
   
   // TossPayments 초기화
-  if (typeof window !== 'undefined' && (window as any).TossPayments) {
-    return (window as any).TossPayments(clientKey);
+  if (typeof window !== 'undefined' && window.TossPayments) {
+    return window.TossPayments(clientKey);
   }
   
   throw new Error('TossPayments SDK를 로드할 수 없습니다.');
@@ -46,4 +55,5 @@ export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat('ko-KR').format(price);
 };
 
-export default { initTossPayments, generateOrderId, formatPrice }; 
+const tossPaymentsLib = { initTossPayments, generateOrderId, formatPrice };
+export default tossPaymentsLib; 

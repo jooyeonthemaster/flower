@@ -52,21 +52,21 @@ export async function POST(request: NextRequest) {
 }
 
 // 주문 정보를 데이터베이스에 저장하는 함수 (예시)
-async function saveOrderToDatabase(paymentData: any) {
-  // Firebase Firestore에 저장하는 예시
-  // const { db } = await import('@/lib/firebase');
-  // const { addDoc, collection } = await import('firebase/firestore');
-  
-  // await addDoc(collection(db, 'orders'), {
-  //   paymentKey: paymentData.paymentKey,
-  //   orderId: paymentData.orderId,
-  //   amount: paymentData.totalAmount,
-  //   status: paymentData.status,
-  //   method: paymentData.method,
-  //   customerEmail: paymentData.customerEmail,
-  //   customerName: paymentData.customerName,
-  //   orderName: paymentData.orderName,
-  //   createdAt: new Date(),
-  //   updatedAt: new Date(),
-  // });
-} 
+// async function saveOrderToDatabase(paymentData: unknown) {
+//   // Firebase Firestore에 저장하는 예시
+//   // const { db } = await import('@/lib/firebase');
+//   // const { addDoc, collection } = await import('firebase/firestore');
+//   
+//   // await addDoc(collection(db, 'orders'), {
+//   //   paymentKey: paymentData.paymentKey,
+//   //   orderId: paymentData.orderId,
+//   //   amount: paymentData.totalAmount,
+//   //   status: paymentData.status,
+//   //   method: paymentData.method,
+//   //   customerEmail: paymentData.customerEmail,
+//   //   customerName: paymentData.customerName,
+//   //   orderName: paymentData.orderName,
+//   //   createdAt: new Date(),
+//   //   updatedAt: new Date(),
+//   // });
+// } 

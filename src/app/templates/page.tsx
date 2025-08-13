@@ -1,21 +1,48 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { TemplateCategory, TemplateMetadata } from '@/types/template'
+import { TemplateMetadata } from '@/types/template'
 import { TEMPLATES_WITH_DATA } from '@/data/templates'
 import PaymentButton from '@/components/payment/PaymentButton'
 
-export default function TemplatesPage() {
+function TemplatesPageContent() {
+  const searchParams = useSearchParams()
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateMetadata | null>(null)
   const [viewMode, setViewMode] = useState<'categories' | 'templates' | 'preview'>('categories')
+  
+  // 렌탈 관련 상태
+  const [isRentalMode, setIsRentalMode] = useState(false)
+  const [rentalInfo, setRentalInfo] = useState({
+    period: 'daily',
+    color: 'blue',
+    amount: 120000
+  })
   
   // 상세 페이지 상태
   const [activeTab, setActiveTab] = useState<'overview' | 'text' | 'image'>('overview')
   const [expandedTextFields, setExpandedTextFields] = useState<number[]>([])
   const [expandedImageFields, setExpandedImageFields] = useState<number[]>([])
   const [showGuide, setShowGuide] = useState(true)
+
+  // 렌탈 쿼리 파라미터 처리
+  useEffect(() => {
+    const rental = searchParams.get('rental')
+    const period = searchParams.get('period')
+    const color = searchParams.get('color')
+    const amount = searchParams.get('amount')
+
+    if (rental === 'true') {
+      setIsRentalMode(true)
+      setRentalInfo({
+        period: period || 'daily',
+        color: color || 'blue',
+        amount: parseInt(amount || '120000')
+      })
+    }
+  }, [searchParams])
 
   const selectedCategoryData = TEMPLATES_WITH_DATA.find(cat => cat.id === selectedCategory)
 
@@ -67,16 +94,18 @@ export default function TemplatesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-600 hover:text-gray-900">
-                ← 메인으로 돌아가기
+              <Link href={isRentalMode ? "/rental" : "/"} className="text-gray-600 hover:text-gray-900">
+                ← {isRentalMode ? '렌탈 페이지로' : '메인으로'} 돌아가기
               </Link>
               <div className="h-6 w-px bg-gray-300"></div>
-              <h1 className="text-xl font-bold text-gray-900">홀로그램 템플릿 선택</h1>
+              <h1 className="text-xl font-bold text-gray-900">
+                {isRentalMode ? '렌탈용 ' : ''}홀로그램 템플릿 선택
+              </h1>
             </div>
             <div className="text-sm text-gray-500">
-              {viewMode === 'categories' && 'STEP 1/3: 카테고리 선택'}
-              {viewMode === 'templates' && 'STEP 2/3: 템플릿 선택'}
-              {viewMode === 'preview' && 'STEP 3/3: 상세 확인'}
+              {viewMode === 'categories' && (isRentalMode ? 'RENTAL STEP 1/3: 카테고리 선택' : 'STEP 1/3: 카테고리 선택')}
+              {viewMode === 'templates' && (isRentalMode ? 'RENTAL STEP 2/3: 템플릿 선택' : 'STEP 2/3: 템플릿 선택')}
+              {viewMode === 'preview' && (isRentalMode ? 'RENTAL STEP 3/3: 상세 확인' : 'STEP 3/3: 상세 확인')}
             </div>
           </div>
         </div>
@@ -90,8 +119,16 @@ export default function TemplatesPage() {
             <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">카테고리 선택</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                화환을 사용할 목적에 맞는 카테고리를 선택해주세요. 각 카테고리별로 최적화된 템플릿을 제공합니다.
+                {isRentalMode 
+                  ? `${rentalInfo.color === 'blue' ? '블루' : '레드'} 타입 홀로그램 화환 렌탈용 카테고리를 선택해주세요.`
+                  : '화환을 사용할 목적에 맞는 카테고리를 선택해주세요. 각 카테고리별로 최적화된 템플릿을 제공합니다.'
+                }
               </p>
+              {isRentalMode && (
+                <div className="mt-4 inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  렌탈 모드: {rentalInfo.period === 'daily' ? '일간' : rentalInfo.period === 'weekly' ? '주간' : '월간'} ₩{rentalInfo.amount.toLocaleString()}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -286,16 +323,21 @@ export default function TemplatesPage() {
                   </div>
                   <div className="flex space-x-4">
                     <PaymentButton 
-                      amount={120000}
-                      orderName={`홀로그램 화환 - ${selectedTemplate.name}`}
+                      amount={isRentalMode ? rentalInfo.amount : 120000}
+                      orderName={isRentalMode 
+                        ? `홀로그램 화환 렌탈 - ${selectedTemplate.name} (${rentalInfo.color === 'blue' ? '블루' : '레드'})`
+                        : `홀로그램 화환 - ${selectedTemplate.name}`
+                      }
                       className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:from-blue-700 hover:to-blue-800"
                     />
-                    <Link
-                      href={`/rental?template=${selectedTemplate.id}`}
-                      className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:from-green-700 hover:to-green-800"
-                    >
-                      📝 렌탈 문의
-                    </Link>
+                    {!isRentalMode && (
+                      <Link
+                        href={`/rental?template=${selectedTemplate.id}`}
+                        className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:from-green-700 hover:to-green-800"
+                      >
+                        📝 렌탈 문의
+                      </Link>
+                    )}
                     <button
                       onClick={handleBackToTemplates}
                       className="px-6 py-4 border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
@@ -455,7 +497,7 @@ export default function TemplatesPage() {
                     ].map((tab) => (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => setActiveTab(tab.id as 'overview' | 'text' | 'image')}
                         className={`flex-1 p-4 text-center font-semibold transition-all duration-200 relative ${
                           activeTab === tab.id
                             ? 'bg-gradient-to-b from-blue-50 to-blue-100 text-blue-700 shadow-inner'
@@ -655,5 +697,13 @@ export default function TemplatesPage() {
 
       </main>
     </div>
+  )
+}
+
+export default function TemplatesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">로딩 중...</div>}>
+      <TemplatesPageContent />
+    </Suspense>
   )
 } 
