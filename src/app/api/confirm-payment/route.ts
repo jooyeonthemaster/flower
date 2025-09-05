@@ -2,37 +2,50 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { paymentKey, orderId, amount } = await request.json();
+    const { paymentId, amount } = await request.json();
 
-    // 토스페이먼츠 시크릿 키
-    const secretKey = process.env.TOSS_SECRET_KEY!;
+    // 포트원 V2 API Secret 키
+    const apiSecret = process.env.PORTONE_API_SECRET!;
     
-    // 토스페이먼츠 결제 승인 API 호출
-    const response = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
-      method: 'POST',
+    // 포트원 V2 결제 정보 조회 API 호출
+    const response = await fetch(`https://api.portone.io/payments/${paymentId}`, {
+      method: 'GET',
       headers: {
-        'Authorization': `Basic ${Buffer.from(secretKey + ':').toString('base64')}`,
+        'Authorization': `PortOne ${apiSecret}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        paymentKey,
-        orderId,
-        amount: parseInt(amount),
-      }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('토스페이먼츠 결제 승인 실패:', data);
+      console.error('포트원 결제 정보 조회 실패:', data);
       return NextResponse.json(
-        { error: data.message || '결제 승인에 실패했습니다.' },
+        { error: data.message || '결제 정보 조회에 실패했습니다.' },
         { status: response.status }
       );
     }
 
-    // 결제 승인 성공
-    console.log('결제 승인 성공:', data);
+    // 결제 상태 확인
+    if (data.status !== 'PAID') {
+      console.error('결제가 완료되지 않음:', data);
+      return NextResponse.json(
+        { error: '결제가 완료되지 않았습니다.' },
+        { status: 400 }
+      );
+    }
+
+    // 결제 금액 검증
+    if (data.amount?.total !== parseInt(amount)) {
+      console.error('결제 금액 불일치:', { expected: amount, actual: data.amount?.total });
+      return NextResponse.json(
+        { error: '결제 금액이 일치하지 않습니다.' },
+        { status: 400 }
+      );
+    }
+
+    // 결제 검증 성공
+    console.log('포트원 결제 검증 성공:', data);
 
     // TODO: 여기서 데이터베이스에 주문 정보를 저장하거나 업데이트
     // await saveOrderToDatabase(data);
@@ -43,7 +56,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('결제 승인 API 오류:', error);
+    console.error('포트원 결제 검증 API 오류:', error);
     return NextResponse.json(
       { error: '서버 오류가 발생했습니다.' },
       { status: 500 }

@@ -18,26 +18,26 @@ export default function Footer() {
       links: [
         { name: '상담 문의', href: '/contact' },
         { name: '기술 지원', href: '/support' },
-        { name: '유지보수', href: '/maintenance' },
-        { name: '보증 서비스', href: '/warranty' },
+        { name: '배송 정보', href: '/shipping' },
+        { name: '교환/환불', href: '/returns' },
       ]
     },
     {
       title: '회사',
       links: [
         { name: '회사 소개', href: '/about' },
-        { name: '기술 혁신', href: '/innovation' },
+        { name: '사업자 정보', href: '/business-info' },
         { name: '파트너십', href: '/partners' },
         { name: '채용 정보', href: '/careers' },
       ]
     },
     {
-      title: '지원',
+      title: '고객지원',
       links: [
         { name: 'FAQ', href: '/faq' },
         { name: '사용 가이드', href: '/guide' },
-        { name: '다운로드', href: '/downloads' },
         { name: '개인정보처리방침', href: '/privacy' },
+        { name: '이용약관', href: '/terms' },
       ]
     }
   ]
@@ -59,11 +59,11 @@ export default function Footer() {
               <div className="space-y-6">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-xl">DH</span>
+                    <span className="text-white font-bold text-xl">디</span>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold">Digital Hologram</h3>
-                    <p className="text-gray-400 text-sm">Wreaths</p>
+                    <h3 className="text-2xl font-bold">디지털화환</h3>
+                    <p className="text-gray-400 text-sm">Digital Hologram Wreaths</p>
                   </div>
                 </div>
                 
@@ -72,14 +72,24 @@ export default function Footer() {
                   전통과 혁신이 만나는 특별한 경험을 선사합니다.
                 </p>
                 
-                <div className="flex items-center space-x-6">
-                  <div className="text-sm">
-                    <span className="text-gray-400">대표전화:</span>
-                    <span className="text-white ml-2 font-medium">1588-0000</span>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-6">
+                    <div className="text-sm">
+                      <span className="text-gray-400">대표전화:</span>
+                      <span className="text-white ml-2 font-medium">02-336-0250</span>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-400">이메일:</span>
+                      <span className="text-white ml-2 font-medium">baikal86@naver.com</span>
+                    </div>
                   </div>
                   <div className="text-sm">
-                    <span className="text-gray-400">이메일:</span>
-                    <span className="text-white ml-2 font-medium">info@dhwreaths.com</span>
+                    <span className="text-gray-400">대표자:</span>
+                    <span className="text-white ml-2 font-medium">조지형</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="text-gray-400">사업자등록번호:</span>
+                    <span className="text-white ml-2 font-medium">411-39-01174</span>
                   </div>
                 </div>
               </div>
@@ -132,9 +142,10 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             
-            {/* 저작권 */}
-            <div className="text-gray-400 text-sm">
-              <p>© {currentYear} Digital Hologram Wreaths. All rights reserved.</p>
+            {/* 저작권 및 사업자 정보 */}
+            <div className="text-gray-400 text-sm space-y-1">
+              <p>© {currentYear} 디지털화환. All rights reserved.</p>
+              <p>서울특별시 중구 을지로 지하 220, 지하2층 청년창업소누리 A-8호 | 대표: 조지형 | 사업자등록번호: 411-39-01174</p>
             </div>
 
             {/* 하단 링크 */}

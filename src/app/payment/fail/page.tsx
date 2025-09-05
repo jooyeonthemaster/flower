@@ -26,8 +26,16 @@ function PaymentFailContent() {
 
   const getErrorMessage = (code?: string) => {
     const errorMessages: { [key: string]: string } = {
-      'PAY_PROCESS_CANCELED': '사용자가 결제를 취소했습니다.',
-      'PAY_PROCESS_ABORTED': '결제 진행 중 오류가 발생했습니다.',
+      'PAYMENT_CANCELLED': '사용자가 결제를 취소했습니다.',
+      'PAYMENT_FAILED': '결제에 실패했습니다.',
+      'INVALID_REQUEST': '잘못된 요청입니다.',
+      'UNAUTHORIZED': '인증에 실패했습니다.',
+      'FORBIDDEN': '접근이 거부되었습니다.',
+      'NOT_FOUND': '요청한 자원을 찾을 수 없습니다.',
+      'INTERNAL_SERVER_ERROR': '서버 내부 오류가 발생했습니다.',
+      'BAD_GATEWAY': '게이트웨이 오류가 발생했습니다.',
+      'SERVICE_UNAVAILABLE': '서비스를 사용할 수 없습니다.',
+      'GATEWAY_TIMEOUT': '게이트웨이 시간 초과가 발생했습니다.',
       'REJECT_CARD_COMPANY': '카드사에서 결제를 거절했습니다.',
       'INVALID_CARD_COMPANY': '유효하지 않은 카드입니다.',
       'NOT_SUPPORTED_INSTALLMENT': '지원하지 않는 할부개월입니다.',

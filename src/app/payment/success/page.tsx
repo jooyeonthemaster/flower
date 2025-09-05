@@ -13,44 +13,45 @@ function PaymentSuccessContent() {
   }>({});
 
   useEffect(() => {
-    const paymentKey = searchParams.get('paymentKey');
-    const orderId = searchParams.get('orderId');
+    const paymentId = searchParams.get('paymentId');
+    const txId = searchParams.get('txId');
     const amount = searchParams.get('amount');
 
     setPaymentInfo({
-      paymentKey: paymentKey || undefined,
-      orderId: orderId || undefined,
+      paymentKey: paymentId || undefined,
+      orderId: txId || undefined,
       amount: amount || undefined,
     });
 
-    // 결제 승인 API 호출 (실제 구현에서는 서버에서 처리해야 함)
-    if (paymentKey && orderId && amount) {
-      confirmPayment(paymentKey, orderId, amount);
+    // 포트원 결제 검증 API 호출
+    if (paymentId && amount) {
+      confirmPayment(paymentId, txId || '', amount);
     }
   }, [searchParams]);
 
-  const confirmPayment = async (paymentKey: string, orderId: string, amount: string) => {
+  const confirmPayment = async (paymentId: string, txId: string, amount: string) => {
     try {
-      // TODO: 실제로는 서버 API를 호출해야 함
+      // 포트원 결제 검증 API 호출
       const response = await fetch('/api/confirm-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          paymentKey,
-          orderId,
+          paymentId,
+          txId,
           amount,
         }),
       });
 
       if (response.ok) {
-        console.log('결제 승인 완료');
+        console.log('포트원 결제 검증 완료');
       } else {
-        console.error('결제 승인 실패');
+        const errorData = await response.json();
+        console.error('포트원 결제 검증 실패:', errorData);
       }
     } catch (error) {
-      console.error('결제 승인 API 호출 오류:', error);
+      console.error('포트원 결제 검증 API 호출 오류:', error);
     }
   };
 
@@ -111,7 +112,7 @@ function PaymentSuccessContent() {
               
               {paymentInfo.paymentKey && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">결제키:</span>
+                  <span className="text-gray-600">결제 ID:</span>
                   <span className="font-medium text-xs">
                     {paymentInfo.paymentKey.substring(0, 20)}...
                   </span>

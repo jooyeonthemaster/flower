@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { initTossPayments, generateOrderId, formatPrice, PaymentRequest } from '@/lib/tossPayments';
+import { requestPayment, formatPrice } from '@/lib/portOnePayments';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface PaymentButtonProps {
@@ -29,33 +29,29 @@ export default function PaymentButton({
     try {
       setIsLoading(true);
       
-      // 토스페이먼츠 SDK 초기화
-      const tossPayments = await initTossPayments();
-      
-      // 결제 요청 데이터 준비
-      const paymentData: PaymentRequest = {
+      // 포트원 결제 요청 데이터 준비
+      const paymentData = {
         amount,
-        orderId: generateOrderId(),
         orderName,
         customerName: user.displayName || '구매자',
-        customerEmail: user.email || '',
+        customerEmail: user.email || undefined,
+        customerMobilePhone: user.phoneNumber || undefined, // 빈 값이면 undefined로 전달
         successUrl: `${window.location.origin}/payment/success`,
-        failUrl: `${window.location.origin}/payment/fail`
+        failUrl: `${window.location.origin}/payment/fail`,
+        customData: {
+          userId: user.uid,
+          timestamp: new Date().toISOString(),
+        }
       };
 
-      // 결제창 방식으로 결제 요청 (API 개별 연동 키 사용)
-      await tossPayments.requestPayment('카드', {
-        amount: paymentData.amount,
-        orderId: paymentData.orderId,
-        orderName: paymentData.orderName,
-        customerName: paymentData.customerName,
-        customerEmail: paymentData.customerEmail,
-        successUrl: paymentData.successUrl,
-        failUrl: paymentData.failUrl,
-      });
+      // 포트원 결제 요청
+      const response = await requestPayment(paymentData);
+      
+      // 결제 성공 시 처리 (포트원은 자동으로 successUrl로 리다이렉트)
+      console.log('포트원 결제 응답:', response);
 
     } catch (error) {
-      console.error('결제 오류:', error);
+      console.error('포트원 결제 오류:', error);
       alert('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
