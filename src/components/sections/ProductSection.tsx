@@ -40,6 +40,14 @@ export default function ProductSection() {
   
   // UI 상태
   const [showLoginAlert, setShowLoginAlert] = useState(false)
+  
+  // 결제 전 동의 상태
+  const [agreements, setAgreements] = useState({
+    terms: false,
+    privacy: false,
+    refund: false,
+    ecommerce: false
+  })
 
   const productInfo = {
     name: "Digital Hologram Wreath",
@@ -732,6 +740,124 @@ export default function ProductSection() {
                   </div>
                 </div>
               </div>
+
+              {/* 결제 전 동의 사항 및 필수 고지사항 */}
+              {currentStep === 6 && (
+                <div className="max-w-6xl mx-auto mt-12">
+                  {/* 전자상거래법 필수 고지사항 */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6">
+                    <h5 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
+                      <span className="mr-2">⚖️</span>
+                      전자상거래법 필수 고지사항
+                    </h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-2">
+                        <div><span className="font-semibold text-blue-700">상호명:</span> 디지털화환</div>
+                        <div><span className="font-semibold text-blue-700">대표자:</span> 조지형</div>
+                        <div><span className="font-semibold text-blue-700">사업자등록번호:</span> 411-39-01174</div>
+                        <div><span className="font-semibold text-blue-700">통신판매업번호:</span> <span className="text-orange-600">[신고 진행중]</span></div>
+                      </div>
+                      <div className="space-y-2">
+                        <div><span className="font-semibold text-blue-700">연락처:</span> 02-336-0250</div>
+                        <div><span className="font-semibold text-blue-700">이메일:</span> baikal86@naver.com</div>
+                        <div><span className="font-semibold text-blue-700">사업장 주소:</span><br />서울특별시 중구 을지로 지하 220, 지하2층 청년창업소누리 A-8호</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 결제 관련 유의사항 */}
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 mb-6">
+                    <h5 className="text-lg font-bold text-yellow-800 mb-4 flex items-center">
+                      <span className="mr-2">⚠️</span>
+                      결제 관련 유의사항
+                    </h5>
+                    <div className="space-y-3 text-sm text-yellow-800">
+                      <div className="flex items-start space-x-2">
+                        <span className="text-yellow-600">•</span>
+                        <span><strong>보증금:</strong> 렌트 비용 외 보증금 {productInfo.baseServices.deposit.toLocaleString()}원이 별도로 결제되며, 제품 반납 시 전액 환불됩니다.</span>
+                      </div>
+                      <div className="flex items-start space-x-2">
+                        <span className="text-yellow-600">•</span>
+                        <span><strong>환불 정책:</strong> 설치 완료 후 7일 이내 환불 신청 가능하며, 환불 금액은 사유에 따라 차등 적용됩니다.</span>
+                      </div>
+                      <div className="flex items-start space-x-2">
+                        <span className="text-yellow-600">•</span>
+                        <span><strong>렌트 기간:</strong> 선택하신 {currentRental.name} 기준으로 계산되며, 연장 시 별도 협의가 필요합니다.</span>
+                      </div>
+                      <div className="flex items-start space-x-2">
+                        <span className="text-yellow-600">•</span>
+                        <span><strong>설치 및 수거:</strong> 전문 기술진이 직접 방문하여 설치 및 수거를 진행하며, 일정 조율이 필요할 수 있습니다.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 약관 동의 */}
+                  <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                    <h5 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                      <span className="mr-2">📋</span>
+                      약관 동의 (필수)
+                    </h5>
+                    <div className="space-y-4">
+                      <label className="flex items-start space-x-3 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={agreements.terms}
+                          onChange={(e) => setAgreements(prev => ({...prev, terms: e.target.checked}))}
+                          className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm">
+                          <a href="/terms" target="_blank" className="text-blue-600 underline font-semibold hover:text-blue-800">이용약관</a>에 동의합니다. <span className="text-red-500">(필수)</span>
+                        </span>
+                      </label>
+                      
+                      <label className="flex items-start space-x-3 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={agreements.privacy}
+                          onChange={(e) => setAgreements(prev => ({...prev, privacy: e.target.checked}))}
+                          className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm">
+                          <a href="/privacy" target="_blank" className="text-blue-600 underline font-semibold hover:text-blue-800">개인정보처리방침</a>에 동의합니다. <span className="text-red-500">(필수)</span>
+                        </span>
+                      </label>
+                      
+                      <label className="flex items-start space-x-3 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={agreements.refund}
+                          onChange={(e) => setAgreements(prev => ({...prev, refund: e.target.checked}))}
+                          className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm">
+                          <a href="/returns" target="_blank" className="text-blue-600 underline font-semibold hover:text-blue-800">교환 및 환불 정책</a>을 확인했습니다. <span className="text-red-500">(필수)</span>
+                        </span>
+                      </label>
+                      
+                      <label className="flex items-start space-x-3 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={agreements.ecommerce}
+                          onChange={(e) => setAgreements(prev => ({...prev, ecommerce: e.target.checked}))}
+                          className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm">
+                          전자상거래법에 따른 필수 고지사항을 확인했으며, 위 결제 관련 유의사항에 동의합니다. <span className="text-red-500">(필수)</span>
+                        </span>
+                      </label>
+                    </div>
+                    
+                    {/* 전체 동의 여부 확인 */}
+                    {(!agreements.terms || !agreements.privacy || !agreements.refund || !agreements.ecommerce) && (
+                      <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm text-red-600 font-medium">
+                          ⚠️ 모든 필수 약관에 동의해야 결제를 진행할 수 있습니다.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -773,7 +899,12 @@ export default function ProductSection() {
                 <PaymentButton 
                   amount={currentRental.price}
                   orderName={`홀로그램 화환 렌탈 - ${selectedTemplate?.name} (${currentColor.name})`}
-                  className="px-12 py-4 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  className={`px-12 py-4 font-bold rounded-2xl transition-all duration-300 transform shadow-lg ${
+                    (!agreements.terms || !agreements.privacy || !agreements.refund || !agreements.ecommerce)
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white hover:scale-105 hover:shadow-xl'
+                  }`}
+                  disabled={!agreements.terms || !agreements.privacy || !agreements.refund || !agreements.ecommerce}
                 />
               )}
             </div>
