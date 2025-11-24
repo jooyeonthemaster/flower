@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function AuthButton() {
@@ -19,11 +20,15 @@ export default function AuthButton() {
       <div className="flex items-center space-x-4">
         {/* 사용자 프로필 */}
         <div className="flex items-center space-x-3">
-          <img
-            src={user.photoURL || '/images/default-avatar.png'}
-            alt={user.displayName || '사용자'}
-            className="w-8 h-8 rounded-full border-2 border-gray-200"
-          />
+          <div className="relative w-8 h-8">
+            <Image
+              src={user.photoURL || '/images/default-avatar.png'}
+              alt={user.displayName || '사용자'}
+              width={32}
+              height={32}
+              className="rounded-full border-2 border-gray-200"
+            />
+          </div>
           <span className="text-sm font-medium text-gray-700 hidden sm:block">
             {user.displayName || '사용자'}
           </span>

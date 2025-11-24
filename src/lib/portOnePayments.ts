@@ -5,7 +5,6 @@ import type { PaymentRequest, PaymentResponse } from '@portone/browser-sdk/v2';
 // 포트원 환경변수
 const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID!;
 const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY!;
-const pgProvider = process.env.NEXT_PUBLIC_PORTONE_PG_PROVIDER!;
 
 // 포트원 SDK는 이미 import되어 있으므로 초기화 함수가 필요 없음
 export const initPortOnePayments = async (): Promise<typeof PortOne> => {

@@ -68,10 +68,16 @@ export default function HeroSection() {
                   </svg>
                 </Link>
                 <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold text-lg hover:bg-white hover:text-gray-900 transition-all duration-300"
+                  href="/ai-hologram"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-lg hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 group relative overflow-hidden"
                 >
-                  상담 문의
+                  <span className="relative z-10 flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    AI 홀로그램 만들기
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </Link>
               </div>
 

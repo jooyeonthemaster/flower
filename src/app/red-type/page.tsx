@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import PaymentButton from '@/components/payment/PaymentButton';
@@ -27,11 +28,12 @@ export default function RedTypePage() {
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-2xl p-8 h-96 flex items-center justify-center">
-                  <img 
-                    src="/images/products/hologram-wreath-red.jpg" 
+                <div className="bg-gradient-to-br from-red-100 to-pink-100 rounded-2xl p-8 h-96 flex items-center justify-center relative">
+                  <Image
+                    src="/images/products/hologram-wreath-red.jpg"
                     alt="레드 타입 홀로그램 화환"
-                    className="w-full h-full object-cover rounded-xl"
+                    fill
+                    className="object-cover rounded-xl"
                   />
                 </div>
               </div>

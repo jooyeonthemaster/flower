@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 
 function RentalContent() {
-  const searchParams = useSearchParams()
+  // const searchParams = useSearchParams()
   // const templateId = searchParams.get('template') // 현재 사용하지 않음
   
   const [selectedColor, setSelectedColor] = useState<'blue' | 'red'>('blue')
@@ -39,22 +39,13 @@ function RentalContent() {
       <div className="max-w-md lg:max-w-4xl xl:max-w-6xl mx-auto bg-white lg:grid lg:grid-cols-2 lg:gap-8">
         {/* 왼쪽: 제품 이미지 및 특징 */}
         <div className="p-4 lg:p-6">
-          <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center mb-6">
-            <img 
-              src="/images/products/hologram-wreath-blue.jpg" 
+          <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center mb-6 relative">
+            <Image
+              src="/images/products/hologram-wreath-blue.jpg"
               alt="홀로그램 화환"
-              className="w-full h-full object-cover rounded-lg"
-              onError={(e) => {
-                const target = e.currentTarget as HTMLImageElement
-                target.style.display = 'none'
-                const nextEl = target.nextElementSibling as HTMLDivElement
-                if (nextEl) nextEl.style.display = 'flex'
-              }}
+              fill
+              className="object-cover rounded-lg"
             />
-            <div className="hidden w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg items-center justify-center flex-col">
-              <div className="text-6xl mb-4">🌸</div>
-              <div className="text-lg font-medium text-gray-600">홀로그램 화환</div>
-            </div>
           </div>
 
           {/* 제품 특징 */}

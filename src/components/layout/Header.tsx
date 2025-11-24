@@ -1,20 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import AuthButton from '@/components/auth/AuthButton'
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   const navigation = [
     { name: '홈', href: '/' },
@@ -31,9 +23,11 @@ export default function Header() {
           {/* 로고 */}
                                 <div className="flex-shrink-0">
                         <Link href="/" className="flex items-center">
-                          <img 
-                            src="/images/logo.png" 
-                            alt="Digital Hologram Wreaths" 
+                          <Image
+                            src="/images/logo.png"
+                            alt="Digital Hologram Wreaths"
+                            width={150}
+                            height={72}
                             className="h-18 w-auto"
                           />
                         </Link>
