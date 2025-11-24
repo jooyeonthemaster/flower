@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
-import fs from 'fs';
-import path from 'path';
 
 // Interface for image generation response part
 interface ImageBytes {
@@ -136,23 +134,14 @@ export async function POST(req: NextRequest) {
       console.error('Unexpected API Response:', JSON.stringify(response, null, 2));
       throw new Error('No image data generated');
     }
-    
-    const buffer = Buffer.from(imageBase64, 'base64');
-    const filename = `hologram_${Date.now()}.png`;
-    const saveDir = path.join(process.cwd(), 'public', 'generated', 'images');
-    
-    if (!fs.existsSync(saveDir)) {
-      fs.mkdirSync(saveDir, { recursive: true });
-    }
-    
-    const filepath = path.join(saveDir, filename);
-    fs.writeFileSync(filepath, buffer);
 
-    const imageUrl = `/generated/images/${filename}`;
+    // Vercel serverless 환경에서는 파일 시스템 쓰기 불가
+    // Base64 data URL로 직접 반환
+    const dataUrl = `data:image/png;base64,${imageBase64}`;
 
-    return NextResponse.json({ 
-      success: true, 
-      imageUrl: imageUrl
+    return NextResponse.json({
+      success: true,
+      imageUrl: dataUrl
     });
 
   } catch (error: unknown) {

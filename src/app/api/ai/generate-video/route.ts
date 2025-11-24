@@ -21,13 +21,27 @@ export async function POST(req: NextRequest) {
 
     const client = new GoogleGenAI({ apiKey });
 
-    const imagePath = path.join(process.cwd(), 'public', sourceImageUrl);
-    if (!fs.existsSync(imagePath)) {
-      throw new Error(`Source image not found at ${imagePath}`);
-    }
+    // Data URL 또는 파일 경로 처리
+    let imageBase64: string;
+    let mimeType = 'image/png';
 
-    const imageBuffer = fs.readFileSync(imagePath);
-    const imageBase64 = imageBuffer.toString('base64');
+    if (sourceImageUrl.startsWith('data:')) {
+      // Data URL에서 base64 추출
+      const matches = sourceImageUrl.match(/^data:(.+);base64,(.+)$/);
+      if (!matches) {
+        throw new Error('Invalid data URL format');
+      }
+      mimeType = matches[1];
+      imageBase64 = matches[2];
+    } else {
+      // 파일 경로 처리 (로컬 개발용)
+      const imagePath = path.join(process.cwd(), 'public', sourceImageUrl);
+      if (!fs.existsSync(imagePath)) {
+        throw new Error(`Source image not found at ${imagePath}`);
+      }
+      const imageBuffer = fs.readFileSync(imagePath);
+      imageBase64 = imageBuffer.toString('base64');
+    }
 
     console.log('Starting Veo generation with prompt:', prompt);
     
@@ -37,7 +51,7 @@ export async function POST(req: NextRequest) {
       prompt: prompt || "Make this hologram animated, slow 360 degree rotation, glowing particles, 8k resolution, cinematic lighting",
       image: {
         imageBytes: imageBase64,
-        mimeType: "image/png",
+        mimeType: mimeType,
       },
       config: {
         aspectRatio: "16:9", // 가로형(Landscape) 비율 설정
@@ -68,24 +82,27 @@ export async function POST(req: NextRequest) {
     if (operation.response?.generatedVideos?.[0]?.video) {
       const videoFile = operation.response.generatedVideos[0].video;
       const filename = `hologram_video_${Date.now()}.mp4`;
-      const saveDir = path.join(process.cwd(), 'public', 'generated', 'videos');
-      
-      if (!fs.existsSync(saveDir)) {
-        fs.mkdirSync(saveDir, { recursive: true });
-      }
 
+      // Vercel serverless 환경: /tmp 디렉토리 사용 (임시)
+      const saveDir = '/tmp';
       const filepath = path.join(saveDir, filename);
 
       await client.files.download({
         file: videoFile,
         downloadPath: filepath
       });
-      
-      const videoUrl = `/generated/videos/${filename}`;
-      
-      return NextResponse.json({ 
-        success: true, 
-        videoUrl: videoUrl 
+
+      // 파일을 base64로 읽어서 data URL로 반환
+      const videoBuffer = fs.readFileSync(filepath);
+      const videoBase64 = videoBuffer.toString('base64');
+      const videoDataUrl = `data:video/mp4;base64,${videoBase64}`;
+
+      // /tmp 파일 삭제 (정리)
+      fs.unlinkSync(filepath);
+
+      return NextResponse.json({
+        success: true,
+        videoUrl: videoDataUrl
       });
     } else {
       throw new Error('Video generation completed but no video data found');
