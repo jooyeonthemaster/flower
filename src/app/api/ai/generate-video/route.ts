@@ -3,7 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 import fs from 'fs';
 import path from 'path';
 
-export const maxDuration = 60;
+// Vercel Pro plan: 최대 300초 (5분)
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('Starting Veo generation with prompt:', prompt);
-    
+
     // 2. Veo 3.1 영상 생성 요청 (16:9 비율 강제)
     let operation = await client.models.generateVideos({
       model: "veo-3.1-generate-preview",
@@ -62,7 +63,8 @@ export async function POST(req: NextRequest) {
     console.log('Video operation started:', operation);
 
     const startTime = Date.now();
-    const MAX_WAIT_TIME = 180000;
+    // Vercel Pro 최대 300초, 여유를 둬서 280초로 설정
+    const MAX_WAIT_TIME = 280000;
     
     while (!operation.done) {
       if (Date.now() - startTime > MAX_WAIT_TIME) {
