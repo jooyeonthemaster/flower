@@ -93,7 +93,7 @@ export default function Footer() {
                   </div>
                   <div className="text-sm">
                     <span className="text-gray-400">통신판매업번호:</span>
-                    <span className="text-orange-400 ml-2 font-medium">[신고 진행중]</span>
+                    <span className="text-white ml-2 font-medium">제 2025-서울동작-1506 호</span>
                   </div>
                 </div>
               </div>
@@ -150,7 +150,7 @@ export default function Footer() {
             <div className="text-gray-400 text-sm space-y-1">
               <p>© {currentYear} 디지털화환. All rights reserved.</p>
               <p>서울특별시 중구 을지로 지하 220, 지하2층 청년창업소누리 A-8호 | 대표: 조지형</p>
-              <p>사업자등록번호: 411-39-01174 | 통신판매업번호: [신고 진행중]</p>
+              <p>사업자등록번호: 411-39-01174 | 통신판매업번호: 제 2025-서울동작-1506 호</p>
             </div>
 
             {/* 하단 링크 */}
