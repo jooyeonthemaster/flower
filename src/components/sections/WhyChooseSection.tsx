@@ -76,50 +76,13 @@ export default function WhyChooseSection() {
             </div>
           </div>
 
-          {/* 오른쪽: 시각적 요소 */}
-          <div className="relative">
-            <div className="bg-white p-12 border-2 border-gray-200">
-              {/* 배경 이미지 영역 */}
-              <div className="relative h-80 bg-gray-100 border-2 border-gray-300 mb-8 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-50"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-gray-600">
-                    <div className="w-24 h-24 mx-auto bg-blue-600 border-4 border-white flex items-center justify-center mb-4">
-                      <span className="text-white font-bold text-2xl">DH</span>
-                    </div>
-                    <p className="text-sm">기술 이미지</p>
-                    <p className="text-xs text-gray-500 mt-1">/images/features/hologram-tech.jpg</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-6">
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    혁신적인 홀로그램 기술
-                  </h3>
-                  <p className="text-gray-600">
-                    8K 해상도의 초고화질 디스플레이로<br />
-                    생생한 홀로그램을 구현합니다
-                  </p>
-                </div>
-                
-                {/* 기술 스펙 */}
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { label: "해상도", value: "8K UHD" },
-                    { label: "재생시간", value: "72시간" },
-                    { label: "제어방식", value: "무선" },
-                    { label: "설치시간", value: "5분" }
-                  ].map((spec, index) => (
-                    <div key={index} className="bg-gray-50 p-4 text-center border border-gray-200">
-                      <div className="text-xs text-gray-500 mb-1 uppercase tracking-wider">{spec.label}</div>
-                      <div className="font-bold text-gray-900">{spec.value}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          {/* 오른쪽: 제품 이미지 */}
+          <div className="relative flex items-end justify-center self-end">
+            <img
+              src="/images/products/product.png"
+              alt="Digital Hologram 제품"
+              className="w-full h-auto object-contain scale-110"
+            />
           </div>
         </div>
       </div>

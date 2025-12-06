@@ -2,7 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(npm run build:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(vercel:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(git checkout:*)",
+      "Bash(cat:*)",
+      "Bash(if not exist scripts mkdir scripts)",
+      "Bash(npm install:*)",
+      "Bash(firebase:*)",
+      "Bash(gcloud --version:*)"
     ],
     "deny": [],
     "ask": []

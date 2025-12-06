@@ -56,7 +56,9 @@ export default function GenerationStep({ promptData, onComplete, onBack }: Gener
     try {
       const res = await aiService.generateVideo({
         sourceImageUrl: imageUrl,
-        prompt: `Create a holographic loop video, style: ${promptData.style}, slow rotation, glowing particles, 3d effect`
+        // prompt 생략 시 백엔드 기본 프롬프트 사용:
+        // "Create a seamless loop holographic video. Keep center image and text STATIC.
+        // Only animate the ring - it must rotate like a SPINNING WHEEL..."
       });
 
       if (res.success && res.videoUrl) {

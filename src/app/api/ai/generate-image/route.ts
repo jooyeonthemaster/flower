@@ -59,24 +59,36 @@ export async function POST(req: NextRequest) {
     const selectedStyle = stylePrompts[style] || stylePrompts['neon'];
 
     const systemPrompt = `
-      Task: Generate a high-quality 3D Hologram Wreath design.
-      
+      Task: Generate a high-quality 2D Hologram Wreath design for video animation.
+
       ${selectedStyle}
-      
-      CORE GUIDELINES:
-      - BACKGROUND: MUST be Pure Black (#000000). No studio lighting, no walls, no floor, no projector device visible.
+
+      CRITICAL COMPOSITION RULES:
+      - BACKGROUND: MUST be PURE BLACK (#000000). Absolutely no gray, no gradients, no studio lighting, no walls, no floor visible.
       - ASPECT RATIO: Cinematic Landscape (16:9) composition.
-      
+
+      CIRCULAR BORDER/RING (EXTREMELY IMPORTANT - READ CAREFULLY):
+      - The holographic ring MUST be viewed from STRAIGHT FRONT, like a circular picture frame hanging on a wall.
+      - Imagine a round mirror or circular photo frame mounted on a wall - you are looking at it directly from the front.
+      - The ring MUST appear as a PERFECT CIRCLE, NOT an ellipse.
+      - ABSOLUTELY NO tilting, NO 3D perspective, NO angle - the ring plane must be parallel to the camera/viewer.
+      - WRONG: Ring tilted like a hula hoop on the ground or at an angle.
+      - CORRECT: Ring perfectly upright and facing the viewer, like a circular portal or round picture frame.
+      - This is critical because the ring will be animated to rotate clockwise in 2D (spinning like a wheel).
+
       REFERENCE IMAGE HANDLING (CRITICAL):
-      - The provided image is a LOGO or SUBJECT that MUST BE PRESERVED EXACTLY in the center.
+      - The provided image is a LOGO, PERSON, or PRODUCT that MUST BE PRESERVED EXACTLY in the center.
+      - REMOVE any white background from the reference image - display it as a CUTOUT/KNOCKOUT image.
+      - The subject should appear cleanly isolated on the pure black background.
       - Do NOT distort, style-transfer, or reimagine the internal details of the reference image (especially faces or text).
-      - The reference image should appear as a flat 2D projection floating inside the holographic wreath.
-      - Apply the '${style}' effects ONLY to the surrounding wreath border and background particles.
-      
+      - The reference image should appear as a flat 2D element floating inside the holographic ring.
+      - Apply the '${style}' effects ONLY to the surrounding ring border and background particles, NOT to the subject.
+
       TEXT GENERATION:
       - Generate appropriate congratulatory text in KOREAN based on the category '${category}' and request '${prompt}'.
       - Example: "개업을 축하합니다", "결혼을 축하합니다".
-      - Text should be glowing and placed clearly below the logo.
+      - Text should be glowing and placed clearly below the subject.
+      - Text must also be on the pure black background, clearly visible.
     `;
 
     console.log(`Requesting image generation with model: gemini-3-pro-image-preview (Style: ${style})`);

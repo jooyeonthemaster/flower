@@ -1,16 +1,16 @@
 'use client'
 
 import { useAuth } from '@/contexts/AuthContext'
-import { TEMPLATES_WITH_DATA } from '@/data/templates'
 import { useProductWizard } from './hooks/useProductWizard'
 import ProgressBar from './components/ProgressBar'
 import LoginAlert from './components/LoginAlert'
 import StepNavigation from './components/StepNavigation'
 import ColorStep from './steps/ColorStep'
 import PeriodStep from './steps/PeriodStep'
-import CategoryStep from './steps/CategoryStep'
-import TemplateStep from './steps/TemplateStep'
-import DataInputStep from './steps/DataInputStep'
+import AIDesignStep from './steps/AIDesignStep'
+import AIGenerationStep from './steps/AIGenerationStep'
+import AIResultStep from './steps/AIResultStep'
+import DeliveryStep from './steps/DeliveryStep'
 import PaymentStep from './steps/PaymentStep'
 
 export default function ProductWizard() {
@@ -19,22 +19,28 @@ export default function ProductWizard() {
     currentStep,
     selectedColor,
     selectedPeriod,
-    selectedCategory,
-    selectedTemplate,
-    templateData,
+    aiDesignData,
+    generatedImageUrl,
+    generatedVideoUrl,
+    aiGenerationStatus,
+    deliveryInfo,
     agreements,
     showLoginAlert,
     setSelectedColor,
     setSelectedPeriod,
-    setSelectedCategory,
+    setDeliveryInfo,
     setAgreements,
     setShowLoginAlert,
+    setAIGenerationStatus,
+    setAIError,
+    resetAIGeneration,
     handleNextStep,
     handlePrevStep,
-    handleCategorySelect,
-    handleTemplateSelect,
-    handleTextFieldChange,
-    handleImageFieldChange
+    handleAIDesignSubmit,
+    handleImageGenerated,
+    handleVideoGenerated,
+    hasStartedGenerationRef,
+    setCurrentStep
   } = useProductWizard()
 
   // 제품 정보
@@ -89,7 +95,6 @@ export default function ProductWizard() {
   }
 
   const currentRental = productInfo.rentalOptions[selectedPeriod]
-  const selectedCategoryData = TEMPLATES_WITH_DATA.find(cat => cat.id === selectedCategory)
 
   // 로그인이 필요한 단계에서 로그인 체크
   const handleNext = () => {
@@ -100,19 +105,22 @@ export default function ProductWizard() {
     handleNextStep()
   }
 
-  const handleBackToCategory = () => {
-    setSelectedCategory('')
-    // currentStep을 3으로 설정하는 대신 handlePrevStep 사용
-    if (currentStep > 3) {
-      // 4단계에서 3단계로 돌아가는 경우
-      handlePrevStep()
-    }
+  // AI 결과에서 다시 만들기
+  const handleRegenerate = () => {
+    resetAIGeneration()
+    setCurrentStep(3) // AI 디자인 단계로 돌아가기
+  }
+
+  // AI 생성 단계에서 뒤로가기
+  const handleBackFromGeneration = () => {
+    resetAIGeneration()
+    handlePrevStep()
   }
 
   return (
     <section className="pt-24 pb-12 bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
+
         {/* 섹션 헤더 */}
         <div className="text-center mb-2">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-4">
@@ -127,9 +135,9 @@ export default function ProductWizard() {
         </div>
 
         {/* 로그인 알림 모달 */}
-        <LoginAlert 
-          show={showLoginAlert} 
-          onClose={() => setShowLoginAlert(false)} 
+        <LoginAlert
+          show={showLoginAlert}
+          onClose={() => setShowLoginAlert(false)}
         />
 
         {/* 진행 단계 표시 */}
@@ -137,10 +145,10 @@ export default function ProductWizard() {
 
         {/* 단계별 컨텐츠 */}
         <div className="min-h-[320px]">
-          
+
           {/* STEP 1: 색상 선택 */}
           {currentStep === 1 && (
-            <ColorStep 
+            <ColorStep
               selectedColor={selectedColor}
               onColorSelect={setSelectedColor}
             />
@@ -148,44 +156,64 @@ export default function ProductWizard() {
 
           {/* STEP 2: 기간 선택 */}
           {currentStep === 2 && (
-            <PeriodStep 
+            <PeriodStep
               selectedPeriod={selectedPeriod}
               onPeriodSelect={setSelectedPeriod}
             />
           )}
 
-          {/* STEP 3: 카테고리 선택 */}
+          {/* STEP 3: AI 디자인 */}
           {currentStep === 3 && (
-            <CategoryStep 
-              onCategorySelect={handleCategorySelect}
+            <AIDesignStep
+              initialData={aiDesignData}
+              onSubmit={handleAIDesignSubmit}
             />
           )}
 
-          {/* STEP 4: 템플릿 선택 */}
-          {currentStep === 4 && selectedCategoryData && (
-            <TemplateStep 
-              selectedCategory={selectedCategory}
-              onTemplateSelect={handleTemplateSelect}
-              onBackToCategory={handleBackToCategory}
+          {/* STEP 4: AI 생성 */}
+          {currentStep === 4 && (
+            <AIGenerationStep
+              designData={aiDesignData}
+              generationStatus={aiGenerationStatus}
+              generatedImageUrl={generatedImageUrl}
+              onStatusChange={setAIGenerationStatus}
+              onImageGenerated={handleImageGenerated}
+              onVideoGenerated={handleVideoGenerated}
+              onError={setAIError}
+              onBack={handleBackFromGeneration}
+              hasStartedRef={hasStartedGenerationRef}
             />
           )}
 
-          {/* STEP 5: 템플릿 정보 입력 */}
-          {currentStep === 5 && selectedTemplate && (
-            <DataInputStep 
-              selectedTemplate={selectedTemplate}
-              templateData={templateData}
-              onTextFieldChange={handleTextFieldChange}
-              onImageFieldChange={handleImageFieldChange}
+          {/* STEP 5: 결과 확인 */}
+          {currentStep === 5 && generatedVideoUrl && (
+            <AIResultStep
+              videoUrl={generatedVideoUrl}
+              designData={aiDesignData}
+              onRegenerate={handleRegenerate}
+              onNext={handleNextStep}
             />
           )}
 
-          {/* STEP 6: 최종 확인 및 결제 */}
+          {/* STEP 6: 배송/설치 정보 */}
           {currentStep === 6 && (
-            <PaymentStep 
+            <DeliveryStep
+              deliveryInfo={deliveryInfo}
+              onUpdate={setDeliveryInfo}
+              onNext={handleNextStep}
+              onPrev={handlePrevStep}
+            />
+          )}
+
+          {/* STEP 7: 최종 확인 및 결제 */}
+          {currentStep === 7 && (
+            <PaymentStep
               selectedColor={selectedColor}
-              selectedTemplate={selectedTemplate!}
-              selectedCategoryData={selectedCategoryData}
+              selectedPeriod={selectedPeriod}
+              aiDesignData={aiDesignData}
+              generatedVideoUrl={generatedVideoUrl}
+              generatedImageUrl={generatedImageUrl}
+              deliveryInfo={deliveryInfo}
               currentRental={currentRental}
               productInfo={productInfo}
               agreements={agreements}
@@ -194,17 +222,23 @@ export default function ProductWizard() {
           )}
         </div>
 
-        {/* 하단 버튼 */}
-        <StepNavigation 
-          currentStep={currentStep}
-          selectedColor={selectedColor}
-          selectedTemplate={selectedTemplate}
-          templateData={templateData}
-          agreements={agreements}
-          currentRental={currentRental}
-          onNext={handleNext}
-          onPrev={handlePrevStep}
-        />
+        {/* 하단 버튼 - Step 3, 4, 5, 6은 자체 네비게이션 사용 */}
+        {(currentStep === 1 || currentStep === 2 || currentStep === 7) && (
+          <StepNavigation
+            currentStep={currentStep}
+            selectedColor={selectedColor}
+            selectedPeriod={selectedPeriod}
+            aiDesignData={aiDesignData}
+            generatedImageUrl={generatedImageUrl}
+            generatedVideoUrl={generatedVideoUrl}
+            deliveryInfo={deliveryInfo}
+            agreements={agreements}
+            currentRental={currentRental}
+            deposit={productInfo.baseServices.deposit}
+            onNext={handleNext}
+            onPrev={handlePrevStep}
+          />
+        )}
       </div>
     </section>
   )

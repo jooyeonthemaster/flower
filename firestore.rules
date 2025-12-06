@@ -1,0 +1,73 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 관리자 확인 함수
+    function isAdmin() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // 인증된 사용자 확인
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 본인 확인
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // users 컬렉션
+    match /users/{userId} {
+      // 읽기: 본인 또는 관리자
+      allow read: if isOwner(userId) || isAdmin();
+
+      // 생성: 인증된 사용자가 본인 문서 생성
+      allow create: if isOwner(userId);
+
+      // 수정: 본인(role 제외) 또는 관리자(모든 필드)
+      allow update: if isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
+                    || isAdmin();
+
+      // 삭제: 관리자만
+      allow delete: if isAdmin();
+    }
+
+    // orders 컬렉션
+    match /orders/{orderId} {
+      // 읽기: 본인 주문 또는 관리자
+      allow read: if isAuthenticated() &&
+                  (resource.data.userId == request.auth.uid || isAdmin());
+
+      // 생성: 인증된 사용자가 본인 주문 생성
+      allow create: if isAuthenticated() &&
+                    request.resource.data.userId == request.auth.uid;
+
+      // 수정: 관리자만 (상태 변경 등)
+      allow update: if isAdmin();
+
+      // 삭제: 관리자만
+      allow delete: if isAdmin();
+    }
+
+    // refund_requests 컬렉션
+    match /refund_requests/{refundId} {
+      // 읽기: 본인 환불 요청 또는 관리자
+      allow read: if isAuthenticated() &&
+                  (resource.data.userId == request.auth.uid || isAdmin());
+
+      // 생성: 인증된 사용자가 본인 환불 요청 생성
+      allow create: if isAuthenticated() &&
+                    request.resource.data.userId == request.auth.uid;
+
+      // 수정: 관리자만 (승인/거절 처리)
+      allow update: if isAdmin();
+
+      // 삭제: 관리자만
+      allow delete: if isAdmin();
+    }
+  }
+}

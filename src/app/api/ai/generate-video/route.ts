@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
 // Vercel Pro plan: 최대 300초 (5분)
 export const maxDuration = 300;
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
     // 2. Veo 3.1 영상 생성 요청 (16:9 비율 강제)
     let operation = await client.models.generateVideos({
       model: "veo-3.1-generate-preview",
-      prompt: prompt || "Make this hologram animated, slow 360 degree rotation, glowing particles, 8k resolution, cinematic lighting",
+      prompt: prompt || "Create a seamless loop holographic video. Keep center image and text STATIC. Only animate the ring - it must rotate like a SPINNING WHEEL around its center axis while staying FLAT and facing the camera. NO 3D flipping. Clockwise rotation like a loading spinner.",
       image: {
         imageBytes: imageBase64,
         mimeType: mimeType,
@@ -81,13 +82,29 @@ export async function POST(req: NextRequest) {
 
     console.log('Video generation complete. Response:', JSON.stringify(operation.response, null, 2));
 
-    if (operation.response?.generatedVideos?.[0]?.video) {
-      const videoFile = operation.response.generatedVideos[0].video;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = operation.response as any;
+
+    // RAI (Responsible AI) 콘텐츠 필터링 체크
+    if (response?.raiMediaFilteredReasons?.length > 0) {
+      const reason = response.raiMediaFilteredReasons[0];
+      console.error('Video filtered by RAI:', reason);
+
+      // 유명인 감지 에러를 사용자 친화적 메시지로 변환
+      if (reason.includes('celebrity')) {
+        throw new Error('이미지에서 유명인이 감지되어 영상 생성이 제한되었습니다. 로고나 제품 이미지를 사용해주세요.');
+      }
+      throw new Error(`콘텐츠 정책으로 인해 영상 생성이 제한되었습니다: ${reason}`);
+    }
+
+    if (response?.generatedVideos?.[0]?.video) {
+      const videoFile = response.generatedVideos[0].video;
       const filename = `hologram_video_${Date.now()}.mp4`;
 
-      // Vercel serverless 환경: /tmp 디렉토리 사용 (임시)
-      const saveDir = '/tmp';
+      // OS별 임시 디렉토리 사용 (Windows: AppData/Local/Temp, Linux/Vercel: /tmp)
+      const saveDir = os.tmpdir();
       const filepath = path.join(saveDir, filename);
+      console.log('Saving video to:', filepath);
 
       await client.files.download({
         file: videoFile,
