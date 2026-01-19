@@ -10,11 +10,23 @@
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@imgly/background-removal": "^1.7.0",
     "@portone/browser-sdk": "^0.1.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "@remotion/bundler": "^4.0.404",
+    "@remotion/cli": "^4.0.404",
+    "@remotion/player": "^4.0.404",
+    "@remotion/renderer": "^4.0.404",
+    "ffmpeg-static": "^5.3.0",
     "firebase": "^12.0.0",
+    "firebase-admin": "^13.6.0",
     "next": "15.4.2",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "remotion": "^4.0.404",
+    "three": "^0.182.0",
+    "troika-three-text": "^0.52.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -22,6 +34,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.182.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.2",
     "tailwindcss": "^4",

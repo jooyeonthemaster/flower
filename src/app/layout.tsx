@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
+import Script from 'next/script'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -67,6 +68,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={`scroll-smooth ${inter.variable} ${playfair.variable}`}>
+      <head>
+        {/* Google Fonts for Hologram Text Effects - 개성있는 폰트 모음 */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Nanum+Gothic:wght@400;700;800&family=Black+Han+Sans&family=Jua&family=Do+Hyeon&family=Dokdo&family=Gugi&family=Gaegu:wght@400;700&family=Gamja+Flower&family=Hi+Melody&family=Poor+Story&family=Stylish&family=Sunflower:wght@500;700&family=East+Sea+Dokdo&family=Song+Myung&family=Nanum+Myeongjo:wght@400;700;800&family=Nanum+Pen+Script&family=Cute+Font&family=Single+Day&family=Roboto:wght@400;700;900&family=Montserrat:wght@400;700;900&family=Anton&family=Bebas+Neue&family=Oswald:wght@700&family=Righteous&family=Russo+One&family=Bungee&family=Fredoka+One&family=Pacifico&family=Lobster&family=Playfair+Display:wght@700;900&family=Cinzel:wght@700;900&family=Lora:wght@700&family=Merriweather:wght@700;900&family=Raleway:wght@700;900&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Audiowide&family=Bangers&family=Permanent+Marker&family=Creepster&family=Rock+Salt&family=VT323&family=Open+Sans:wght@700;800&family=Poppins:wght@700;900&family=Shadows+Into+Light&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="antialiased">
         <AuthProvider>
           {children}

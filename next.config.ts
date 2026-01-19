@@ -9,6 +9,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverExternalPackages: [
+    '@remotion/bundler',
+    '@remotion/renderer',
+    'esbuild',
+    'sharp'
+  ],
+  webpack: (config) => {
+    config.externals.push({
+      sharp: 'commonjs sharp',
+    });
+    return config;
+  },
 };
 
 export default nextConfig;

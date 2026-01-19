@@ -51,12 +51,14 @@ export default function GenerationStep({ promptData, onComplete, onBack }: Gener
 
   const startVideoGeneration = async () => {
     if (!imageUrl) return;
-    
+
     setStatus('generating-video');
     try {
-      const res = await aiService.generateVideo({
+      // Higgsfield API로 영상 생성
+      const res = await aiService.generateVideoHiggsfield({
         sourceImageUrl: imageUrl,
-        prompt: `Create a holographic loop video, style: ${promptData.style}, slow rotation, glowing particles, 3d effect`
+        prompt: `Spectacular holographic fireworks: massive energy burst from center, particles exploding outward in all directions, glowing light rays radiating and expanding, pulsating celebration effects, style: ${promptData.style}, NO rotation, only radial explosion patterns, ultra vivid and dynamic`,
+        duration: 5,
       });
 
       if (res.success && res.videoUrl) {
