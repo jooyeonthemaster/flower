@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
     'esbuild',
     'sharp'
   ],
+  // Next.js 16+ Turbopack configuration
+  turbopack: {},
   webpack: (config) => {
     config.externals.push({
       sharp: 'commonjs sharp',
