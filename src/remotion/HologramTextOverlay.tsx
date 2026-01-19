@@ -281,25 +281,48 @@ const KineticText: React.FC<{
     : '';
 
   // Position Logic - 상중하만 지원 (% 단위 사용 - Remotion 렌더링 호환)
+  // 이펙트들이 Y축으로 최대 ±150px 움직일 수 있으므로 안전한 마진 확보
+  // 1080px 기준: 상단 30%=324px, 중앙 50%=540px, 하단 68%=734px
   const leftPos = '50%'; // 항상 가로 중앙
-  let topPos = '75%'; // 기본값 (하단)
+  let topPos = '68%'; // 기본값 (하단) - 75% → 68%로 조정
 
   if (textPosition === 'random') {
     const randVal = seed % 1; // 0~1 범위로 정규화
     if (randVal < 0.33) { // Top
-      topPos = '20%'; // 상단
+      topPos = '30%'; // 상단 - 20% → 30%로 조정 (이펙트 마진 확보)
     } else if (randVal < 0.66) { // Middle
-      topPos = '50%'; // 중앙
+      topPos = '50%'; // 중앙 - 변경 없음
     } else { // Bottom
-      topPos = '75%'; // 하단
+      topPos = '68%'; // 하단 - 75% → 68%로 조정
     }
   } else if (textPosition === 'top') {
-    topPos = '20%'; // 상단
+    topPos = '30%'; // 상단 - 20% → 30%로 조정
   } else if (textPosition === 'center') {
-    topPos = '50%'; // 중앙
+    topPos = '50%'; // 중앙 - 변경 없음
   } else if (textPosition === 'bottom') {
-    topPos = '75%'; // 하단
+    topPos = '68%'; // 하단 - 75% → 68%로 조정
   }
+
+  // Y축 이동량 계산 및 클램프 (프레임 밖으로 나가지 않도록 제한)
+  const rawYOffset = driftY + waveY + bounceY + spiralY + orbitY + flipUpY + wave3dY;
+  const rawXOffset = driftX + spiralX + swingX + slideX + orbitX;
+
+  // 위치에 따른 Y축 이동 제한값 (1080px 기준)
+  // 상단(30%=324px): 위로 -150px, 아래로 +200px 제한
+  // 중앙(50%=540px): 위로 -250px, 아래로 +250px 제한
+  // 하단(68%=734px): 위로 -200px, 아래로 +150px 제한
+  let maxYUp = -250;
+  let maxYDown = 250;
+  if (topPos === '30%') {
+    maxYUp = -120; // 상단은 위로 덜 움직이게
+    maxYDown = 200;
+  } else if (topPos === '68%') {
+    maxYUp = -200;
+    maxYDown = 120; // 하단은 아래로 덜 움직이게
+  }
+
+  const clampedYOffset = Math.max(maxYUp, Math.min(maxYDown, rawYOffset));
+  const clampedXOffset = Math.max(-150, Math.min(150, rawXOffset)); // X축도 제한
 
   const containerStyle: React.CSSProperties = {
     position: 'absolute',
@@ -310,8 +333,8 @@ const KineticText: React.FC<{
     transform: `
       translate(-50%, -50%)
       translate(
-        ${driftX + spiralX + swingX + slideX + orbitX}px,
-        ${driftY + waveY + bounceY + spiralY + orbitY + flipUpY + wave3dY}px
+        ${clampedXOffset}px,
+        ${clampedYOffset}px
       )
       translateZ(${zoomInZ + flipUpZ + spiral3dZ + wave3dZ + tumbleZ}px)
       rotateX(${rotateX + flipUpRotateX + spiral3dRotateX + wave3dRotateX + tumbleRotateX}deg)
