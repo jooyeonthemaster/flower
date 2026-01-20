@@ -1,0 +1,7 @@
+# Large files
+node_modules
+.next
+public/templates/videos/backup
+*.mp4
+my-hologram.mp4
+flower-63624-firebase-adminsdk-fbsvc-e0b1cf0f43.json
