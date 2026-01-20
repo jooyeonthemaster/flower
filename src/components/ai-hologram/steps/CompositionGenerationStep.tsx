@@ -80,15 +80,30 @@ export default function CompositionGenerationStep({
     // 0. 이미지를 먼저 Firebase Storage에 업로드 (413 에러 방지)
     const timestamp = Date.now();
     console.log(`[Phase 1] Uploading images to Firebase Storage...`);
+    console.log(`[Phase 1] Start Frame Length: ${startFrame.length}, End Frame Length: ${endFrame.length}`);
 
-    const [startImageUrl, endImageUrl] = await Promise.all([
-      uploadImageToStorage(startFrame, `start-${index}-${timestamp}.png`),
-      uploadImageToStorage(endFrame, `end-${index}-${timestamp}.png`),
-    ]);
+    let startImageUrl: string;
+    let endImageUrl: string;
 
-    console.log(`[Phase 1] Images uploaded:`, { startImageUrl, endImageUrl });
+    try {
+      [startImageUrl, endImageUrl] = await Promise.all([
+        uploadImageToStorage(startFrame, `start-${index}-${timestamp}.png`),
+        uploadImageToStorage(endFrame, `end-${index}-${timestamp}.png`),
+      ]);
+      console.log(`[Phase 1] Upload success. Start URL: ${startImageUrl.substring(0, 50)}..., End URL: ${endImageUrl.substring(0, 50)}...`);
+    } catch (error) {
+      console.error('Firebase Upload Error:', error);
+      throw new Error(`이미지 업로드 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+    }
+
+    // Critical Check: 413 에러 방지를 위해 Data URL인지 확인
+    if (startImageUrl.startsWith('data:') || endImageUrl.startsWith('data:')) {
+      console.error('Critical: Data URL detected, aborting API call');
+      throw new Error('이미지가 정상적으로 업로드되지 않았습니다. (Data URL 감지됨)');
+    }
 
     // 1. Job 시작 요청 (URL만 전송하여 413 에러 방지)
+    console.log('[Phase 1] Sending API Request...');
     const startResponse = await fetch('/api/ai/generate-video-startend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -103,8 +118,14 @@ export default function CompositionGenerationStep({
       }),
     });
 
+    if (startResponse.status === 413) {
+      throw new Error(`요청 용량 초과 (413 Payload Too Large) - 이미지가 제대로 업로드되지 않았을 수 있습니다. URL 길이: ${startImageUrl.length}`);
+    }
+
     if (!startResponse.ok) {
-      throw new Error(`영상 생성 시작 실패 (${index + 1}번째)`);
+      const errText = await startResponse.text();
+      console.error('API Error Body:', errText);
+      throw new Error(`영상 생성 시작 실패 (${index + 1}번째): ${startResponse.status} ${startResponse.statusText}`);
     }
 
     const startResult = await startResponse.json();
