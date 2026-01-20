@@ -4,10 +4,27 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { CompositionData } from './CompositionInputStep';
 import { GeneratedDualFrame } from './CompositionImagePreviewStep';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // 테스트 모드에서 사용할 모델
 // 지원 모델: dop-lite, dop-preview, dop-turbo, kling-2.5-turbo-pro
 const TEST_MODEL = 'kling-2.5-turbo-pro';
+
+// Data URL을 Firebase Storage에 업로드하고 공개 URL 반환
+const uploadImageToStorage = async (dataUrl: string, filename: string): Promise<string> => {
+  // Data URL을 Blob으로 변환
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
+
+  // Firebase Storage에 업로드
+  const storageRef = ref(storage, `ai-videos/${filename}`);
+  await uploadBytes(storageRef, blob);
+
+  // 다운로드 URL 가져오기
+  const downloadUrl = await getDownloadURL(storageRef);
+  return downloadUrl;
+};
 
 interface CompositionGenerationStepProps {
   data: CompositionData;
@@ -53,21 +70,36 @@ export default function CompositionGenerationStep({
   const generateStartEndVideo = async (
     startFrame: string,
     endFrame: string,
-    text: string,
-    index: number
+    _text: string,
+    index: number,
+    style: string,
+    category: string
   ): Promise<string> => {
-    console.log(`[Phase 1] Starting video generation ${index + 1}/${sceneCount} with model: ${selectedModel}`);
+    console.log(`[Phase 1] Starting video generation ${index + 1}/${sceneCount} with model: ${selectedModel}, style: ${style}, category: ${category}`);
 
-    // 1. Job 시작 요청
+    // 0. 이미지를 먼저 Firebase Storage에 업로드 (413 에러 방지)
+    const timestamp = Date.now();
+    console.log(`[Phase 1] Uploading images to Firebase Storage...`);
+
+    const [startImageUrl, endImageUrl] = await Promise.all([
+      uploadImageToStorage(startFrame, `start-${index}-${timestamp}.png`),
+      uploadImageToStorage(endFrame, `end-${index}-${timestamp}.png`),
+    ]);
+
+    console.log(`[Phase 1] Images uploaded:`, { startImageUrl, endImageUrl });
+
+    // 1. Job 시작 요청 (URL만 전송하여 413 에러 방지)
     const startResponse = await fetch('/api/ai/generate-video-startend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        startImageUrl: startFrame,
-        endImageUrl: endFrame,
+        startImageUrl,
+        endImageUrl,
         model: selectedModel,
         motionStrength: 0.6,
         duration: 10,
+        style,    // 추가: 스타일 전달
+        category, // 추가: 카테고리 전달
       }),
     });
 
@@ -165,7 +197,9 @@ export default function CompositionGenerationStep({
             frame.startFrameUrl,
             frame.endFrameUrl,
             frame.message,
-            index
+            index,
+            _data.style || 'fancy',    // style 전달
+            _data.category || 'event'  // category 전달
           );
 
           // 각 영상 완료시 progress 업데이트
@@ -216,7 +250,7 @@ export default function CompositionGenerationStep({
       setPhase('error');
       setErrorMessage(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
     }
-  }, [sceneCount, generatedFrames, selectedModel, onComplete]);
+  }, [sceneCount, generatedFrames, selectedModel, onComplete, _data.style, _data.category]);
 
   // 컴포넌트 마운트 시 생성 시작
   useEffect(() => {
