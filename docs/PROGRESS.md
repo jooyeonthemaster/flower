@@ -40,6 +40,31 @@
 
 ## 최근 수정 사항 (2026-01-23)
 
+### 프리미엄 버전 UX 개선
+
+#### 1. 예상 시간 및 경과 시간 표시
+- **대상**: AI 이미지 생성 + AI 영상 생성
+- **기능**:
+  - 경과 시간 실시간 표시 (0:00 형식)
+  - 전체 예상 시간 "약 5~10분" 안내
+  - 완료 시 총 소요 시간 표시
+- **수정 파일**:
+  - `src/components/ai-hologram/steps/CompositionImagePreviewStep.tsx`
+  - `src/components/ai-hologram/steps/CompositionGenerationStep/index.tsx`
+  - `src/components/ai-hologram/steps/CompositionGenerationStep/components/ProgressPanel.tsx`
+
+#### 2. 페이지 이탈 경고 기능
+- **대상**: AI 이미지 생성 + AI 영상 생성 중일 때
+- **기능**:
+  - 탭 닫기/새로고침 시 브라우저 경고창 표시 (beforeunload)
+  - 뒤로가기 버튼 클릭 시 확인 대화상자 표시 (popstate)
+- **구현 방식**:
+  - `historyPushedRef`로 더미 히스토리 1회만 추가
+  - 사용자가 "취소" 선택 시 히스토리 다시 추가
+  - 생성 완료 후 자동으로 경고 비활성화
+
+---
+
 ### Vercel Pro 배포 및 핵심 인프라 구축
 
 #### 1. 413 Payload Too Large 에러 해결
@@ -284,6 +309,8 @@ NEXT_PUBLIC_PORTONE_CHANNEL_KEY=
 
 ## 최근 해결 완료 (2026-01-23)
 
+- [x] 프리미엄 버전 예상 시간 표시 (약 5~10분) ✅
+- [x] 프리미엄 버전 페이지 이탈 경고 (beforeunload + popstate) ✅
 - [x] Vercel Pro 배포 ✅
 - [x] 413 Payload Too Large 에러 해결 ✅
 - [x] Vercel에서 FFmpeg 작동 문제 해결 ✅
