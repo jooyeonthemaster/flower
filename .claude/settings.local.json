@@ -47,8 +47,7 @@
       "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: 참조 이미지 기능 임시 비활성화 및 예상 시간 수정\n\n- 참조 이미지 업로드 UI 비활성화 \\(버그 해결 후 복원 예정\\)\n- 예상 시간 표시 5분 → 5~10분으로 수정\n- Canvas 기반 렌더링 시스템 개선\n- 백업 문서 추가 \\(docs/REFERENCE-IMAGE-BACKUP.md\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git commit:*)",
       "Bash(node scripts/upload-templates.js:*)",
-      "Bash(node scripts/set-cors.js:*)",
-      "Bash(npm run lint)"
+      "Bash(node scripts/set-cors.js:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\jayit\\OneDrive\\바탕 화면\\roqkf\\flower\\src\\components\\ai-hologram\\steps\\TextPreviewStep"

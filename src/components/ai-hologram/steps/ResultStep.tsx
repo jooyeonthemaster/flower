@@ -15,15 +15,17 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
   const [isReversing, setIsReversing] = useState(false);
   const [playCount, setPlayCount] = useState(0);
 
-  const isPremium = isCompositionMode;
+  console.log('ResultStep - videoUrl:', videoUrl?.substring(0, 50) + '...');
+  console.log('ResultStep - isCompositionMode:', isCompositionMode);
 
   const handleSendToAdmin = () => {
     alert('관리자에게 영상이 전송되었습니다. 확인 후 연락드리겠습니다.');
   };
 
-  // Ping-Pong Playback Logic (Premium Only)
+  // Composition 모드가 아닌 경우 (Single Mode) - 이미 완성된 30초 영상이므로 loop 속성만 사용
+  // Composition 모드인 경우 - ping-pong 재생 로직 사용
   useEffect(() => {
-    if (!isCompositionMode) return;
+    if (!isCompositionMode) return; // Single Mode는 video loop 속성으로 처리
 
     const video = videoRef.current;
     if (!video) return;
@@ -44,8 +46,10 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
     const reversePlay = () => {
       const step = () => {
         if (!videoRef.current) return;
+
         // 역재생: 시간을 뒤로 감기
         lastTime -= 0.033; // 약 30fps
+
         if (lastTime <= 0) {
           // 역재생 완료 → 다시 정방향
           videoRef.current.currentTime = 0;
@@ -54,126 +58,156 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
           videoRef.current.play();
           return;
         }
+
         videoRef.current.currentTime = lastTime;
         animationFrameId = requestAnimationFrame(step);
       };
+
       animationFrameId = requestAnimationFrame(step);
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
+
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
     };
   }, [isReversing, isCompositionMode]);
 
+  // 4회 ping-pong 후 계속 반복 (무한 루프)
   useEffect(() => {
-    if (playCount >= 4) setPlayCount(0);
+    if (playCount >= 4) {
+      setPlayCount(0);
+    }
   }, [playCount]);
 
-  return (
-    <div className="w-full h-full flex flex-col items-center">
+  // Theme helpers
+  const isPremium = isCompositionMode;
+  const theme = {
+    panel: isPremium
+      ? 'bg-gradient-to-br from-slate-900/80 to-black/80 border-amber-500/20 shadow-[0_0_30px_-5px_rgba(245,158,11,0.1)]'
+      : 'bg-slate-900/40 border-blue-500/10 shadow-lg',
+    accentText: isPremium ? 'text-amber-500' : 'text-blue-500',
+    accentBg: isPremium ? 'bg-amber-500' : 'bg-blue-500',
+    accentBorder: isPremium ? 'border-amber-500/50' : 'border-blue-500/50',
+    buttonPrimary: isPremium ? 'bg-gradient-to-r from-amber-600 to-amber-500 hover:shadow-amber-500/30' : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:shadow-blue-500/30',
+    badge: isPremium ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'
+  };
 
-      {/* 타이틀 */}
-      <div className="text-center mb-8 animate-fadeIn">
-        <h2 className={`text-3xl font-display font-bold mb-2 ${isPremium ? 'text-gradient-gold' : 'text-blue-400'}`}>
-          {isPremium ? '프리미엄 홀로그램 완성' : '홀로그램 영상 생성 완료'}
-        </h2>
-        <p className={`${isPremium ? 'text-amber-500/60' : 'text-blue-400/60'} font-light`}>
-          나만의 홀로그램 영상이 완성되었습니다.
+  return (
+    <div className="animate-fade-in h-full flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="flex-none mb-6 text-center lg:text-left">
+        <h1 className="text-3xl font-extrabold text-white mb-2 drop-shadow-sm flex items-center justify-center lg:justify-start gap-3">
+          {isPremium && <span className="text-amber-500">Premium</span>}
+          <span>나만의 홀로그램 완성</span>
+        </h1>
+        <p className="text-gray-400 text-sm">
+          모든 작업이 완료되었습니다. 영상을 확인하고 저장하세요.
         </p>
       </div>
 
-      {/* Main 2-Column Layout */}
-      <div className="w-full max-w-[1920px] grid grid-cols-1 lg:grid-cols-2 gap-8 items-center h-[calc(100vh-250px)] min-h-[600px]">
+      {/* Main Content - 1:1 Split on Desktop */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 items-center justify-center">
+        {/* Left Side: Video Output */}
+        <div className="flex flex-col items-center justify-center min-h-0 w-full">
+          <div className={`w-full max-w-[700px] aspect-square flex flex-col items-center justify-center rounded-[1.5rem] backdrop-blur-md overflow-hidden relative group border ${theme.panel}`}>
 
-        {/* LEFT: Video Output */}
-        <div className="h-full flex flex-col items-center justify-center relative">
-          <div className={`relative w-full max-w-[700px] aspect-square rounded-2xl overflow-hidden shadow-2xl bg-black group ${isPremium ? 'shadow-[0_0_50px_-10px_rgba(245,158,11,0.2)]' : 'shadow-blue-500/20'}`}>
+            {/* Ambient Glow */}
+            <div className={`absolute inset-0 ${isPremium ? 'bg-amber-500/5' : 'bg-blue-500/5'} blur-3xl rounded-full scale-150 pointer-events-none`}></div>
 
-            {/* Frame Border */}
-            <div className={`absolute inset-0 border-2 z-20 pointer-events-none rounded-2xl ${isPremium ? 'border-amber-500/20' : 'border-blue-500/20'}`}></div>
-
-            <video
-              ref={videoRef}
-              src={videoUrl}
-              autoPlay
-              muted
-              loop={!isCompositionMode}
-              playsInline
-              controls
-              className="w-full h-full object-contain relative z-10"
-            />
+            <div className="relative w-full h-full flex items-center justify-center p-4">
+              <div className="relative w-full h-full rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 bg-black">
+                <video
+                  ref={videoRef}
+                  src={videoUrl}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
 
             {/* Status Badge */}
-            <div className="absolute top-6 left-6 z-30">
-              <div className={`px-4 py-2 rounded-full border backdrop-blur-md text-xs font-bold flex items-center gap-2 ${isPremium
-                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                : 'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                }`}>
+            <div className="absolute top-6 left-6 z-20">
+              <div className={`px-4 py-2 rounded-full border backdrop-blur-md text-sm font-bold flex items-center gap-2 ${isPremium ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-blue-500/10 border-blue-500/30 text-blue-400'}`}>
                 <span className="w-2 h-2 rounded-full bg-current animate-pulse"></span>
-                최종 결과물 (FINAL RENDER)
+                최종 완성본
               </div>
             </div>
           </div>
         </div>
 
-        {/* RIGHT: Actions */}
-        <div className={`h-full max-h-[600px] glass-panel rounded-2xl p-8 flex flex-col justify-between animate-fadeIn ${isPremium ? 'border-amber-500/20 shadow-[0_0_30px_-5px_rgba(245,158,11,0.05)]' : 'border-blue-500/20'
-          }`} style={{ animationDelay: '0.2s' }}>
-
-          <div>
-            <h3 className={`font-display font-bold text-lg mb-6 flex items-center gap-3 ${isPremium ? 'text-amber-500' : 'text-blue-400'}`}>
-              <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${isPremium ? 'bg-amber-500/20' : 'bg-blue-500/20'}`}>✓</span>
-              프로젝트 요약 (PROJECT SUMMARY)
-            </h3>
-
-            <div className="bg-black/20 rounded-xl p-6 border border-white/5 space-y-4">
-              <div className="flex justify-between items-center text-sm border-b border-white/5 pb-3">
-                <span className="text-gray-500">영상 타입</span>
-                <span className="text-gray-200 font-bold">{isPremium ? 'Premium Composition' : 'Standard Template'}</span>
+        {/* Right Side: Actions & Details */}
+        <div className="flex flex-col items-center justify-center min-h-0 w-full">
+          <div className="w-full max-w-[700px] aspect-square flex flex-col gap-4 min-h-0">
+            <div className={`flex-1 flex flex-col rounded-[1.5rem] backdrop-blur-sm overflow-hidden border ${theme.panel}`}>
+              <div className="p-6 pb-4 border-b border-white/5 bg-white/5">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${theme.badge}`}>✓</span>
+                  결과 관리
+                </h3>
               </div>
-              <div className="flex justify-between items-center text-sm border-b border-white/5 pb-3">
-                <span className="text-gray-500">재생 시간</span>
-                <span className="text-gray-200 font-bold">30초 (Loop)</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">해상도</span>
-                <span className="text-gray-200 font-bold">1080 x 1080 (1:1)</span>
+
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+
+                {/* Scene Info Summary */}
+                <div className="bg-black/20 rounded-xl p-5 border border-white/5">
+                  <p className="text-sm text-gray-400 mb-3 font-bold uppercase tracking-wider">Project Summary</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Video Type</span>
+                      <span className="text-white font-medium">{isPremium ? 'Premium Composition' : 'Standard Template'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Duration</span>
+                      <span className="text-white font-medium">30s Loop</span>
+                    </div>
+                    {scenes && scenes.length > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Text Scenes</span>
+                        <span className={`font-bold ${theme.accentText}`}>{scenes.length} Scenes</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="space-y-4">
+                  <button
+                    onClick={handleSendToAdmin}
+                    className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all hover:-translate-y-1 flex items-center justify-center gap-2 ${theme.buttonPrimary}`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                    관리자에게 전송
+                  </button>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <a
+                      href={videoUrl}
+                      download="my-hologram.mp4"
+                      className="py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                      다운로드
+                    </a>
+                    <button
+                      onClick={onReset}
+                      className="py-3 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 font-bold transition-all"
+                    >
+                      처음으로
+                    </button>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
-
-          <div className="space-y-4">
-            <button
-              onClick={handleSendToAdmin}
-              className={`w-full py-5 rounded-xl font-bold text-lg text-black shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 ${isPremium
-                ? 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 shadow-amber-500/20'
-                : 'bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 shadow-blue-500/20'
-                }`}
-            >
-              <span>홀로그램 기기로 전송</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-            </button>
-
-            <div className="grid grid-cols-2 gap-3">
-              <a
-                href={videoUrl}
-                download="my-hologram.mp4"
-                className="py-4 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                다운로드
-              </a>
-              <button
-                onClick={onReset}
-                className="py-4 rounded-xl border border-white/10 text-gray-500 font-bold hover:bg-white/5 hover:text-gray-300 transition-all"
-              >
-                처음으로
-              </button>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>

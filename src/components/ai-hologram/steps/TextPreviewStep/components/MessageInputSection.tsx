@@ -1,5 +1,5 @@
 import { SceneData } from '../../MultiSceneStep';
-import { getKeywordsForCategory } from '../constants/keywordMessages';
+import { getKeywordsForCategory, keywordMessageSets } from '../constants/keywordMessages';
 
 interface MessageInputSectionProps {
   category: string;
@@ -24,8 +24,19 @@ export default function MessageInputSection({
   const keywords = getKeywordsForCategory(category);
 
   const handleKeywordSelect = (keyword: string) => {
-    // 부모 컴포넌트의 selectKeyword가 씬 업데이트를 처리함
+    const messageSet = keywordMessageSets[category]?.[keyword];
+    if (!messageSet) return;
+
+    const newScenes = scenes.map((scene, index) => ({
+      ...scene,
+      text: messageSet[index] || scene.text,
+    }));
+
     onKeywordSelect(keyword);
+    // Note: Parent component should handle updating scenes
+    newScenes.forEach((scene) => {
+      onSceneChange(scene.id, scene.text);
+    });
   };
 
   return (

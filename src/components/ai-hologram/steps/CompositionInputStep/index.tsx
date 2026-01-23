@@ -6,7 +6,7 @@ import {
   EventInfo,
   CompositionInputStepProps,
 } from './types';
-import { keywordMessageSets } from './constants/keywordMessages';
+import { keywordMessageSets, getKeywordsForCategory } from './constants/keywordMessages';
 import CategorySelector from './components/CategorySelector';
 import StyleSelector from './components/StyleSelector';
 import EventInfoFields from './components/EventInfoFields';
@@ -109,116 +109,81 @@ export default function CompositionInputStep({ onNext, initialData, onBack }: Co
   const isValid = filledCount >= 1;
 
   return (
-    <div className="w-full h-full flex flex-col items-center">
-
-      {/* 타이틀 */}
-      <div className="text-center mb-8 animate-fadeIn">
-        <h2 className="text-3xl font-display font-bold mb-2 text-gradient-gold">AI 프리미엄 생성</h2>
-        <p className="text-amber-500/60 font-light">AI가 당신만의 스토리를 분석하여 독창적인 영상을 설계합니다.</p>
+    <div className="animate-fade-in-down h-full flex flex-col overflow-hidden">
+      {/* 상단 헤더: Premium 테마 */}
+      <div className="flex-none mb-6 text-center lg:text-left">
+        <h1 className="text-3xl font-extrabold text-white mb-2 drop-shadow-sm">
+          AI 프리미엄 홀로그램 제작
+        </h1>
+        <p className="text-gray-400 text-sm">
+          AI가 당신만의 특별한 스토리를 완전히 새로운 영상으로 창조합니다.
+        </p>
       </div>
 
-      {/* 메인 3분할 레이아웃 - Dashboard Style (Gold Theme) */}
-      <div className="w-full max-w-[1920px] grid grid-cols-1 lg:grid-cols-12 gap-6 items-start h-[calc(100vh-250px)] min-h-[600px]">
+      {/* 메인 3단 레이아웃 (균등 분할) */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
 
-        {/* 1. 좌측: 영상 설정 (3 Col) */}
-        <div className="lg:col-span-3 h-full glass-panel border-amber-500/20 rounded-2xl overflow-hidden flex flex-col animate-fadeIn" style={{ animationDelay: '0.1s' }}>
-          <div className="p-5 border-b border-amber-500/10 bg-amber-500/5">
-            <h3 className="font-display font-bold text-amber-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-              영상 설정 <span className="text-[10px] opacity-50 ml-1 font-normal tracking-widest">CONFIGURATION</span>
+        {/* ================= 1. 영상 설정 패널 ================= */}
+        <div className="flex flex-col gap-6 min-h-0 overflow-y-auto custom-scrollbar">
+          {/* Premium Card Style */}
+          <div className="bg-gradient-to-br from-slate-900/80 to-black/80 border border-amber-500/20 rounded-[1.5rem] p-5 backdrop-blur-md flex-1 flex flex-col justify-between shadow-[0_0_40px_-10px_rgba(251,191,36,0.05)]">
+            <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-amber-500/20 text-white flex items-center justify-center text-sm font-bold border border-amber-500/20">1</span>
+              영상 설정
             </h3>
-          </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-5 flex flex-col gap-6">
-            {/* 카테고리 */}
-            <div>
-              <label className="text-xs font-bold text-amber-500/50 mb-2 block uppercase tracking-wider">이벤트 유형 (Event Type)</label>
-              <CategorySelector category={category} onCategoryChange={handleCategoryChange} />
-            </div>
 
-            {/* 스타일 */}
-            <div>
-              <label className="text-xs font-bold text-amber-500/50 mb-2 block uppercase tracking-wider">비주얼 스타일 (Visual Style)</label>
-              <StyleSelector style={style} onStyleChange={setStyle} />
-            </div>
-
-            {/* 상세 정보 */}
-            <div>
-              <label className="text-xs font-bold text-amber-500/50 mb-2 block uppercase tracking-wider">상세 정보 (Details)</label>
-              <EventInfoFields
-                category={category}
-                eventInfo={eventInfo}
-                setEventInfo={setEventInfo}
-                onBlur={updateTitleFromEventInfo}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 2. 중앙: 미리보기 (6 Col) */}
-        <div className="lg:col-span-6 h-full flex flex-col gap-6">
-
-          {/* Preview Area */}
-          <div className="flex-1 glass-panel border-amber-500/20 rounded-2xl p-1 overflow-hidden animate-fadeIn relative group" style={{ animationDelay: '0.2s' }}>
-            <PreviewPanel
+            {/* 1. 행사 유형 */}
+            <CategorySelector
               category={category}
+              onCategoryChange={handleCategoryChange}
+            />
+
+            {/* 2. 스타일 */}
+            <StyleSelector
               style={style}
-              previewUrl={previewUrl}
-              onFileChange={handleFileChange}
-              onDelete={() => setPreviewUrl(null)}
+              onStyleChange={setStyle}
             />
 
-            {/* Gold Overlay Frame */}
-            <div className="absolute inset-0 pointer-events-none border border-amber-500/20 rounded-xl z-20"></div>
-            <div className="absolute top-4 right-4 z-30 px-3 py-1 rounded-full bg-black/60 backdrop-blur border border-amber-500/30 text-amber-400 text-xs font-mono shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-              AI 컨셉 미리보기
+            {/* 3. 상세 정보 */}
+            <div className="flex-1 flex flex-col justify-center">
+              <label className="block text-sm font-bold text-gray-300 mb-3">상세 정보 입력</label>
+              <div className="bg-black/40 rounded-xl p-5 border border-amber-500/10 h-full flex flex-col justify-center">
+                <EventInfoFields
+                  category={category}
+                  eventInfo={eventInfo}
+                  setEventInfo={setEventInfo}
+                  onBlur={updateTitleFromEventInfo}
+                />
+              </div>
             </div>
           </div>
-
-          {/* Action Buttons */}
-          <div className="h-20 glass-panel border-amber-500/20 rounded-xl p-3 flex items-center justify-between gap-4 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
-            <button onClick={onBack} className="h-full px-8 rounded-lg border border-amber-500/10 hover:bg-amber-500/5 text-amber-500/50 hover:text-amber-500 transition-colors font-bold">
-              이전
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="h-full px-12 rounded-lg bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold tracking-wider hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all flex items-center gap-2"
-              disabled={!isValid}
-            >
-              <span>AI 에셋 생성하기</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            </button>
-          </div>
         </div>
 
-        {/* 3. 우측: 문구/프롬프트 입력 (3 Col) */}
-        <div className="lg:col-span-3 h-full glass-panel border-amber-500/20 rounded-2xl overflow-hidden flex flex-col animate-fadeIn" style={{ animationDelay: '0.3s' }}>
-          <div className="p-5 border-b border-amber-500/10 bg-amber-500/5">
-            <h3 className="font-display font-bold text-amber-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-              스토리 프롬프트 <span className="text-[10px] opacity-50 ml-1 font-normal tracking-widest">PROMPT</span>
-            </h3>
-          </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-5">
-            <MessageInputPanel
-              category={category}
-              messages={messages}
-              messageMode={messageMode}
-              selectedKeywords={selectedKeywords}
-              filledCount={filledCount}
-              isValid={isValid}
-              onMessageChange={handleMessageChange}
-              onMessageModeChange={setMessageMode}
-              onKeywordSelect={selectKeyword}
-              onSubmit={handleSubmit}
-              onBack={onBack}
-              // Hide internal buttons as we moved them to the center column
-              hideButtons={true}
-            />
-          </div>
-        </div>
+        {/* ================= 2. 미리보기 패널 ================= */}
+        <PreviewPanel
+          category={category}
+          style={style}
+          previewUrl={previewUrl}
+          onFileChange={handleFileChange}
+          onDelete={() => setPreviewUrl(null)}
+        />
+
+        {/* ================= 3. 문구 입력 패널 ================= */}
+        <MessageInputPanel
+          category={category}
+          messages={messages}
+          messageMode={messageMode}
+          selectedKeywords={selectedKeywords}
+          filledCount={filledCount}
+          isValid={isValid}
+          onMessageChange={handleMessageChange}
+          onMessageModeChange={setMessageMode}
+          onKeywordSelect={selectKeyword}
+          onSubmit={handleSubmit}
+          onBack={onBack}
+        />
 
       </div>
     </div>
   );
 }
-
