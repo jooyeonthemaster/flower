@@ -1,6 +1,6 @@
 # AI Hologram 프로젝트 진행상황
 
-## 최종 업데이트: 2026-01-19
+## 최종 업데이트: 2026-01-22
 
 ---
 
@@ -23,7 +23,37 @@
 
 ---
 
-## 최근 수정 사항 (2026-01-19)
+## 중요: FFmpeg 텍스트 오버레이 사용 금지
+
+**텍스트 오버레이에 FFmpeg drawtext 방식 사용 절대 불가**
+- 3D 효과, 글리치, 홀로그램 효과 지원 안 됨
+- 반드시 Remotion 사용
+- FFmpeg는 영상 병합/루프 등 단순 처리에만 사용
+
+---
+
+## 이전 수정 사항 (2026-01-21)
+
+### AI 합성 모드 1:1 비율 문제 해결
+
+#### 문제
+- AI 합성 모드(Composition Mode)에서 생성된 영상이 가로로 긴 비율로 출력됨
+- 1:1 정사각형으로 크롭되어야 하는데 적용되지 않음
+
+#### 원인
+- `generate-video-startend/route.ts`에서 Kling/DoP 모델 요청 시 `aspect_ratio` 파라미터 누락
+- 이미지 분할(`splitImage`)은 1:1로 처리되지만, 영상 생성 API에서 기본 비율(16:9)로 출력
+
+#### 해결
+- Kling 모델 requestBody에 `aspect_ratio: '1:1'` 추가 (라인 207)
+- DoP 모델 requestBody에 `aspect_ratio: '1:1'` 추가 (라인 220)
+
+#### 수정 파일
+- `src/app/api/ai/generate-video-startend/route.ts`
+
+---
+
+## 이전 수정 사항 (2026-01-19)
 
 ### 템플릿 모드 대폭 개선
 

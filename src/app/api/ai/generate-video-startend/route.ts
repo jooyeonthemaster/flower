@@ -70,6 +70,8 @@ export async function POST(req: NextRequest) {
       model = DEFAULT_MODEL,
       motionStrength = 0.5,
       duration = 10,  // 기본값 10초
+      style = 'fancy', // 추가: 스타일 파라미터
+      category = 'event', // 추가: 카테고리 파라미터
     } = body;
 
     // Higgsfield API 키 확인
@@ -136,34 +138,57 @@ export async function POST(req: NextRequest) {
       motionStrength,
     });
 
-    // 기본 프롬프트: Start Frame → End Frame 화려한 전환 (영어)
-    // 배경 효과 + 카메라 무빙 + 텍스트 모션 모두 극대화
-    const defaultPrompt = `SPECTACULAR cinematic transition from start frame to end frame with MAXIMUM visual impact.
+    // 텍스트 등장 효과 옵션 (랜덤 선택으로 다양성 확보)
+    const textRevealEffects = [
+      'luminous particles converge and form the text',
+      'soft mist clears to reveal the text',
+      'energy waves ripple outward as text appears',
+      'gentle light blooms and the text emerges',
+      'ethereal glow intensifies into clear text',
+      'atmospheric haze parts to unveil the text',
+    ];
+    const randomEffect = textRevealEffects[Math.floor(Math.random() * textRevealEffects.length)];
 
-BACKGROUND ANIMATION (CRITICAL - must be visually exciting):
-- DRAMATIC camera movement: sweeping aerial pullback with intense zoom-out effect
-- Background particles and light effects MUST animate and swirl dynamically
-- Light rays pulsing and expanding outward with energy
-- Sparkles and glowing orbs floating and dancing through the scene
-- Energy waves rippling across the background
-- All background elements should feel ALIVE with constant motion
+    // 스타일별 분위기 (간결하게 - AI 창의성 존중)
+    const videoStyleConfigs: Record<string, string> = {
+      fancy: 'Dynamic, cinematic atmosphere with dramatic lighting and energetic motion.',
+      simple: 'Elegant, refined atmosphere with smooth motion and subtle lighting.',
+    };
 
-CAMERA MOVEMENT:
-- Start close-up, dramatically pull back to reveal the full scene
-- Add subtle rotation and dynamic angle shifts
-- Create strong sense of depth and three-dimensional space
-- Cinematic dolly zoom effect for dramatic impact
+    // 행사별 분위기 (간결하게)
+    const videoCategoryConfigs: Record<string, string> = {
+      wedding: 'Romantic and dreamy mood.',
+      opening: 'Celebratory and grand mood.',
+      event: 'Sophisticated and premium mood.',
+    };
 
-TEXT ANIMATION (BOLD and DYNAMIC):
-- Text SWOOPS UP from BELOW in a dramatic CURVED ARC motion
-- Rising from the bottom of the frame with a sweeping, fluid curve trajectory
-- The text bends and curves upward like a wave or ribbon unfurling
-- SPIN and ROTATE while ascending in the curved path
-- Scale up dramatically from tiny to full size as it rises
-- Glowing edges intensify as text approaches final position
-- Combine curved arc + rotation + scale for spectacular entrance
+    // 6가지 조합별 색상 팔레트
+    const videoColorPalettes: Record<string, string> = {
+      'wedding-fancy': 'rose pink, magenta, soft coral, blush gold',
+      'opening-fancy': 'rich gold, champagne, warm amber, bright white',
+      'event-fancy': 'royal purple, deep violet, electric cyan, silver',
+      'wedding-simple': 'soft pink, pearl white, gentle silver',
+      'opening-simple': 'warm cream, soft gold, clean white',
+      'event-simple': 'cool silver, soft blue-gray, elegant white',
+    };
 
-OVERALL: Hollywood-quality visual effects, constant dynamic motion throughout entire video, breathtaking cinematic finish with spectacular visual payoff.`;
+    const safeCategory = videoCategoryConfigs[category as string] ? category : 'event';
+    const safeStyle = style === 'simple' ? 'simple' : 'fancy';
+    const styleConfig = videoStyleConfigs[safeStyle];
+    const categoryConfig = videoCategoryConfigs[safeCategory as string];
+    const colorPalette = videoColorPalettes[`${safeCategory}-${safeStyle}`];
+
+    // 동적 프롬프트 생성 (간결 + 핵심 규칙만)
+    const defaultPrompt = `Cinematic transition from start to end frame.
+${categoryConfig} ${styleConfig}
+Color theme: ${colorPalette}
+
+TEXT TIMING: Text should stay hidden for most of the video, then ${randomEffect} in the final moments.
+
+AVOID: Do not include specific objects like coins, flowers, hearts, balloons, ribbons. Keep effects abstract.
+IMPORTANT: Final text must appear sharp and clear, not distorted.
+
+High-quality professional render.`;
 
     // API 요청 본문 구성
     // 모델별로 다른 파라미터 형식 사용
@@ -181,6 +206,7 @@ OVERALL: Hollywood-quality visual effects, constant dynamic motion throughout en
         duration: duration,            // 5 또는 10 (기본값 5)
         cfg_scale: motionStrength,     // 0~1 (기본값 0.5)
         negative_prompt: '',           // 원치 않는 요소 제외
+        aspect_ratio: '1:1',           // LED 팬 홀로그램용 정사각형 비율
       };
     } else {
       // DoP 모델: input_images / input_images_end 형식
@@ -193,6 +219,7 @@ OVERALL: Hollywood-quality visual effects, constant dynamic motion throughout en
         duration: duration,
         // AERIAL PULLBACK 프리셋 적용
         preset: 'aerial_pullback',
+        aspect_ratio: '1:1',           // LED 팬 홀로그램용 정사각형 비율
       };
     }
 

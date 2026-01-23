@@ -1,54 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
 
+/**
+ * @deprecated 이 API는 더 이상 사용되지 않습니다.
+ * 4분할 문제 해결을 위해 generate-background와 generate-text-frame API로 대체되었습니다.
+ *
+ * 새로운 플로우:
+ * 1. /api/ai/generate-background - 1:1 배경 이미지 생성 (텍스트 없음)
+ * 2. /api/ai/generate-text-frame - 배경 참조하여 텍스트 추가된 1:1 이미지 생성
+ *
+ * 이 API는 하위 호환성을 위해 유지되지만, 새 코드에서는 사용하지 마세요.
+ */
+
 // Vercel Pro plan: 최대 300초 (5분)
 export const maxDuration = 300;
 
-// 스타일별 프롬프트 템플릿 (프론트엔드에서 사용하는 2개 스타일만 정의)
-const stylePrompts: Record<string, string> = {
-  fancy: `SPECTACULAR CELEBRATION EXPLOSION style:
-    - Color palette: bright neon pink, electric purple, golden sparkles, cyan accents, vivid magenta
-    - Light effects: MAXIMUM visual impact with layered explosions, multiple light bursts, dazzling flare cascades
-    - Particles: golden confetti fountains, colorful fireworks bursts, stardust cascades, glitter showers, holographic sparkles
-    - Texture: holographic shimmer, liquid gold surfaces, crystal reflections, iridescent glow
-    - Atmosphere: ultimate celebration energy, like fireworks and magic combined, maximum festive impact`,
-
-  simple: `ELEGANT MINIMALIST style:
-    - Color palette: soft white, silver, subtle gold accents, muted pastels, gentle ivory
-    - Light effects: gentle radiant glow, soft lens flares, understated brilliance, clean light rays
-    - Particles: delicate floating sparkles, minimal dust motes, refined light trails, subtle shimmer
-    - Texture: silk-like smooth gradients, clean geometric lines, premium matte finish
-    - Atmosphere: sophisticated elegance, premium refinement, modern minimalism, understated luxury`,
-};
-
-// 행사별 프롬프트 템플릿 (프론트엔드에서 사용하는 3개 카테고리만 정의)
-const categoryPrompts: Record<string, string> = {
-  wedding: `WEDDING CELEBRATION atmosphere:
-    - Emotion: eternal love, romantic union, blessed beginning
-    - Symbols: intertwining light ribbons (unity), ascending heart particles, ring-shaped halos
-    - Motion: gentle swirling embrace pattern, floating rose petal effect
-    - Energy: warm loving radiance, soft romantic glow spreading outward`,
-
-  opening: `GRAND OPENING atmosphere:
-    - Emotion: exciting launch, prosperous beginning, success anticipation
-    - Symbols: ribbon cutting light burst, door opening radiance, fortune flowing in
-    - Motion: explosive outward expansion, welcoming energy waves
-    - Energy: prosperity gold shower, success firework cascade`,
-
-  event: `SPECIAL EVENT atmosphere:
-    - Emotion: exciting anticipation, spectacular moment, memorable highlight
-    - Symbols: spotlight burst, VIP carpet radiance, camera flash effects
-    - Motion: dramatic reveal expansion, climactic energy build
-    - Energy: show-stopping brilliance, headline-worthy spectacle`,
+// 행사별 분위기 설정
+const categoryConfigs: Record<string, {
+  mood: string;
+  elements: string;
+  motion: string;
+}> = {
+  wedding: {
+    mood: "romantic union, eternal love, blessed beginning",
+    elements: "soft ring-shaped abstract halos, intertwining light ribbons, ethereal heart shapes",
+    motion: "gentle swirling embrace pattern, rising updraft of light",
+  },
+  opening: {
+    mood: "prosperous beginning, exciting launch, success",
+    elements: "golden coins abstract flow, open door radiance, upward trending light paths",
+    motion: "explosive outward expansion, welcoming energy waves",
+  },
+  event: {
+    mood: "memorable highlight, special occasion, spotlight moment",
+    elements: "spotlight beams, camera flash effects, VIP carpet radiance",
+    motion: "harmonic convergence, climactic energy build",
+  },
 };
 
 /**
  * 듀얼 프레임 이미지 생성 API (Google Gemini 사용)
- *
- * 공식 문서 기반:
- * - 모델: gemini-3-pro-image-preview (Nano Banana Pro)
- * - 참조 이미지: inlineData로 전달
- * - 16:9 비율, 최대 4K 해상도 지원
  */
 export async function POST(req: NextRequest) {
   try {
@@ -81,8 +72,9 @@ export async function POST(req: NextRequest) {
     // GoogleGenAI 클라이언트 초기화
     const ai = new GoogleGenAI({ apiKey });
 
-    const styleDesc = stylePrompts[style] || stylePrompts.elegant;
-    const categoryMood = categoryPrompts[category] || categoryPrompts.other;
+    // 카테고리 설정 가져오기 (기본값 처리)
+    const safeCategory = (categoryConfigs[category] ? category : 'event');
+    const categoryConfig = categoryConfigs[safeCategory];
 
     // 참조 이미지 Base64 준비
     let referenceImageBase64: string | null = null;
@@ -116,89 +108,58 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 참조 이미지 관련 프롬프트 생성
+    // 참조 이미지 관련 프롬프트
     const referenceInstruction = referenceImageBase64
       ? `IMPORTANT: The attached image is a logo/reference image.
 Remove its background and place it at the center-top area of the generated image.
-The style and the attached image should blend harmoniously together.
-Position the text below the attached image so they don't overlap.
-The attached image must appear in BOTH the left and right halves of the final image.`
+The style and the attached image should blend harmoniously.
+Position the text below the attached image.
+The attached image must appear in BOTH the left and right halves.`
       : '';
 
-    // 듀얼 프레임 프롬프트 생성 (16:9 비율, 영어로 작성)
-    // 스타일+카테고리 조합에 맞는 고유한 이미지 생성 + 다양성 확보
-    const dualFramePrompt = `Create a UNIQUE and VISUALLY SPECTACULAR image.
+    // 동적 프롬프트 생성 - 품질 섹션 복원
+    const dualFramePrompt = `Generate a WIDE 16:9 horizontal image with the following structure:
 
-=== VISUAL STYLE ===
-${styleDesc}
+IMAGE LAYOUT (THIS IS THE MOST IMPORTANT INSTRUCTION):
+- Create ONE wide horizontal image (aspect ratio 16:9)
+- Mentally divide this image into LEFT HALF and RIGHT HALF
+- LEFT HALF: Shows the decorated background WITH the 3D text "${text}" in the center
+- RIGHT HALF: Shows the EXACT SAME decorated background but WITHOUT any text (completely empty of text)
+- Both halves share the same continuous background design
+- If there is a visible vertical line in the middle, make it PURE BLACK (#000000) and very thin
 
-=== OCCASION MOOD ===
-${categoryMood}
+VISUAL STYLE (${style.toUpperCase()}):
+${style === 'simple'
+        ? '- Clean, minimal, elegant design\n- Soft lighting, subtle sparkles\n- Modern and refined atmosphere'
+        : '- Spectacular, grand, dramatic design\n- Intense lighting, rich particle effects\n- Celebration energy with visual impact'}
 
-=== CRITICAL: DIVERSITY REQUIREMENT ===
-- Generate a COMPLETELY UNIQUE composition - avoid generic or repetitive layouts
-- Creatively interpret the style and occasion combination
-- Use UNEXPECTED and CREATIVE arrangements of visual elements
-- Each generation should feel fresh and distinctive
+OCCASION (${category.toUpperCase()}):
+- Mood: ${categoryConfig.mood}
+- Elements: ${categoryConfig.elements}
 
-=== BACKGROUND DESIGN ===
-- Fill the entire background with DYNAMIC, EXCITING visual effects
-- Light rays, particles, and energy effects should feel ALIVE and in MOTION
-- Create DEPTH with layered foreground/midground/background elements
-- The background should tell a visual story matching the occasion
-
-=== 3D TEXT: "${text}" ===
-- BOLD, DRAMATIC 3D typography that commands attention
-- Apply the ${style} style effects to the text
-- Glowing edges, metallic reflections, strong dimensional presence
-- Text should harmonize with but stand out from the background
+3D TEXT STYLING:
+- Text: "${text}"
+- Style: ${style === 'simple' ? 'Clean modern 3D, matte or brushed metal finish' : 'Bold ornate 3D, glowing chrome or crystal finish'}
+- Position: Centered in the left side only
+- The right side must have NO TEXT at all
 
 ${referenceInstruction}
 
-=== IMAGE STRUCTURE (ABSOLUTELY CRITICAL - READ CAREFULLY) ===
+BACKGROUND:
+- Base color: Pure black (#000000)
+- Dynamic visual effects, light rays, particles
+- The background decoration should be the same on both left and right sides
 
-*** SPLIT RULES - MUST FOLLOW EXACTLY ***
-- The image is divided by ONE SINGLE VERTICAL LINE running down the EXACT CENTER
-- This creates exactly TWO halves: LEFT and RIGHT
-- There is ABSOLUTELY NO horizontal division - the image is NOT split top/bottom
-- DO NOT create 4 quadrants - only 2 vertical halves exist
-- The dividing line is INVISIBLE - it's conceptual for layout purposes only
-
-*** VISUAL DIAGRAM ***
-The final 16:9 image should look like this:
-┌─────────────────────┬─────────────────────┐
-│                     │                     │
-│     LEFT HALF       │     RIGHT HALF      │
-│   (with 3D text)    │   (NO text)         │
-│                     │                     │
-│   Background fills  │   IDENTICAL         │
-│   entire left half  │   background        │
-│                     │                     │
-│   Text: "${text}"   │   (empty of text)   │
-│                     │                     │
-└─────────────────────┴─────────────────────┘
-
-*** LEFT HALF SPECIFICATIONS ***
-- Contains: Full background effects + 3D text "${text}"${referenceImageBase64 ? ' + reference image' : ''}
-- Background fills the ENTIRE left half from top to bottom
-- Text positioned aesthetically within the left half
-
-*** RIGHT HALF SPECIFICATIONS ***
-- Contains: IDENTICAL background effects${referenceImageBase64 ? ' + same reference image' : ''} - NO text whatsoever
-- Must be a perfect mirror of the left half's background
-- The ONLY difference is the absence of text
-
-*** ABSOLUTE PROHIBITIONS ***
-- NO horizontal lines dividing the image
-- NO 4-quadrant layouts
-- NO top/bottom separation
-- NO grid patterns
-- ONLY vertical split at center
-
-*** BASE REQUIREMENTS ***
-- Aspect ratio: EXACTLY 16:9 (wide horizontal format)
-- Base color: Pure black (#000000) filled with spectacular light effects
-- Both halves share ONE continuous background design
+CRITICAL RULES:
+1. Output must be 16:9 wide horizontal rectangle
+2. LEFT half = background + text "${text}"
+3. RIGHT half = same background, NO text
+4. Do NOT create 4 panels or 2x2 grid
+5. Do NOT repeat the text twice
+6. The text "${text}" should appear ONLY ONCE, in the LEFT half
+7. NEVER split TOP and BOTTOM - ONLY split LEFT and RIGHT (vertical dividing line)
+8. The layout must be: [LEFT: with text] | [RIGHT: no text], NOT [TOP] / [BOTTOM]
+9. Do NOT add any labels like "LEFT HALF", "RIGHT HALF", "LEFT", "RIGHT" to the image - these are instructions for you, not text to render
 
 === QUALITY ===
 Ultra HD resolution, professional CGI quality, cinematic lighting, maximum visual impact, breathtaking artistry.
@@ -234,7 +195,6 @@ The two halves must be seamlessly part of ONE unified image composition.`;
         responseModalities: ['TEXT', 'IMAGE'],
         imageConfig: {
           aspectRatio: '16:9',
-          imageSize: '2K',
         },
       },
     });
@@ -264,76 +224,11 @@ The two halves must be seamlessly part of ONE unified image composition.`;
       }
     }
 
-    // 이미지를 찾지 못한 경우 - Gemini 2.5 Flash Image로 폴백
+    // 이미지를 찾지 못한 경우 에러 반환 (fallback 제거 - 하위 모델은 원하는 품질의 텍스트를 생성하지 못함)
     if (!imageBase64) {
-      console.log('No image from gemini-3-pro-image-preview, trying gemini-2.5-flash-image...');
-
-      try {
-        const fallbackResponse = await ai.models.generateContent({
-          model: 'gemini-2.5-flash-image',
-          contents: contents,
-          config: {
-            responseModalities: ['TEXT', 'IMAGE'],
-            imageConfig: {
-              aspectRatio: '16:9',
-            },
-          },
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fallbackResult = fallbackResponse as any;
-
-        if (fallbackResult.candidates?.[0]?.content?.parts) {
-          for (const part of fallbackResult.candidates[0].content.parts) {
-            if (part.inlineData?.data) {
-              imageBase64 = part.inlineData.data;
-              imageMimeType = part.inlineData.mimeType || 'image/png';
-              console.log('Image extracted from fallback response');
-              break;
-            }
-          }
-        }
-      } catch (fallbackError) {
-        console.error('Fallback model failed:', fallbackError);
-      }
-    }
-
-    // 여전히 이미지가 없으면 Imagen 3 시도
-    if (!imageBase64) {
-      console.log('Trying Imagen 3 as final fallback...');
-
-      try {
-        // Imagen은 참조 이미지 없이 텍스트만 사용
-        const imagenResponse = await ai.models.generateImages({
-          model: 'imagen-3.0-generate-001',
-          prompt: dualFramePrompt,
-          config: {
-            numberOfImages: 1,
-            aspectRatio: '16:9',
-          },
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const imagenResult = imagenResponse as any;
-        console.log('Imagen response keys:', Object.keys(imagenResult || {}));
-
-        if (imagenResult.generatedImages?.[0]?.image?.imageBytes) {
-          imageBase64 = imagenResult.generatedImages[0].image.imageBytes;
-          console.log('Image extracted from Imagen response');
-        } else if (imagenResult.images?.[0]?.imageBytes) {
-          imageBase64 = imagenResult.images[0].imageBytes;
-          console.log('Image extracted from Imagen images array');
-        }
-      } catch (imagenError) {
-        console.error('Imagen fallback failed:', imagenError);
-      }
-    }
-
-    if (!imageBase64) {
-      // 전체 응답 로깅 (디버깅용)
-      console.error('No image found in any response');
+      console.error('No image found in response');
       console.error('Full response structure:', JSON.stringify(result, null, 2).substring(0, 2000));
-      throw new Error('이미지 생성에 실패했습니다. 응답에 이미지가 없습니다.');
+      throw new Error('이미지 생성에 실패했습니다. 잠시 후 다시 시도해주세요.');
     }
 
     const fullImageDataUrl = `data:${imageMimeType};base64,${imageBase64}`;

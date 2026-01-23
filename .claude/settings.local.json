@@ -1,10 +1,53 @@
 {
   "permissions": {
     "allow": [
+      "Bash(git clone:*)",
+      "Bash(dir:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm install)",
       "Bash(npm run build:*)",
-      "Bash(git add:*)"
+      "Bash(npm install:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(where:*)",
+      "Bash(winget install:*)",
+      "Bash(refreshenv)",
+      "Bash(cmd /c \"C:\\\\Users\\\\jayit\\\\AppData\\\\Local\\\\Microsoft\\\\WinGet\\\\Links\\\\ffmpeg.exe -version\")",
+      "Bash(powershell -Command \"ffmpeg -version\")",
+      "Bash(powershell:*)",
+      "Bash(\"C:\\\\Users\\\\jayit\\\\AppData\\\\Local\\\\Microsoft\\\\WinGet\\\\Packages\\\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\\\ffmpeg-8.0.1-full_build\\\\bin\\\\ffmpeg.exe\" -version)",
+      "Bash(curl:*)",
+      "Bash(git log:*)",
+      "Bash(if not exist \"docs\\\\archive\" mkdir \"docs\\\\archive\")",
+      "Bash(move:*)",
+      "Bash(if not exist archive mkdir archive)",
+      "Bash(test:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx next lint:*)",
+      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: AI 홀로그램 기능 대규모 업데이트\n\n주요 변경사항:\n- 텍스트 오버레이 자동화 \\(MultiSceneGenerationStep에서 처리\\)\n- ResultStep 간소화 \\(수동 오버레이 버튼 제거\\)\n- 텍스트 위치 vh → % 단위로 변경 \\(Remotion 호환\\)\n- Remotion 기반 실시간 미리보기 구현\n- 24개 텍스트 이펙트 \\(typewriter, glitch, neon 등\\)\n- 105개 색상 팔레트\n- 11개 한글 폰트 지원\n- AI 영상 합성 모드 \\(Composition Mode\\) 추가\n- Start/End Frame 방식 영상 생성\n- Ping-pong 30초 루프 생성\n- FFmpeg/Remotion 에러 핸들링 개선\n\nAPI 추가:\n- /api/ai/loop-video \\(영상 루프\\)\n- /api/ai/render-text-overlay \\(Remotion 렌더링\\)\n- /api/ai/generate-dual-frame \\(듀얼 프레임 생성\\)\n- /api/ai/generate-video-startend \\(Start/End 영상\\)\n- /api/ai/merge-videos \\(영상 합성\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(npx vercel env add:*)",
+      "Bash(npx vercel:*)",
+      "Bash(vercel --version:*)",
+      "Bash(vercel:*)",
+      "Bash(findstr:*)",
+      "Bash(ffprobe:*)",
+      "Bash(gsutil cors set:*)",
+      "Bash(gcloud --version:*)",
+      "Bash(wc:*)",
+      "Bash(cd:*)",
+      "Bash(node scripts/test-text-overlay.js:*)",
+      "Bash(npm run dev:*)",
+      "Bash(node scripts/test-text-overlay-options.js:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: 참조 이미지 기능 임시 비활성화 및 예상 시간 수정\n\n- 참조 이미지 업로드 UI 비활성화 \\(버그 해결 후 복원 예정\\)\n- 예상 시간 표시 5분 → 5~10분으로 수정\n- Canvas 기반 렌더링 시스템 개선\n- 백업 문서 추가 \\(docs/REFERENCE-IMAGE-BACKUP.md\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
-    "deny": [],
-    "ask": []
+    "additionalDirectories": [
+      "c:\\Users\\jayit\\OneDrive\\바탕 화면\\roqkf\\flower\\src\\components\\ai-hologram\\steps\\TextPreviewStep"
+    ]
   }
 }

@@ -1,23 +1,31 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { SceneData } from './MultiSceneStep';
 import { CustomSettings } from './TextPreviewStep';
+import {
+  VideoCompositor,
+  DEFAULT_RENDERER_CONFIG,
+  DEFAULT_TEXT_STYLE,
+  type RenderConfig,
+  type EffectType,
+  type TextPosition,
+  type CharEffectMode,
+} from '@/lib/canvas-renderer';
+import { createMP4FromFrames, checkWebCodecsSupport } from '@/lib/video-encoder';
 
 // 템플릿 이미지/영상 경로 생성 헬퍼 함수
-// 템플릿 이미지/영상 경로 생성 헬퍼 함수
 const getTemplateImagePath = (category: string, style: string): string => {
-  // MultiSceneStep과 동일한 경로 사용
   return `/previews/${category}-${style}.png`;
 };
 
 const getTemplateVideoPath = (category: string, style: string): string => {
-  // Firebase Storage에서 템플릿 영상 로드
-  return `https://storage.googleapis.com/flower-63624.firebasestorage.app/templates/videos/${category}-${style}.mp4`;
+  // 로컬 public 폴더에서 템플릿 영상 로드 (CORS 이슈 방지)
+  return `/templates/videos/${category}-${style}.mp4`;
 };
 
-// 새 플로우: 템플릿 기반 진행 상태 (텍스트 오버레이까지 포함)
-type GenerationPhase = 'idle' | 'loading-video' | 'looping-video' | 'applying-overlay' | 'completed' | 'error';
+// 브라우저 렌더링 기반 진행 상태
+type GenerationPhase = 'idle' | 'loading-video' | 'rendering' | 'encoding' | 'uploading' | 'completed' | 'error';
 
 interface MultiSceneGenerationStepProps {
   sceneData: {
@@ -32,26 +40,6 @@ interface MultiSceneGenerationStepProps {
   onBack: () => void;
 }
 
-// 안전한 API 호출 헬퍼 함수 (JSON 파싱 오류 방지)
-const safeApiCall = async (response: Response, context: string) => {
-  if (!response.ok) {
-    let errorText: string;
-    try {
-      errorText = await response.text();
-    } catch {
-      errorText = `HTTP ${response.status}`;
-    }
-    throw new Error(`${context} 실패 (${response.status}): ${errorText.substring(0, 100)}`);
-  }
-
-  const text = await response.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error(`${context} 응답 파싱 실패: ${text.substring(0, 100)}`);
-  }
-};
-
 export default function MultiSceneGenerationStep({
   sceneData,
   onComplete,
@@ -60,13 +48,24 @@ export default function MultiSceneGenerationStep({
   const [currentPhase, setCurrentPhase] = useState<GenerationPhase>('idle');
   const [overallProgress, setOverallProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [elapsedTime, setElapsedTime] = useState(0); // 경과 시간 (초)
-  // 템플릿 이미지 경로 (AI 생성 없이 바로 사용)
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [isWebCodecsSupported, setIsWebCodecsSupported] = useState(true);
+
   const templateImageUrl = getTemplateImagePath(sceneData.category, sceneData.style);
   const isGeneratingRef = useRef(false);
   const startTimeRef = useRef<number>(Date.now());
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const isLeavingConfirmedRef = useRef(false); // 사용자가 나가기 확인했는지 추적
+  const compositorRef = useRef<VideoCompositor | null>(null);
+  const historyPushedRef = useRef(false);
+
+  // WebCodecs 지원 확인
+  useEffect(() => {
+    const support = checkWebCodecsSupport();
+    setIsWebCodecsSupported(support.supported);
+    if (!support.supported) {
+      setErrorMessage('이 브라우저는 WebCodecs를 지원하지 않습니다. Chrome, Edge 등 최신 브라우저를 사용해주세요.');
+      setCurrentPhase('error');
+    }
+  }, []);
 
   // 경과 시간 타이머
   useEffect(() => {
@@ -79,249 +78,224 @@ export default function MultiSceneGenerationStep({
     return () => clearInterval(timer);
   }, [currentPhase]);
 
-  // 페이지 이탈 경고 - 창 닫기/새로고침/브라우저 뒤로가기 시 경고
+  // 화면 이탈 경고 (생성 중일 때) - 탭 닫기, 새로고침
   useEffect(() => {
-    const isGenerating = currentPhase !== 'completed' && currentPhase !== 'error' && currentPhase !== 'idle';
+    const isGenerating = currentPhase !== 'idle' && currentPhase !== 'completed' && currentPhase !== 'error';
 
-    // 1. 창 닫기/새로고침 감지
+    if (!isGenerating) return;
+
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isGenerating) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-      }
+      e.preventDefault();
+      e.returnValue = '영상 생성이 진행 중입니다. 페이지를 떠나면 생성이 중단됩니다.';
+      return e.returnValue;
     };
-
-    // 2. 브라우저 뒤로가기 버튼 감지 (SPA 내부 네비게이션)
-    const handlePopState = () => {
-      // 이미 나가기 확인된 상태면 그냥 진행
-      if (isLeavingConfirmedRef.current) {
-        return;
-      }
-
-      if (isGenerating) {
-        // 뒤로가기 취소하고 현재 위치 유지
-        window.history.pushState(null, '', window.location.href);
-
-        // 사용자에게 경고
-        const confirmLeave = window.confirm(
-          '영상 생성이 진행 중입니다.\n이 페이지를 벗어나면 진행 상황이 저장되지 않습니다.\n\n정말 나가시겠습니까?'
-        );
-
-        if (confirmLeave) {
-          // 플래그 설정 후 뒤로가기 실행
-          isLeavingConfirmedRef.current = true;
-          window.history.go(-1);
-        }
-      }
-    };
-
-    // 현재 상태를 history에 추가 (뒤로가기 감지용)
-    if (isGenerating) {
-      window.history.pushState(null, '', window.location.href);
-    }
 
     window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [currentPhase]);
 
+  // 브라우저 뒤로가기 경고 (생성 중일 때)
+  useEffect(() => {
+    const isGenerating = currentPhase !== 'idle' && currentPhase !== 'completed' && currentPhase !== 'error';
+
+    if (!isGenerating) {
+      historyPushedRef.current = false;
+      return;
+    }
+
+    // 더미 히스토리 한 번만 추가
+    if (!historyPushedRef.current) {
+      window.history.pushState({ generating: true }, '');
+      historyPushedRef.current = true;
+    }
+
+    const handlePopState = () => {
+      const confirmed = window.confirm('영상 생성이 진행 중입니다. 페이지를 떠나면 생성이 중단됩니다.\n\n정말 나가시겠습니까?');
+      if (confirmed) {
+        // 나가기 선택 시 리스너 제거 후 뒤로가기
+        window.removeEventListener('popstate', handlePopState);
+        historyPushedRef.current = false;
+        window.history.back();
+      } else {
+        // 취소 시 히스토리 다시 추가
+        window.history.pushState({ generating: true }, '');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
   }, [currentPhase]);
 
-  // 생성 시작
-  useEffect(() => {
-    if (!isGeneratingRef.current) {
-      isGeneratingRef.current = true;
-      startTimeRef.current = Date.now();
-      startGeneration();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // 렌더링 설정 생성
+  const createRenderConfig = useCallback((): RenderConfig => {
+    const settings = sceneData.customSettings;
+    const texts = sceneData.scenes.map(scene => scene.text);
+    const templateVideoUrl = getTemplateVideoPath(sceneData.category, sceneData.style);
 
-  const startGeneration = async () => {
-    // AbortController 초기화
-    abortControllerRef.current = new AbortController();
+    return {
+      renderer: {
+        ...DEFAULT_RENDERER_CONFIG,
+        width: 1080,
+        height: 1080,
+        fps: 30,
+        duration: texts.length * 5,
+      },
+      textStyle: {
+        ...DEFAULT_TEXT_STYLE,
+        fontFamily: settings?.fontFamily || "'Noto Sans KR', sans-serif",
+        fontSize: settings?.fontSize || 50,
+        color: settings?.textColor || '#ffffff',
+        glowColor: settings?.glowColor || '#00ffff',
+      },
+      effects: [
+        ...(settings?.effects || []),
+        ...(settings?.letterEffect && settings.letterEffect !== 'none' ? [settings.letterEffect] : [])
+      ] as EffectType[],
+      charEffectMode: 'all' as CharEffectMode,
+      texts,
+      textPosition: (settings?.textPosition || 'random') as TextPosition,
+      videoSrc: templateVideoUrl,
+      referenceImageSrc: sceneData.referenceImage,
+    };
+  }, [sceneData]);
+
+  // 브라우저 렌더링으로 영상 생성
+  const startGeneration = useCallback(async () => {
+    if (!isWebCodecsSupported) return;
 
     try {
-      // Phase 1: 템플릿 영상 로드
+      // Phase 1: 영상/리소스 로드
       setCurrentPhase('loading-video');
-      setOverallProgress(10);
+      setOverallProgress(5);
 
-      const templateVideoUrl = getTemplateVideoPath(sceneData.category, sceneData.style);
-      console.log('Using template video:', templateVideoUrl);
+      const renderConfig = createRenderConfig();
+      const compositor = new VideoCompositor(renderConfig);
+      compositorRef.current = compositor;
 
-      // 클라이언트에서 직접 Firebase Storage에 접근하면 CORS 에러 발생
-      // 서버 API에서 영상을 다운로드하도록 URL만 전달
+      await compositor.initialize();
       setOverallProgress(20);
 
-      // Phase 2: 영상 루프 (5초 → 30초)
-      setCurrentPhase('looping-video');
-      const loopResult = await loopVideo(templateVideoUrl);
+      // Phase 2: 프레임 렌더링
+      setCurrentPhase('rendering');
+      const frames = await compositor.renderAllFrames((progress) => {
+        if (progress.phase === 'rendering') {
+          setOverallProgress(20 + progress.percentage * 0.4); // 20-60%
+        }
+      });
 
-      setOverallProgress(50);
+      // Phase 3: MP4 인코딩
+      setCurrentPhase('encoding');
+      const blob = await createMP4FromFrames(
+        frames,
+        {
+          width: renderConfig.renderer.width,
+          height: renderConfig.renderer.height,
+          fps: renderConfig.renderer.fps,
+          bitrate: 5_000_000,
+          codec: 'avc1',
+        },
+        (progress) => {
+          if (progress.phase === 'encoding') {
+            setOverallProgress(60 + progress.percentage * 0.25); // 60-85%
+          } else if (progress.phase === 'muxing') {
+            setOverallProgress(85 + progress.percentage * 0.05); // 85-90%
+          }
+        }
+      );
 
-      // Phase 3: 텍스트 오버레이 자동 적용
-      setCurrentPhase('applying-overlay');
-      const finalVideoUrl = await applyTextOverlay(loopResult.videoUrl);
+      // Phase 4: Firebase 업로드
+      setCurrentPhase('uploading');
+      setOverallProgress(90);
 
-      setCurrentPhase('completed');
+      const videoUrl = await uploadToFirebase(blob);
       setOverallProgress(100);
 
-      // 완료 시 최종 영상 전달 (텍스트 오버레이 이미 적용됨)
-      onComplete(finalVideoUrl);
+      // 완료
+      setCurrentPhase('completed');
+      compositor.dispose();
+
+      onComplete(videoUrl);
     } catch (error) {
       console.error('Generation error:', error);
       setCurrentPhase('error');
       setErrorMessage(error instanceof Error ? error.message : '생성 중 오류가 발생했습니다.');
+
+      if (compositorRef.current) {
+        compositorRef.current.dispose();
+      }
     }
-  };
+  }, [isWebCodecsSupported, createRenderConfig, onComplete]);
 
-  // 템플릿 영상 로드 (이미 1:1, 30초 ping-pong 처리됨)
-  const loopVideo = async (templateVideoUrl: string): Promise<{ videoUrl: string; looped: boolean }> => {
-    console.log('Loading pre-processed template video (already 1:1, 30s ping-pong)');
-    setOverallProgress(60);
-
-    // Firebase Storage URL은 이미 절대 URL이므로 그대로 사용
-    // 서버에서 fetch하면 CORS 제한 없이 다운로드 가능
-    const response = await fetch('/api/ai/loop-video', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        videoUrl: templateVideoUrl,  // Firebase Storage URL 직접 전달
-        passthroughOnly: true,  // 이미 처리된 영상이므로 Data URL 변환만 수행
-      }),
-      signal: abortControllerRef.current?.signal,
-    });
-
-    const result = await safeApiCall(response, '영상 루프');
-
-    if (!result.success) {
-      throw new Error(result.error || '영상 루프 실패');
-    }
-
-    if (result.warning) {
-      console.log('Loop warning:', result.warning);
-    }
-
-    setOverallProgress(40);
-    return {
-      videoUrl: result.videoUrl,
-      looped: result.looped !== false
-    };
-  };
-
-  // Data URL을 Blob으로 변환하는 헬퍼 함수
-  const dataUrlToBlob = (dataUrl: string): Blob => {
-    const parts = dataUrl.split(',');
-    const mime = parts[0].match(/:(.*?);/)?.[1] || 'video/mp4';
-    const bstr = atob(parts[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-  };
-
-  // 텍스트 오버레이 적용 (Remotion 렌더링)
-  const applyTextOverlay = async (videoDataUrl: string): Promise<string> => {
-    console.log('Applying text overlay with Remotion...');
-    setOverallProgress(60);
-
-    const texts = sceneData.scenes.map(scene => scene.text);
-    const settings = sceneData.customSettings;
-
-    // 디버깅: 전달되는 설정값 확인
-    console.log('Text Overlay Settings:', {
-      fontSize: settings?.fontSize,
-      fontFamily: settings?.fontFamily,
-      textColor: settings?.textColor,
-      glowColor: settings?.glowColor,
-      effects: settings?.effects,
-      textPosition: settings?.textPosition,
-      texts: texts,
-    });
-
-    // Convert Base64 to Blob
-    const videoBlob = dataUrlToBlob(videoDataUrl);
-    console.log('Video Blob created:', videoBlob.size, 'bytes');
-
-    // Create FormData
+  // Firebase Storage 업로드
+  const uploadToFirebase = async (blob: Blob): Promise<string> => {
     const formData = new FormData();
-    formData.append('video', videoBlob, 'input-video.mp4');
-    formData.append('texts', JSON.stringify(texts));
-    formData.append('fontSize', settings?.fontSize?.toString() || '50');
-    formData.append('fontFamily', settings?.fontFamily || "'Noto Sans KR', sans-serif");
-    formData.append('textColor', settings?.textColor || '#ffffff');
-    formData.append('glowColor', settings?.glowColor || '#00ffff');
-    formData.append('effects', JSON.stringify(settings?.effects || []));
-    formData.append('textPosition', settings?.textPosition || 'random');
+    formData.append('file', blob, 'hologram-video.mp4');
+    formData.append('folder', 'generated-videos');
 
-    // 참조 이미지가 있으면 추가
-    if (sceneData.referenceImage) {
-      console.log('Adding reference image...');
-      formData.append('referenceImage', sceneData.referenceImage);
-    }
-
-    setOverallProgress(70);
-
-    const response = await fetch('/api/ai/render-text-overlay', {
+    const response = await fetch('/api/upload-video', {
       method: 'POST',
       body: formData,
-      signal: abortControllerRef.current?.signal,
     });
 
-    setOverallProgress(85);
-
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`텍스트 오버레이 실패 (${response.status}): ${errorText.substring(0, 100)}`);
+      // 업로드 실패 시 Blob URL 반환 (로컬 다운로드용)
+      console.warn('Firebase upload failed, using blob URL');
+      return URL.createObjectURL(blob);
     }
 
     const result = await response.json();
-
-    if (!result.success && !result.warning) {
-      throw new Error(result.error || '텍스트 오버레이 실패');
-    }
-
-    if (result.warning) {
-      console.log('Overlay warning:', result.warning);
-    }
-
-    setOverallProgress(95);
-    return result.videoUrl;
+    return result.url;
   };
 
-  // 시간 포맷 함수 (초 → MM:SS)
+  // 생성 시작
+  useEffect(() => {
+    if (!isGeneratingRef.current && isWebCodecsSupported) {
+      isGeneratingRef.current = true;
+      startTimeRef.current = Date.now();
+      startGeneration();
+    }
+  }, [isWebCodecsSupported, startGeneration]);
+
+  // 컴포넌트 언마운트 시 정리
+  useEffect(() => {
+    return () => {
+      if (compositorRef.current) {
+        compositorRef.current.dispose();
+      }
+    };
+  }, []);
+
+  // 시간 포맷 함수
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // 예상 소요 시간 (실제 테스트 기반, 보수적 추정)
+  // 예상 소요 시간 (브라우저 렌더링 기준)
   const getEstimatedTime = (): string => {
     switch (currentPhase) {
-      case 'loading-video': return '약 30초';
-      case 'looping-video': return '약 1분';
-      case 'applying-overlay': return '약 5~10분';
+      case 'loading-video': return '약 2-3초';
+      case 'rendering': return '약 5-10초';
+      case 'encoding': return '약 3-5초';
+      case 'uploading': return '약 2-3초';
       default: return '';
     }
   };
 
-  // 전체 예상 시간
   const getTotalEstimatedTime = (): string => {
-    return '약 7~12분';
+    return '약 5~10분';
   };
 
   const getPhaseLabel = () => {
     switch (currentPhase) {
       case 'idle': return '준비 중...';
-      case 'loading-video': return '템플릿 영상 로드 중...';
-      case 'looping-video': return '영상 변환 중...';
-      case 'applying-overlay': return '텍스트 오버레이 적용 중...';
+      case 'loading-video': return '리소스 로드 중...';
+      case 'rendering': return '프레임 렌더링 중...';
+      case 'encoding': return 'MP4 인코딩 중...';
+      case 'uploading': return '업로드 중...';
       case 'completed': return '완료!';
       case 'error': return '오류 발생';
     }
@@ -330,17 +304,17 @@ export default function MultiSceneGenerationStep({
   const getPhaseDescription = () => {
     switch (currentPhase) {
       case 'idle': return '잠시만 기다려주세요...';
-      case 'loading-video': return '템플릿 영상을 불러오고 있습니다';
-      case 'looping-video': return '영상을 Data URL로 변환하고 있습니다';
-      case 'applying-overlay': return '텍스트와 이펙트를 영상에 합성합니다';
+      case 'loading-video': return '템플릿 영상과 리소스를 불러오고 있습니다';
+      case 'rendering': return '영상을 렌더링하고 있습니다';
+      case 'encoding': return 'WebCodecs로 MP4 영상을 생성합니다';
+      case 'uploading': return '완성된 영상을 업로드합니다';
       case 'completed': return '영상이 완성되었습니다!';
       case 'error': return '문제가 발생했습니다';
     }
   };
 
-  // 각 Phase의 완료 여부 체크
   const isPhaseComplete = (phase: string) => {
-    const phaseOrder = ['loading-video', 'looping-video', 'applying-overlay', 'completed'];
+    const phaseOrder = ['loading-video', 'rendering', 'encoding', 'uploading', 'completed'];
     const currentIndex = phaseOrder.indexOf(currentPhase);
     const phaseIndex = phaseOrder.indexOf(phase);
     return currentIndex > phaseIndex || currentPhase === 'completed';
@@ -348,11 +322,11 @@ export default function MultiSceneGenerationStep({
 
   const isPhaseActive = (phase: string) => currentPhase === phase;
 
-  // 3단계 UI 데이터 (텍스트 오버레이까지 포함)
   const phases = [
-    { id: 'loading-video', label: '템플릿 영상 로드', icon: '🎬' },
-    { id: 'looping-video', label: '30초 확장', icon: '🔄' },
-    { id: 'applying-overlay', label: '텍스트 오버레이', icon: '✨' },
+    { id: 'loading-video', label: '리소스 로드', icon: '📥' },
+    { id: 'rendering', label: '프레임 렌더링', icon: '🎨' },
+    { id: 'encoding', label: 'MP4 인코딩', icon: '🎬' },
+    { id: 'uploading', label: '업로드', icon: '☁️' },
   ];
 
   return (
@@ -362,23 +336,20 @@ export default function MultiSceneGenerationStep({
           영상 생성 중
         </h1>
         <p className="text-gray-400 text-sm">
-          템플릿 영상으로 홀로그램을 만들고 있습니다. 잠시만 기다려주세요.
+          브라우저에서 직접 렌더링합니다. 빠르게 완료됩니다!
         </p>
       </div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 items-center justify-center">
-
         {/* Left Side: Preview Visual */}
         <div className="flex flex-col items-center justify-center min-h-0 w-full">
           <div className="w-full max-w-[700px] aspect-square bg-gradient-to-br from-slate-900/80 to-black/80 border border-blue-500/20 rounded-[1.5rem] p-8 backdrop-blur-md flex flex-col items-center justify-center shadow-[0_0_40px_-10px_rgba(59,130,246,0.05)] relative overflow-hidden">
-            {/* Background Ambient Effect */}
             <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full scale-150 animate-pulse-slow pointer-events-none"></div>
 
             <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10 group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={templateImageUrl} alt="Preview" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
 
-              {/* Overlay Status */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
                 <div className="flex items-center gap-3">
                   {currentPhase === 'completed' ? (
@@ -410,12 +381,11 @@ export default function MultiSceneGenerationStep({
               </div>
 
               <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4 space-y-8">
-
                 {/* Overall Progress Bar */}
                 <div>
                   <div className="flex justify-between text-sm font-bold text-gray-300 mb-2">
                     <span>Total Progress</span>
-                    <span className="text-blue-400">{overallProgress}%</span>
+                    <span className="text-blue-400">{Math.round(overallProgress)}%</span>
                   </div>
                   <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
                     <div
@@ -424,13 +394,12 @@ export default function MultiSceneGenerationStep({
                     />
                   </div>
 
-                  {/* 시간 정보 */}
                   <div className="mt-3 space-y-1">
                     {currentPhase !== 'completed' && currentPhase !== 'error' && (
                       <>
                         <div className="flex justify-between text-xs">
-                          <span className="text-gray-400">⏱ 경과 시간: <span className="text-white font-mono">{formatTime(elapsedTime)}</span></span>
-                          <span className="text-gray-400">전체 예상: <span className="text-yellow-300">{getTotalEstimatedTime()}</span></span>
+                          <span className="text-gray-400">경과 시간: <span className="text-white font-mono">{formatTime(elapsedTime)}</span></span>
+                          <span className="text-gray-400">전체 예상: <span className="text-green-300">{getTotalEstimatedTime()}</span></span>
                         </div>
                         {getEstimatedTime() && (
                           <div className="text-xs text-gray-500">
@@ -455,8 +424,7 @@ export default function MultiSceneGenerationStep({
 
                     return (
                       <div key={phase.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all ${isActive ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-transparent border border-transparent opacity-60'}`}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-inner ${isDone ? 'bg-green-500 text-white' : isActive ? 'bg-blue-500 text-white animate-pulse' : 'bg-gray-800 text-gray-500'
-                          }`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-inner ${isDone ? 'bg-green-500 text-white' : isActive ? 'bg-blue-500 text-white animate-pulse' : 'bg-gray-800 text-gray-500'}`}>
                           {isDone ? '✓' : phase.icon}
                         </div>
                         <div className="flex-1">
@@ -469,7 +437,7 @@ export default function MultiSceneGenerationStep({
                 </div>
 
                 {/* Text Info */}
-                <div className="bg-black/40 rounded-xl p-4 border border-blue-500/10">
+                <div className="bg-black/40 rounded-xl p-4 border border-blue-500/10 -mt-4">
                   <p className="text-xs text-gray-500 mb-2 font-bold uppercase">포함된 문구</p>
                   <div className="space-y-1">
                     {sceneData.scenes.map((scene, idx) => (
@@ -496,7 +464,6 @@ export default function MultiSceneGenerationStep({
                 </button>
               </div>
             )}
-
           </div>
         </div>
       </div>

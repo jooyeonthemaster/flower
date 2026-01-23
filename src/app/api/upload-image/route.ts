@@ -5,8 +5,9 @@ import { getStorage } from 'firebase-admin/storage';
 // Firebase Admin 초기화 (서버사이드용)
 if (!getApps().length) {
   // 환경변수에서 서비스 계정 정보 가져오기 또는 기본 설정 사용
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+  // .trim()으로 환경변수 값의 줄바꿈/공백 제거 (CORS 에러 방지)
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.trim();
+  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim();
 
   if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
     // 서비스 계정 키가 있는 경우
@@ -62,7 +63,8 @@ export async function POST(req: NextRequest) {
     const timestamp = Date.now();
     const extension = mimeType.split('/')[1] || 'png';
     const finalFilename = filename || `ai-generated-${timestamp}.${extension}`;
-    const filePath = `ai-images/${finalFilename}`;
+    // filename에 경로가 포함되어 있으면 그대로 사용, 아니면 ai-images/ 기본 경로 사용
+    const filePath = finalFilename.includes('/') ? finalFilename : `ai-images/${finalFilename}`;
     console.log('[Upload Image] Target path:', filePath);
 
     // Firebase Storage에 업로드

@@ -41,3 +41,19 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+.env*.local
+
+# Firebase Admin SDK
+*-firebase-adminsdk-*.json
+firebase-adminsdk*.json
+
+# Large video files (backup, test)
+public/templates/videos/backup/
+test-output-options.mp4
+my-hologram.mp4
+*.mp4.backup
+nul
+
+# Korean filename error
+오류해결.md
+public/templates/videos/opening-fancy.mp4

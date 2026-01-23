@@ -7,7 +7,7 @@ import TextPreviewStep, { CustomSettings } from './steps/TextPreviewStep';
 import MultiSceneGenerationStep from './steps/MultiSceneGenerationStep';
 import CompositionInputStep, { CompositionData } from './steps/CompositionInputStep';
 import CompositionImagePreviewStep, { GeneratedDualFrame } from './steps/CompositionImagePreviewStep';
-import CompositionGenerationStep from './steps/CompositionGenerationStep';
+import CompositionGenerationStep from './steps/CompositionGenerationStep/index';
 import ModeSelectLanding from './ModeSelectLanding';
 
 // 단일 영상 생성 모드용 (30초, 6개 문구)
@@ -46,15 +46,17 @@ export default function HologramWizard() {
   };
 
   // 텍스트 프리뷰 완료 (이미지 URL, 커스텀 설정, 수정된 scenes 받아서 저장)
+  // 함수형 업데이트로 변경하여 referenceImage 유실 방지
   const handlePreviewComplete = (previewImageUrl: string, customSettings: CustomSettings, scenes: SceneData[]) => {
-    if (sceneData) {
-      setSceneData({
-        ...sceneData,
+    setSceneData((prevSceneData) => {
+      if (!prevSceneData) return prevSceneData;
+      return {
+        ...prevSceneData,
         scenes, // 수정된 scenes 업데이트
         previewImageUrl,
         customSettings,
-      });
-    }
+      };
+    });
     setStep(2); // 영상 생성으로 이동
   };
 
@@ -101,7 +103,7 @@ export default function HologramWizard() {
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600/10 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className={`relative z-10 w-full px-6 py-8 max-w-[1800px] mx-auto flex flex-col ${mode === 'select' ? 'min-h-screen' : 'h-[calc(100vh-60px)]'}`}>
+      <div className="relative z-10 w-full px-4 lg:px-6 py-4 lg:py-8 max-w-[1800px] mx-auto flex flex-col min-h-[100dvh]">
         {/* Header */}
         <header className="flex-none flex items-center justify-between mb-6 border-b border-white/10 pb-4">
           <div className="flex items-center space-x-4">
@@ -130,7 +132,7 @@ export default function HologramWizard() {
         </header>
 
         {/* Content Area */}
-        <main className={`flex-1 flex flex-col ${mode === 'select' ? '' : 'min-h-0 overflow-hidden'}`}>
+        <main className="flex-1 flex flex-col">
           {/* 모드 선택 화면 */}
           {mode === 'select' && (
             <ModeSelectLanding onSelectMode={handleModeSelect} />

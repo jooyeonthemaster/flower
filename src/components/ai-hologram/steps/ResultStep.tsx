@@ -109,10 +109,11 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
         </p>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
-        {/* Left Side: Video Output (7/12) */}
-        <div className="lg:col-span-7 flex flex-col min-h-0">
-          <div className={`flex-1 flex flex-col items-center justify-center rounded-[1.5rem] backdrop-blur-md overflow-hidden relative group border ${theme.panel}`}>
+      {/* Main Content - 1:1 Split on Desktop */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 items-center justify-center">
+        {/* Left Side: Video Output */}
+        <div className="flex flex-col items-center justify-center min-h-0 w-full">
+          <div className={`w-full max-w-[700px] aspect-square flex flex-col items-center justify-center rounded-[1.5rem] backdrop-blur-md overflow-hidden relative group border ${theme.panel}`}>
 
             {/* Ambient Glow */}
             <div className={`absolute inset-0 ${isPremium ? 'bg-amber-500/5' : 'bg-blue-500/5'} blur-3xl rounded-full scale-150 pointer-events-none`}></div>
@@ -142,67 +143,69 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
           </div>
         </div>
 
-        {/* Right Side: Actions & Details (5/12) */}
-        <div className="lg:col-span-5 flex flex-col h-full gap-4 min-h-0">
-          <div className={`flex-1 flex flex-col rounded-[1.5rem] backdrop-blur-sm overflow-hidden border ${theme.panel}`}>
-            <div className="p-6 pb-4 border-b border-white/5 bg-white/5">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${theme.badge}`}>✓</span>
-                결과 관리
-              </h3>
-            </div>
+        {/* Right Side: Actions & Details */}
+        <div className="flex flex-col items-center justify-center min-h-0 w-full">
+          <div className="w-full max-w-[700px] aspect-square flex flex-col gap-4 min-h-0">
+            <div className={`flex-1 flex flex-col rounded-[1.5rem] backdrop-blur-sm overflow-hidden border ${theme.panel}`}>
+              <div className="p-6 pb-4 border-b border-white/5 bg-white/5">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${theme.badge}`}>✓</span>
+                  결과 관리
+                </h3>
+              </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
 
-              {/* Scene Info Summary */}
-              <div className="bg-black/20 rounded-xl p-5 border border-white/5">
-                <p className="text-sm text-gray-400 mb-3 font-bold uppercase tracking-wider">Project Summary</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Video Type</span>
-                    <span className="text-white font-medium">{isPremium ? 'Premium Composition' : 'Standard Template'}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Duration</span>
-                    <span className="text-white font-medium">30s Loop</span>
-                  </div>
-                  {scenes && scenes.length > 0 && (
+                {/* Scene Info Summary */}
+                <div className="bg-black/20 rounded-xl p-5 border border-white/5">
+                  <p className="text-sm text-gray-400 mb-3 font-bold uppercase tracking-wider">Project Summary</p>
+                  <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Text Scenes</span>
-                      <span className={`font-bold ${theme.accentText}`}>{scenes.length} Scenes</span>
+                      <span className="text-gray-500">Video Type</span>
+                      <span className="text-white font-medium">{isPremium ? 'Premium Composition' : 'Standard Template'}</span>
                     </div>
-                  )}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Duration</span>
+                      <span className="text-white font-medium">30s Loop</span>
+                    </div>
+                    {scenes && scenes.length > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Text Scenes</span>
+                        <span className={`font-bold ${theme.accentText}`}>{scenes.length} Scenes</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="space-y-4">
-                <button
-                  onClick={handleSendToAdmin}
-                  className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all hover:-translate-y-1 flex items-center justify-center gap-2 ${theme.buttonPrimary}`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                  관리자에게 전송
-                </button>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <a
-                    href={videoUrl}
-                    download="my-hologram.mp4"
-                    className="py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                    다운로드
-                  </a>
+                {/* Actions */}
+                <div className="space-y-4">
                   <button
-                    onClick={onReset}
-                    className="py-3 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 font-bold transition-all"
+                    onClick={handleSendToAdmin}
+                    className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all hover:-translate-y-1 flex items-center justify-center gap-2 ${theme.buttonPrimary}`}
                   >
-                    처음으로
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                    관리자에게 전송
                   </button>
-                </div>
-              </div>
 
+                  <div className="grid grid-cols-2 gap-3">
+                    <a
+                      href={videoUrl}
+                      download="my-hologram.mp4"
+                      className="py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                      다운로드
+                    </a>
+                    <button
+                      onClick={onReset}
+                      className="py-3 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 font-bold transition-all"
+                    >
+                      처음으로
+                    </button>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>

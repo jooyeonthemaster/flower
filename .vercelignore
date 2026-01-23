@@ -1,7 +1,14 @@
 # Large files
 node_modules
 .next
-public/templates/videos/backup
-*.mp4
 my-hologram.mp4
 flower-63624-firebase-adminsdk-fbsvc-e0b1cf0f43.json
+
+# Root level mp4 files only
+/*.mp4
+
+# Upload scripts
+scripts/
+
+# Template video backups only (main templates are needed for deployment)
+public/templates/videos/backup

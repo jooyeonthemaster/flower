@@ -1,43 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { bundle } from '@remotion/bundler';
-import { renderMedia, selectComposition } from '@remotion/renderer';
-import path from 'path';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import fs from 'fs';
+import path from 'path';
 import os from 'os';
+
+import { getFFmpegPath, cleanupTempFiles } from '@/lib/ffmpeg';
+
+const execFileAsync = promisify(execFile);
 
 // Vercel Pro: max 300s (5min)
 export const maxDuration = 300;
-
-// Bundle caching
-let cachedBundlePath: string | null = null;
-let bundlePromise: Promise<string> | null = null;
-
-async function getOrCreateBundle(entryPoint: string): Promise<string> {
-  if (cachedBundlePath) {
-    console.log('Using cached Remotion bundle:', cachedBundlePath);
-    return cachedBundlePath;
-  }
-
-  if (bundlePromise) {
-    console.log('Waiting for ongoing bundle creation...');
-    return bundlePromise;
-  }
-
-  console.log('Creating new Remotion bundle...');
-  bundlePromise = bundle({ entryPoint }).then((bundlePath) => {
-    cachedBundlePath = bundlePath;
-    bundlePromise = null;
-    console.log('Bundle created and cached:', bundlePath);
-    return bundlePath;
-  });
-
-  return bundlePromise;
-}
 
 /**
  * overlay-video-on-image API
  *
  * 배경 이미지 위에 텍스트 영상을 screen 블렌딩으로 오버레이합니다.
+ * FFmpeg의 overlay 필터와 blend 모드를 사용합니다.
  *
  * 입력:
  * - backgroundImageUrl: 배경 이미지 URL (참조 이미지 포함된 AI 생성 배경)
@@ -61,106 +40,136 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('Starting overlay-video-on-image rendering...');
+    console.log('Starting FFmpeg overlay-video-on-image rendering...');
     const timestamp = Date.now();
     const tempDir = os.tmpdir();
 
-    // 1. 배경 이미지를 temp 파일로 저장 (Data URL인 경우)
-    let bgImagePath = backgroundImageUrl;
+    // 1. FFmpeg 경로 확인
+    let ffmpegBin: string;
+    try {
+      ffmpegBin = await getFFmpegPath();
+    } catch (e) {
+      console.error('FFmpeg not found:', e);
+      return NextResponse.json(
+        { success: false, error: 'FFmpeg를 찾을 수 없습니다.' },
+        { status: 500 }
+      );
+    }
+
+    // 2. 배경 이미지 저장
+    const bgImagePath = path.join(tempDir, `bg_${timestamp}.png`);
+    tempFiles.push(bgImagePath);
+
     if (backgroundImageUrl.startsWith('data:')) {
       const matches = backgroundImageUrl.match(/^data:image\/([^;]+);base64,(.+)$/);
       if (matches) {
         const base64Data = matches[2];
         const buffer = Buffer.from(base64Data, 'base64');
-        const tempBgPath = path.join(tempDir, `bg_${timestamp}.png`);
-        fs.writeFileSync(tempBgPath, buffer);
-        tempFiles.push(tempBgPath);
-
-        // HTTP URL로 변환
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-        const host = req.headers.get('host') || 'localhost:3000';
-        bgImagePath = `${protocol}://${host}/api/temp-video/${path.basename(tempBgPath)}`;
-        console.log('Background image saved:', bgImagePath);
+        fs.writeFileSync(bgImagePath, buffer);
+        console.log(`Background image saved: ${(buffer.length / 1024 / 1024).toFixed(2)}MB`);
+      } else {
+        throw new Error('Invalid background image data URL format');
       }
+    } else {
+      // 외부 URL에서 다운로드
+      console.log('Downloading background image from URL...');
+      const response = await fetch(backgroundImageUrl);
+      if (!response.ok) {
+        throw new Error(`배경 이미지 다운로드 실패: ${response.status}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      fs.writeFileSync(bgImagePath, buffer);
+      console.log(`Background image downloaded: ${(buffer.length / 1024 / 1024).toFixed(2)}MB`);
     }
 
-    // 2. 텍스트 영상을 temp 파일로 저장 (Data URL인 경우)
-    let textVideoPath = textVideoUrl;
+    // 3. 텍스트 영상 저장
+    const textVideoPath = path.join(tempDir, `text_video_${timestamp}.mp4`);
+    tempFiles.push(textVideoPath);
+
     if (textVideoUrl.startsWith('data:')) {
       const matches = textVideoUrl.match(/^data:video\/([^;]+);base64,(.+)$/);
       if (matches) {
         const base64Data = matches[2];
         const buffer = Buffer.from(base64Data, 'base64');
-        const tempVideoPath = path.join(tempDir, `text_video_${timestamp}.mp4`);
-        fs.writeFileSync(tempVideoPath, buffer);
-        tempFiles.push(tempVideoPath);
-
-        // HTTP URL로 변환
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-        const host = req.headers.get('host') || 'localhost:3000';
-        textVideoPath = `${protocol}://${host}/api/temp-video/${path.basename(tempVideoPath)}`;
-        console.log('Text video saved:', textVideoPath);
+        fs.writeFileSync(textVideoPath, buffer);
+        console.log(`Text video saved: ${(buffer.length / 1024 / 1024).toFixed(2)}MB`);
+      } else {
+        throw new Error('Invalid text video data URL format');
       }
+    } else {
+      // 외부 URL에서 다운로드
+      console.log('Downloading text video from URL...');
+      const response = await fetch(textVideoUrl);
+      if (!response.ok) {
+        throw new Error(`텍스트 영상 다운로드 실패: ${response.status}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      fs.writeFileSync(textVideoPath, buffer);
+      console.log(`Text video downloaded: ${(buffer.length / 1024 / 1024).toFixed(2)}MB`);
     }
 
-    // 3. Remotion Bundle
-    const entryPoint = path.join(process.cwd(), 'src', 'remotion', 'index.ts');
+    // 4. FFmpeg로 오버레이 합성
+    // filter_complex:
+    // - [0:v] 배경 이미지를 영상으로 변환 (loop, fps 설정)
+    // - [1:v] 텍스트 영상
+    // - blend=all_mode=screen 또는 overlay 필터 사용
+    const outputPath = path.join(tempDir, `overlay_output_${timestamp}.mp4`);
+    tempFiles.push(outputPath);
 
-    if (!fs.existsSync(entryPoint)) {
-      throw new Error(`Remotion entry point not found at ${entryPoint}`);
+    console.log('Executing FFmpeg overlay...');
+
+    // FFmpeg 명령어:
+    // 배경 이미지를 영상으로 변환하고, 그 위에 텍스트 영상을 screen 블렌딩으로 합성
+    // Screen 블렌딩: 어두운 부분(검은색)이 투명해지는 효과
+    const ffmpegArgs = [
+      '-y',
+      // 입력 1: 배경 이미지를 영상으로 변환
+      '-loop', '1',
+      '-t', duration.toString(),
+      '-i', bgImagePath,
+      // 입력 2: 텍스트 영상
+      '-i', textVideoPath,
+      // 필터: screen 블렌딩으로 합성
+      '-filter_complex',
+      '[0:v]fps=30,format=rgb24[bg];' +
+      '[1:v]fps=30,format=rgb24,scale=1080:1080:force_original_aspect_ratio=decrease,pad=1080:1080:(ow-iw)/2:(oh-ih)/2[fg];' +
+      '[bg][fg]blend=all_mode=screen:all_opacity=1[out]',
+      '-map', '[out]',
+      // 출력 설정
+      '-c:v', 'libx264',
+      '-preset', 'fast',
+      '-crf', '18',
+      '-r', '30',
+      '-g', '30',
+      '-sc_threshold', '0',
+      '-pix_fmt', 'yuv420p',
+      '-movflags', '+faststart',
+      '-t', duration.toString(),
+      outputPath
+    ];
+
+    try {
+      await execFileAsync(ffmpegBin, ffmpegArgs, { timeout: 240000 });
+    } catch (ffmpegError) {
+      console.error('FFmpeg execution error:', ffmpegError);
+      const errMsg = ffmpegError instanceof Error ? ffmpegError.message : 'Unknown FFmpeg error';
+      throw new Error(`FFmpeg 실행 실패: ${errMsg}`);
     }
 
-    const bundled = await getOrCreateBundle(entryPoint);
+    console.log('FFmpeg overlay completed');
 
-    // 4. Select Composition
-    const compositionId = 'VideoOnImageOverlay';
-    const fps = 30;
-    const durationInFrames = duration * fps;
-
-    const composition = await selectComposition({
-      serveUrl: bundled,
-      id: compositionId,
-      inputProps: {
-        backgroundImageSrc: bgImagePath,
-        textVideoSrc: textVideoPath,
-      },
-    });
-
-    // 5. Render Video
-    const outputLocation = path.join(tempDir, `overlay_output_${timestamp}.mp4`);
-    tempFiles.push(outputLocation);
-
-    console.log('Rendering overlay video...');
-
-    await renderMedia({
-      composition: {
-        ...composition,
-        durationInFrames,
-        fps,
-      },
-      serveUrl: bundled,
-      codec: 'h264',
-      outputLocation,
-      inputProps: {
-        backgroundImageSrc: bgImagePath,
-        textVideoSrc: textVideoPath,
-      },
-      concurrency: 4,
-      disallowParallelEncoding: false,
-      videoBitrate: '4M',
-      timeoutInMilliseconds: 300000,
-    });
-
-    console.log('Render completed:', outputLocation);
-
-    // 6. Read result
-    if (!fs.existsSync(outputLocation)) {
+    // 5. 결과 파일 확인
+    if (!fs.existsSync(outputPath)) {
       throw new Error('Output file was not created');
     }
 
-    const resultBuffer = fs.readFileSync(outputLocation);
+    const resultBuffer = fs.readFileSync(outputPath);
     const resultBase64 = resultBuffer.toString('base64');
     const resultDataUrl = `data:video/mp4;base64,${resultBase64}`;
+
+    console.log(`Output video size: ${(resultBuffer.length / 1024 / 1024).toFixed(2)}MB`);
 
     // Cleanup
     cleanupTempFiles(tempFiles);
@@ -168,6 +177,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       videoUrl: resultDataUrl,
+      engine: 'ffmpeg-blend',
     });
 
   } catch (error: unknown) {
@@ -182,14 +192,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function cleanupTempFiles(files: string[]) {
-  for (const file of files) {
-    try {
-      if (fs.existsSync(file)) {
-        fs.unlinkSync(file);
-      }
-    } catch (e) {
-      console.error('Failed to cleanup file:', file, e);
-    }
-  }
-}
