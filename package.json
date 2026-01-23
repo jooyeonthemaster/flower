@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fontsource/rajdhani": "^5.2.7",
     "@google/genai": "^1.30.0",
     "@imgly/background-removal": "^1.7.0",
     "@portone/browser-sdk": "^0.1.0",

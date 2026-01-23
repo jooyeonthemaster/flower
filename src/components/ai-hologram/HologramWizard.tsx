@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
 import ResultStep from './steps/ResultStep';
@@ -46,7 +46,6 @@ export default function HologramWizard() {
   };
 
   // 텍스트 프리뷰 완료 (이미지 URL, 커스텀 설정, 수정된 scenes 받아서 저장)
-  // 함수형 업데이트로 변경하여 referenceImage 유실 방지
   const handlePreviewComplete = (previewImageUrl: string, customSettings: CustomSettings, scenes: SceneData[]) => {
     setSceneData((prevSceneData) => {
       if (!prevSceneData) return prevSceneData;
@@ -72,7 +71,7 @@ export default function HologramWizard() {
     setStep(1); // 이미지 생성/미리보기로 이동
   };
 
-  // 이미지 생성 완료 (새로운 핸들러)
+  // 이미지 생성 완료
   const handleCompositionImageComplete = (frames: GeneratedDualFrame[]) => {
     setCompositionFrames(frames);
     setStep(2); // 영상 생성으로 이동
@@ -95,120 +94,152 @@ export default function HologramWizard() {
     setCompositionMessages(null);
   };
 
+  // Background style based on mode
+  const getBackgroundGradient = () => {
+    if (mode === 'composition') return 'bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-[#050505] to-[#050505]';
+    if (mode === 'single') return 'bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-[#050505] to-[#050505]';
+    return 'bg-[#050505]';
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Background Effects */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600/10 rounded-full blur-[120px]"></div>
+    <div className={`min-h-screen text-white relative overflow-hidden font-sans selection:bg-blue-500/30 selection:text-white ${getBackgroundGradient()}`}>
+
+      {/* Global Background Effects */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        {/* Animated Aurora */}
+        <div className="absolute top-[-50%] left-[-20%] w-[150%] h-[150%] bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-transparent blur-[120px] animate-aurora-flow opacity-60"></div>
+        {mode === 'composition' && (
+          <div className="absolute bottom-[-20%] right-[-20%] w-[80%] h-[80%] bg-gradient-to-tl from-amber-600/5 to-transparent blur-[120px] animate-pulse-slow"></div>
+        )}
+
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.03]"></div>
       </div>
 
-      <div className="relative z-10 w-full px-4 lg:px-6 py-4 lg:py-8 max-w-[1800px] mx-auto flex flex-col min-h-[100dvh]">
-        {/* Header */}
-        <header className="flex-none flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-              </svg>
+      <div className="relative z-10 flex flex-col min-h-screen">
+
+        {/* Navigation / Header (Only visible if not in select mode) */}
+        {mode !== 'select' && (
+          <header className="fixed top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-6 lg:px-8 border-b border-white/5 backdrop-blur-xl bg-black/50">
+            <div className="flex items-center gap-3 cursor-pointer group" onClick={handleReset}>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors">
+                <span className="text-lg">💠</span>
+              </div>
+              <span className="font-bold text-lg tracking-tight font-display text-white/90 group-hover:text-white transition-colors">
+                FLOWER <span className="font-light text-white/40">HOLOGRAM</span>
+              </span>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">AI Custom Hologram</h1>
-              <p className="text-xs text-gray-500 tracking-wider">나만의 홀로그램 만들기</p>
+
+            {/* Progress Steps */}
+            <div className="hidden lg:flex items-center gap-1">
+              {['설정 입력', '미리보기', '영상 생성', '완료'].map((label, idx) => {
+                const isActive = step >= idx;
+                const isCurrent = step === idx;
+                return (
+                  <div key={idx} className="flex items-center">
+                    <div className={`
+                      flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300
+                      ${isCurrent ? 'bg-white/10 text-white border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.1)]' : isActive ? 'text-white/60' : 'text-white/20'}
+                    `}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${isCurrent ? 'bg-blue-400 animate-pulse' : isActive ? 'bg-white/60' : 'bg-white/20'}`} />
+                      {label}
+                    </div>
+                    {idx < 3 && <div className="w-8 h-[1px] bg-white/5 mx-1" />}
+                  </div>
+                );
+              })}
             </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono text-white/30 px-2 py-1 rounded border border-white/5">
+                {mode === 'composition' ? 'PREMIUM AI' : 'STANDARD TEMPLATE'}
+              </span>
+            </div>
+          </header>
+        )}
+
+        {/* Main Content Area */}
+        <main className={`flex-1 flex flex-col ${mode !== 'select' ? 'pt-20 lg:pt-24 pb-12 px-4 lg:px-12 max-w-[1920px] mx-auto w-full' : ''}`}>
+
+          {/* Animated Transition Wrapper */}
+          <div className="w-full h-full flex flex-col animate-fadeIn">
+
+            {/* 모드 선택 화면 */}
+            {mode === 'select' && (
+              <ModeSelectLanding onSelectMode={handleModeSelect} />
+            )}
+
+            {/* 단일 영상 생성 모드 */}
+            {mode === 'single' && (
+              <>
+                {step === 0 && (
+                  <MultiSceneStep
+                    onNext={handleSceneSubmit}
+                    initialData={sceneData || undefined}
+                    onBack={() => setMode('select')}
+                  />
+                )}
+                {step === 1 && sceneData && (
+                  <TextPreviewStep
+                    sceneData={sceneData}
+                    onNext={handlePreviewComplete}
+                    onBack={() => setStep(0)}
+                  />
+                )}
+                {step === 2 && sceneData && (
+                  <MultiSceneGenerationStep
+                    sceneData={sceneData}
+                    onComplete={handleGenerationComplete}
+                    onBack={() => setStep(1)}
+                  />
+                )}
+                {step === 3 && (
+                  <ResultStep
+                    videoUrl={finalVideoUrl}
+                    onReset={handleReset}
+                  />
+                )}
+              </>
+            )}
+
+            {/* AI 영상 합성 모드 */}
+            {mode === 'composition' && (
+              <>
+                {step === 0 && (
+                  <CompositionInputStep
+                    onNext={handleCompositionInput}
+                    initialData={compositionData || undefined}
+                    onBack={() => setMode('select')}
+                  />
+                )}
+                {step === 1 && compositionData && (
+                  <CompositionImagePreviewStep
+                    data={compositionData}
+                    onNext={handleCompositionImageComplete}
+                    onBack={() => setStep(0)}
+                  />
+                )}
+                {step === 2 && compositionData && compositionFrames && (
+                  <CompositionGenerationStep
+                    data={compositionData}
+                    generatedFrames={compositionFrames}
+                    onComplete={handleCompositionGenerationComplete}
+                    onBack={() => setStep(1)}
+                  />
+                )}
+                {step === 3 && (
+                  <ResultStep
+                    videoUrl={finalVideoUrl}
+                    onReset={handleReset}
+                    scenes={compositionMessages?.map((msg, i) => ({ id: i + 1, text: msg, type: 'message' as const })) || undefined}
+                    isCompositionMode={true}
+                  />
+                )}
+              </>
+            )}
+
           </div>
-
-          {/* Step Indicators - 모드에 따라 다르게 표시 */}
-          <div className="flex items-center space-x-2">
-            {mode !== 'select' && [0, 1, 2, 3].map((s) => (
-              <div
-                key={s}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${step === s ? 'bg-blue-500 scale-125' :
-                  step > s ? 'bg-blue-900' : 'bg-gray-800'
-                  }`}
-              />
-            ))}
-          </div>
-        </header>
-
-        {/* Content Area */}
-        <main className="flex-1 flex flex-col">
-          {/* 모드 선택 화면 */}
-          {mode === 'select' && (
-            <ModeSelectLanding onSelectMode={handleModeSelect} />
-          )}
-
-          {/* 단일 영상 생성 모드 */}
-          {mode === 'single' && step === 0 && (
-            <MultiSceneStep
-              onNext={handleSceneSubmit}
-              initialData={sceneData || undefined}
-              onBack={() => setMode('select')}
-            />
-          )}
-
-          {mode === 'single' && step === 1 && sceneData && (
-            <TextPreviewStep
-              sceneData={sceneData}
-              onNext={handlePreviewComplete}
-              onBack={() => setStep(0)}
-            />
-          )}
-
-          {mode === 'single' && step === 2 && sceneData && (
-            <MultiSceneGenerationStep
-              sceneData={sceneData}
-              onComplete={handleGenerationComplete}
-              onBack={() => setStep(1)}
-            />
-          )}
-
-          {mode === 'single' && step === 3 && (
-            <ResultStep
-              videoUrl={finalVideoUrl}
-              onReset={handleReset}
-            />
-          )}
-
-          {/* AI 영상 합성 모드 */}
-          {mode === 'composition' && step === 0 && (
-            <CompositionInputStep
-              onNext={handleCompositionInput}
-              initialData={compositionData || undefined}
-              onBack={() => setMode('select')}
-            />
-          )}
-
-          {/* Step 1: AI 이미지 생성 + 미리보기 (새로운 컴포넌트) */}
-          {mode === 'composition' && step === 1 && compositionData && (
-            <CompositionImagePreviewStep
-              data={compositionData}
-              onNext={handleCompositionImageComplete}
-              onBack={() => setStep(0)}
-            />
-          )}
-
-          {/* Step 2: 영상 생성 (이미지는 이미 생성됨) */}
-          {mode === 'composition' && step === 2 && compositionData && compositionFrames && (
-            <CompositionGenerationStep
-              data={compositionData}
-              generatedFrames={compositionFrames}
-              onComplete={handleCompositionGenerationComplete}
-              onBack={() => setStep(1)}
-            />
-          )}
-
-          {mode === 'composition' && step === 3 && (
-            <ResultStep
-              videoUrl={finalVideoUrl}
-              onReset={handleReset}
-              scenes={compositionMessages?.map((msg, i) => ({ id: i + 1, text: msg, type: 'message' as const })) || undefined}
-              isCompositionMode={true}
-            />
-          )}
         </main>
-
-
       </div>
     </div>
   );
