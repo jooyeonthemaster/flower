@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { CompositionData } from './CompositionInputStep';
 
@@ -56,6 +56,9 @@ export default function CompositionImagePreviewStep({
   const [generationPhase, setGenerationPhase] = useState<GenerationPhase>('idle');
   const [backgroundProgress, setBackgroundProgress] = useState<boolean[]>([]);
   const [textFrameProgress, setTextFrameProgress] = useState<boolean[]>([]);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const startTimeRef = useRef<number>(Date.now());
+  const historyPushedRef = useRef(false);
 
   // 테스트 모드에서는 1개만 처리
   const messageCount = TEST_MODE ? 1 : data.messages.length;
@@ -64,6 +67,68 @@ export default function CompositionImagePreviewStep({
   const completedBackgrounds = backgroundProgress.filter(Boolean).length;
   const completedTextFrames = textFrameProgress.filter(Boolean).length;
   const totalProgress = ((completedBackgrounds + completedTextFrames) / (messageCount * 2)) * 100;
+
+  // 시간 포맷 함수
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // 경과 시간 타이머
+  useEffect(() => {
+    if (state === 'completed' || state === 'error' || state === 'idle') return;
+
+    const timer = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [state]);
+
+  // 화면 이탈 경고 (생성 중일 때) - 탭 닫기, 새로고침
+  useEffect(() => {
+    if (state !== 'generating') return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '이미지 생성이 진행 중입니다. 페이지를 떠나면 생성이 중단됩니다.';
+      return e.returnValue;
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [state]);
+
+  // 화면 이탈 경고 (생성 중일 때) - 뒤로가기 버튼
+  useEffect(() => {
+    if (state !== 'generating') {
+      historyPushedRef.current = false;
+      return;
+    }
+
+    // 더미 히스토리 한 번만 추가
+    if (!historyPushedRef.current) {
+      window.history.pushState({ generating: true }, '');
+      historyPushedRef.current = true;
+    }
+
+    const handlePopState = () => {
+      const confirmed = window.confirm(
+        '이미지 생성이 진행 중입니다. 페이지를 떠나면 생성이 중단됩니다.\n\n정말 나가시겠습니까?'
+      );
+      if (confirmed) {
+        window.removeEventListener('popstate', handlePopState);
+        historyPushedRef.current = false;
+        window.history.back();
+      } else {
+        window.history.pushState({ generating: true }, '');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [state]);
 
   // 배경 이미지 생성 (텍스트 없음, 1:1 비율)
   const generateBackgroundImage = async (): Promise<string> => {
@@ -121,6 +186,8 @@ export default function CompositionImagePreviewStep({
 
   // 모든 이미지 생성 (AI 2회 생성 방식 - 병렬 처리)
   const handleGenerateImages = async () => {
+    startTimeRef.current = Date.now();
+    setElapsedTime(0);
     setState('generating');
     setErrorMessage('');
     setGeneratedFrames([]);
@@ -376,6 +443,37 @@ export default function CompositionImagePreviewStep({
 
                 {/* 컨텐츠 */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4 space-y-6">
+
+                  {/* Progress Bar (생성 중일 때만) */}
+                  {state === 'generating' && (
+                    <div>
+                      <div className="flex justify-between text-sm font-bold text-gray-400 mb-2">
+                        <span>Total Progress</span>
+                        <span className="text-amber-500">{Math.round(totalProgress)}%</span>
+                      </div>
+                      <div className="h-2 bg-gray-800 rounded-full overflow-hidden border border-white/5">
+                        <div
+                          className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-500 ease-out shadow-[0_0_15px_-2px_rgba(245,158,11,0.5)]"
+                          style={{ width: `${totalProgress}%` }}
+                        />
+                      </div>
+                      <div className="mt-3 flex justify-between text-xs">
+                        <span className="text-gray-400">
+                          경과 시간: <span className="text-white font-mono">{formatTime(elapsedTime)}</span>
+                        </span>
+                        <span className="text-gray-400">
+                          전체 예상: <span className="text-green-300">약 5~10분</span>
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 완료 시 소요 시간 */}
+                  {state === 'completed' && (
+                    <div className="text-xs text-green-400">
+                      ✓ 총 소요 시간: <span className="font-mono">{formatTime(elapsedTime)}</span>
+                    </div>
+                  )}
 
                   {/* 정보 요약 */}
                   <div className="grid grid-cols-2 gap-3">

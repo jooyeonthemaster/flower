@@ -1,12 +1,15 @@
 [
   {
     "origin": [
+      "https://www.flower-signage.com",
+      "https://flower-signage.com",
+      "https://flower-9mhvx2mld-jooyoens-projects-59877186.vercel.app",
       "https://flower-livid-zeta.vercel.app",
       "http://localhost:3000",
       "http://localhost:3001"
     ],
-    "method": ["GET", "HEAD"],
+    "method": ["GET", "HEAD", "OPTIONS"],
     "maxAgeSeconds": 3600,
-    "responseHeader": ["Content-Type", "Content-Length"]
+    "responseHeader": ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges"]
   }
 ]

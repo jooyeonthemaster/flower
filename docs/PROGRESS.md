@@ -1,15 +1,20 @@
 # AI Hologram 프로젝트 진행상황
 
-## 최종 업데이트: 2026-01-22
+## 최종 업데이트: 2026-01-23
 
 ---
 
-## 현재 상태: 정상 작동
+## 현재 상태: Vercel Pro 배포 완료
+
+### 배포 정보
+- **URL**: https://www.flower-signage.com
+- **플랜**: Vercel Pro
+- **상태**: 정상 작동
 
 ### 1. 템플릿 모드 (Single Mode) - 무료
 - **상태**: 정상 작동
 - **기능**: 템플릿 영상 + 6개 문구 텍스트 오버레이로 30초 영상 생성
-- **방식**: 사전 제작 템플릿 영상 (AI 생성 없음 → 비용 절감)
+- **방식**: Firebase Storage에서 템플릿 영상 로드 (100MB+ 파일 지원)
 - **신규 기능**:
   - 참조 이미지 합성 (배경 제거 후 상단 중앙 배치)
   - 105개 색상 팔레트 + 24개 텍스트 이펙트
@@ -20,6 +25,7 @@
 - **상태**: 정상 작동
 - **기능**: 3개 문구로 30초 3D 텍스트 영상 자동 생성
 - **API**: Google Gemini (이미지 생성) + Higgsfield Kling 2.5 (영상 생성)
+- **영상 합성**: FFmpeg (Vercel serverless에서 정상 작동)
 
 ---
 
@@ -29,6 +35,45 @@
 - 3D 효과, 글리치, 홀로그램 효과 지원 안 됨
 - 반드시 Remotion 사용
 - FFmpeg는 영상 병합/루프 등 단순 처리에만 사용
+
+---
+
+## 최근 수정 사항 (2026-01-23)
+
+### Vercel Pro 배포 및 핵심 인프라 구축
+
+#### 1. 413 Payload Too Large 에러 해결
+- **문제**: 3개 영상(각 ~30MB) 합성 시 413 에러 발생
+- **원인**: `check-video-status`에서 영상을 Base64로 변환해 반환 → 90MB+ 요청 발생
+- **해결**: 영상을 Firebase Storage에 업로드 후 URL만 반환
+- **수정 파일**: `src/app/api/ai/check-video-status/route.ts`
+
+#### 2. Vercel에서 FFmpeg 작동 문제 해결
+- **문제**: Vercel serverless에서 ffmpeg-static 바이너리 미포함 → 첫 번째 영상만 반환
+- **원인**: Next.js 빌드 시 ffmpeg 바이너리가 번들에서 제외됨
+- **해결**: `next.config.ts`에 `outputFileTracingIncludes` 설정 추가
+  ```typescript
+  outputFileTracingIncludes: {
+    '/api/ai/merge-videos': ['./node_modules/ffmpeg-static/ffmpeg'],
+    '/api/ai/loop-video': ['./node_modules/ffmpeg-static/ffmpeg'],
+    // ...
+  },
+  serverExternalPackages: [..., 'ffmpeg-static'],
+  ```
+- **참고**: [Vercel 공식 가이드](https://github.com/vercel-labs/ffmpeg-on-vercel)
+
+#### 3. 템플릿 영상 Firebase Storage 마이그레이션
+- **문제**: 템플릿 영상(27MB~113MB)이 Vercel 정적 파일 제한(100MB) 초과
+- **해결**: 6개 템플릿 영상을 Firebase Storage에 업로드
+- **경로**: `templates/videos/{category}-{style}.mp4`
+- **수정 파일**:
+  - `src/components/ai-hologram/steps/TextPreviewStep/utils/templatePath.ts`
+  - `src/components/ai-hologram/steps/MultiSceneGenerationStep.tsx`
+
+#### 4. Firebase Storage CORS 설정
+- **문제**: 브라우저에서 Firebase Storage 영상 접근 불가 (CORS 에러)
+- **해결**: `gsutil cors set cors.json gs://bucket-name` 으로 CORS 설정
+- **허용 도메인**: flower-signage.com, localhost:3000, localhost:3001
 
 ---
 
@@ -164,16 +209,30 @@
 
 ## 환경 변수
 
+### Firebase 클라이언트 (7개)
 ```env
-# Higgsfield API
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+```
+
+### 서버 시크릿 (5개)
+```env
+FIREBASE_SERVICE_ACCOUNT_KEY=  # JSON 문자열
 HIGGSFIELD_API_KEY=
 HIGGSFIELD_API_SECRET=
-
-# Google AI
 GOOGLE_GENAI_API_KEY=
+PORTONE_API_SECRET=
+```
 
-# Firebase (이미지 업로드용)
-FIREBASE_*
+### 결제 (2개)
+```env
+NEXT_PUBLIC_PORTONE_STORE_ID=
+NEXT_PUBLIC_PORTONE_CHANNEL_KEY=
 ```
 
 ---
@@ -185,6 +244,9 @@ FIREBASE_*
 2. ✅ Nano Banana API input_images 구조 오류 → API 문서 기준으로 수정
 3. ✅ aspect_ratio 지원하지 않는 값 사용 → 1:1로 변경
 4. ✅ 사용자에게 불필요한 기술적 정보 노출 → UI에서 제거
+5. ✅ 413 Payload Too Large → Firebase Storage URL 방식으로 해결
+6. ✅ Vercel에서 FFmpeg 미작동 → outputFileTracingIncludes 설정 추가
+7. ✅ 템플릿 영상 100MB 초과 → Firebase Storage 마이그레이션
 
 ### 참고 사항
 - 영상 생성 예상 소요 시간: 3-7분
@@ -215,12 +277,20 @@ FIREBASE_*
 
 ## 다음 단계 (예정)
 
-- [ ] Firebase Storage 연동
+- [ ] API 인증 미들웨어 (Firebase Auth 기반)
+- [ ] Rate Limiting
 - [ ] 관리자 페이지 구현
-- [ ] 결제 시스템 통합
 - [ ] 홀로그램 디바이스 실제 테스트
 
-## 최근 해결 완료 (2026-01-19)
+## 최근 해결 완료 (2026-01-23)
+
+- [x] Vercel Pro 배포 ✅
+- [x] 413 Payload Too Large 에러 해결 ✅
+- [x] Vercel에서 FFmpeg 작동 문제 해결 ✅
+- [x] 템플릿 영상 Firebase Storage 마이그레이션 ✅
+- [x] Firebase Storage CORS 설정 ✅
+
+## 이전 완료 (2026-01-19)
 
 - [x] 참조 이미지 배경 제거 기능 ✅
 - [x] 한글 텍스트 렌더링 문제 해결 ✅

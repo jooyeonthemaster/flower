@@ -5,8 +5,32 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import ffmpegPath from 'ffmpeg-static';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getStorage } from 'firebase-admin/storage';
 
 import { spawnAsync, getFFmpegPath, cleanupTempFiles } from '@/lib/ffmpeg';
+
+// Firebase Admin 초기화
+if (!getApps().length) {
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.trim();
+  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim();
+
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    if (serviceAccount.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+    }
+    initializeApp({
+      credential: cert(serviceAccount),
+      storageBucket: storageBucket,
+    });
+  } else {
+    initializeApp({
+      projectId: projectId,
+      storageBucket: storageBucket,
+    });
+  }
+}
 
 const execAsync = promisify(exec);
 
@@ -95,27 +119,46 @@ export async function POST(req: NextRequest) {
     // OS에 맞는 임시 디렉토리 사용 (Windows: AppData\Local\Temp, Linux/Vercel: /tmp)
     const tempDir = os.tmpdir();
 
-    // 1. Base64 영상들을 임시 폴더에 파일로 저장
+    // 1. 영상들을 임시 폴더에 파일로 저장 (URL 또는 Base64 지원)
     const videoFiles: string[] = [];
     for (let i = 0; i < videoDataUrls.length; i++) {
-      const dataUrl = videoDataUrls[i];
+      const videoInput = videoDataUrls[i];
+      const filepath = path.join(tempDir, `video_${timestamp}_${i}.mp4`);
 
-      // Data URL에서 base64 추출
-      const matches = dataUrl.match(/^data:video\/([^;]+);base64,(.+)$/);
-      if (!matches) {
-        console.error(`Invalid video data URL format at index ${i}`);
+      try {
+        if (videoInput.startsWith('data:')) {
+          // Data URL에서 base64 추출
+          const matches = videoInput.match(/^data:video\/([^;]+);base64,(.+)$/);
+          if (!matches) {
+            console.error(`Invalid video data URL format at index ${i}`);
+            continue;
+          }
+          const base64Data = matches[2];
+          const buffer = Buffer.from(base64Data, 'base64');
+          fs.writeFileSync(filepath, buffer);
+          console.log(`Saved video ${i + 1}/${videoDataUrls.length} from Base64: ${filepath}`);
+        } else if (videoInput.startsWith('http://') || videoInput.startsWith('https://')) {
+          // 외부 URL에서 다운로드
+          console.log(`Downloading video ${i + 1}/${videoDataUrls.length} from URL: ${videoInput.substring(0, 80)}...`);
+          const response = await fetch(videoInput);
+          if (!response.ok) {
+            throw new Error(`Failed to download video: ${response.status}`);
+          }
+          const arrayBuffer = await response.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          fs.writeFileSync(filepath, buffer);
+          console.log(`Downloaded and saved video ${i + 1}/${videoDataUrls.length}: ${filepath} (${(buffer.length / 1024 / 1024).toFixed(1)}MB)`);
+        } else {
+          console.error(`Unknown video format at index ${i}`);
+          continue;
+        }
+
+        videoFiles.push(filepath);
+        tempFiles.push(filepath);
+      } catch (downloadError) {
+        console.error(`Failed to process video ${i}:`, downloadError);
         continue;
       }
-
-      const base64Data = matches[2];
-      const buffer = Buffer.from(base64Data, 'base64');
-
-      const filepath = path.join(tempDir, `video_${timestamp}_${i}.mp4`);
-      fs.writeFileSync(filepath, buffer);
-      videoFiles.push(filepath);
-      tempFiles.push(filepath);
-
-      console.log(`Saved video ${i + 1}/${videoDataUrls.length}: ${filepath}`);
     }
 
     if (videoFiles.length === 0) {
@@ -237,20 +280,39 @@ export async function POST(req: NextRequest) {
     }
 
     const resultBuffer = fs.readFileSync(outputPath);
-    const resultBase64 = resultBuffer.toString('base64');
-    const videoDataUrl = `data:video/mp4;base64,${resultBase64}`;
 
     // 총 영상 길이 계산: 각 영상 길이 합 - (전환 횟수 * 전환 시간)
     const totalDuration = durations.reduce((sum, d) => sum + d, 0) - (videoFiles.length - 1) * CROSSFADE_DURATION;
 
     console.log(`Video merge completed successfully. Total duration: ${totalDuration.toFixed(1)}s (with ${videoFiles.length - 1} crossfades)`);
 
-    // 5. 임시 파일 정리
+    // 5. Firebase Storage에 업로드
+    let finalVideoUrl: string;
+    try {
+      const bucket = getStorage().bucket();
+      const uploadPath = `merged-videos/merged_${timestamp}.mp4`;
+      const file = bucket.file(uploadPath);
+
+      await file.save(resultBuffer, {
+        metadata: { contentType: 'video/mp4' },
+      });
+      await file.makePublic();
+
+      finalVideoUrl = `https://storage.googleapis.com/${bucket.name}/${uploadPath}`;
+      console.log(`Uploaded merged video to Firebase: ${finalVideoUrl}`);
+    } catch (uploadError) {
+      console.error('Firebase upload failed, returning Base64:', uploadError);
+      // 업로드 실패 시 Base64로 fallback (작은 영상인 경우)
+      const resultBase64 = resultBuffer.toString('base64');
+      finalVideoUrl = `data:video/mp4;base64,${resultBase64}`;
+    }
+
+    // 6. 임시 파일 정리
     cleanupTempFiles(tempFiles);
 
     return NextResponse.json({
       success: true,
-      videoUrl: videoDataUrl,
+      videoUrl: finalVideoUrl,
       duration: Math.round(totalDuration),
       sceneCount: videoFiles.length,
       crossfadeDuration: CROSSFADE_DURATION

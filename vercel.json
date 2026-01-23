@@ -5,16 +5,25 @@
   "installCommand": "npm install --legacy-peer-deps",
   "functions": {
     "src/app/api/upload-image/route.ts": {
-      "maxDuration": 60,
-      "maxBodySize": "50mb"
+      "maxDuration": 60
     },
     "src/app/api/upload-video/route.ts": {
-      "maxDuration": 120,
-      "maxBodySize": "50mb"
+      "maxDuration": 120
+    },
+    "src/app/api/ai/merge-videos/route.ts": {
+      "maxDuration": 300,
+      "memory": 3009
+    },
+    "src/app/api/ai/loop-video/route.ts": {
+      "maxDuration": 300,
+      "memory": 3009
+    },
+    "src/app/api/ai/overlay-video-on-image/route.ts": {
+      "maxDuration": 300,
+      "memory": 3009
     },
     "src/app/api/ai/**/*.ts": {
-      "maxDuration": 300,
-      "maxBodySize": "50mb"
+      "maxDuration": 300
     }
   }
 }

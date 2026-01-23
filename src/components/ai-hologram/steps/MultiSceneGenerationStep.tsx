@@ -19,9 +19,12 @@ const getTemplateImagePath = (category: string, style: string): string => {
   return `/previews/${category}-${style}.png`;
 };
 
+// Firebase Storage 템플릿 영상 URL
+const STORAGE_BASE_URL = `https://storage.googleapis.com/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'flower-63624.firebasestorage.app'}`;
+
 const getTemplateVideoPath = (category: string, style: string): string => {
-  // 로컬 public 폴더에서 템플릿 영상 로드 (CORS 이슈 방지)
-  return `/templates/videos/${category}-${style}.mp4`;
+  // Firebase Storage에서 템플릿 영상 로드
+  return `${STORAGE_BASE_URL}/templates/videos/${category}-${style}.mp4`;
 };
 
 // 브라우저 렌더링 기반 진행 상태

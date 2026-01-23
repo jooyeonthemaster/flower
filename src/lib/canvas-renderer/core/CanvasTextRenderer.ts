@@ -10,7 +10,7 @@ import type {
   EffectContext,
   CharEffectMode,
 } from '../types';
-import { calculateCharPositions, calculateCharPositionsMultiLine, calculateTextBounds } from '../utils/textMeasure';
+import { calculateCharPositions, calculateCharPositionsMultiLine, calculateTextBounds, autoWrapKoreanText } from '../utils/textMeasure';
 import { hexToRgb, rgba } from '../utils/colorUtils';
 import { GLOW_RADII } from '../constants/effects';
 
@@ -27,6 +27,7 @@ export class CanvasTextRenderer {
 
   /**
    * 텍스트 렌더링 (전체 또는 글자별)
+   * 긴 텍스트는 자동 줄바꿈 적용 (캔버스 너비의 80% 기준)
    */
   renderText(
     text: string,
@@ -35,10 +36,14 @@ export class CanvasTextRenderer {
     mode: CharEffectMode,
     charEffects?: EffectResult[] // 글자별 이펙트 (perChar 모드용)
   ): void {
+    // 자동 줄바꿈 적용 (캔버스 너비의 80%를 최대 너비로)
+    const maxWidth = this.width * 0.8;
+    const wrappedText = autoWrapKoreanText(text, style, maxWidth);
+
     if (mode === 'perChar' && charEffects) {
-      this.renderCharByChar(text, style, effects, charEffects);
+      this.renderCharByChar(wrappedText, style, effects, charEffects);
     } else {
-      this.renderWholeText(text, style, effects);
+      this.renderWholeText(wrappedText, style, effects);
     }
   }
 

@@ -10,5 +10,8 @@ flower-63624-firebase-adminsdk-fbsvc-e0b1cf0f43.json
 # Upload scripts
 scripts/
 
-# Template video backups only (main templates are needed for deployment)
-public/templates/videos/backup
+# Generated files (use external storage)
+public/generated
+
+# Template videos (use external storage)
+public/templates/videos

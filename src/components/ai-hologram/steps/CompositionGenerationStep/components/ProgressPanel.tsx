@@ -6,14 +6,22 @@ interface ProgressPanelProps {
   sceneCount: number;
   errorMessage: string;
   onBack: () => void;
+  elapsedTime: number;
 }
 
-export default function ProgressPanel({ phase, progress, sceneCount, errorMessage, onBack }: ProgressPanelProps) {
+export default function ProgressPanel({ phase, progress, sceneCount, errorMessage, onBack, elapsedTime }: ProgressPanelProps) {
   // 진행 상황 계산
   const totalSteps = sceneCount + (sceneCount > 1 ? 1 : 0);
   const completedSteps = progress.filter((p) => p.videoGenerated).length + (phase === 'completed' && sceneCount > 1 ? 1 : 0);
   const progressPercent = Math.round((completedSteps / totalSteps) * 100);
   const completedCount = progress.filter((p) => p.videoGenerated).length;
+
+  // 시간 포맷 함수
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
     <div className="lg:col-span-5 flex flex-col h-full gap-4 min-h-0">
@@ -40,6 +48,21 @@ export default function ProgressPanel({ phase, progress, sceneCount, errorMessag
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
+            {phase !== 'completed' && phase !== 'error' && (
+              <div className="mt-3 flex justify-between text-xs">
+                <span className="text-gray-400">
+                  경과 시간: <span className="text-white font-mono">{formatTime(elapsedTime)}</span>
+                </span>
+                <span className="text-gray-400">
+                  전체 예상: <span className="text-green-300">약 5~10분</span>
+                </span>
+              </div>
+            )}
+            {phase === 'completed' && (
+              <div className="mt-3 text-xs text-green-400">
+                ✓ 총 소요 시간: <span className="font-mono">{formatTime(elapsedTime)}</span>
+              </div>
+            )}
           </div>
 
           {/* Status Steps */}

@@ -75,23 +75,38 @@ export function spawnAsync(
 export async function getFFmpegPath(): Promise<string> {
   // Priority 1: Environment variable
   if (process.env.FFMPEG_BIN) {
+    console.log('[FFmpeg] Using FFMPEG_BIN env:', process.env.FFMPEG_BIN);
     return process.env.FFMPEG_BIN;
   }
 
   // Priority 2: System FFmpeg
   try {
     await execAsync('ffmpeg -version', { timeout: 5000 });
+    console.log('[FFmpeg] Using system ffmpeg');
     return 'ffmpeg';
   } catch {
     // System FFmpeg not found
+    console.log('[FFmpeg] System ffmpeg not found');
   }
 
   // Priority 3: ffmpeg-static package
+  console.log('[FFmpeg] ffmpeg-static raw path:', ffmpegPath);
+
   if (ffmpegPath && typeof ffmpegPath === 'string') {
-    if (ffmpegPath.includes('\\ROOT\\') || ffmpegPath.includes('/ROOT/')) {
-      throw new Error('ffmpeg-static returned an invalid path.');
-    }
+    // Vercel 환경에서 ROOT 경로가 반환되는 경우 처리
+    // fs.existsSync가 false를 반환해도 실제로 실행 가능할 수 있음
+    console.log('[FFmpeg] Checking ffmpeg-static path exists:', fs.existsSync(ffmpegPath));
+
+    // 파일이 존재하면 사용
     if (fs.existsSync(ffmpegPath)) {
+      console.log('[FFmpeg] Using ffmpeg-static (file exists)');
+      return ffmpegPath;
+    }
+
+    // 파일이 존재하지 않아도 경로가 유효해 보이면 시도
+    // (Vercel serverless 환경에서는 fs.existsSync가 제대로 작동하지 않을 수 있음)
+    if (!ffmpegPath.includes('ROOT')) {
+      console.log('[FFmpeg] Using ffmpeg-static (assuming valid path)');
       return ffmpegPath;
     }
   }

@@ -190,3 +190,62 @@ export function calculateTextBounds(
     lineHeight,
   };
 }
+
+/**
+ * 한글 자동 줄바꿈 (글자 단위)
+ * 기준: "두 분의 결혼을 진심으로 축하드립니다" (약 16글자) 보다 긴 텍스트
+ * - 기존 수동 줄바꿈(\n)은 유지
+ * - 각 줄에서 maxWidth를 초과하면 글자 단위로 줄바꿈
+ */
+export function autoWrapKoreanText(
+  text: string,
+  style: TextStyle,
+  maxWidth: number
+): string {
+  const ctx = getMeasureContext();
+  ctx.font = `${style.fontWeight} ${style.fontSize}px ${style.fontFamily}`;
+
+  // 이미 수동 줄바꿈이 있는 경우 각 줄별로 처리
+  const manualLines = text.split('\n');
+  const resultLines: string[] = [];
+
+  for (const line of manualLines) {
+    if (line.length === 0) {
+      resultLines.push('');
+      continue;
+    }
+
+    // 현재 줄의 너비 측정
+    const lineWidth = ctx.measureText(line).width;
+
+    if (lineWidth <= maxWidth) {
+      // 너비가 충분하면 그대로 유지
+      resultLines.push(line);
+    } else {
+      // 너비 초과 시 글자 단위로 줄바꿈
+      let currentLine = '';
+      let currentWidth = 0;
+
+      for (const char of line) {
+        const charWidth = ctx.measureText(char).width;
+
+        if (currentWidth + charWidth > maxWidth && currentLine.length > 0) {
+          // 현재 줄 저장하고 새 줄 시작
+          resultLines.push(currentLine);
+          currentLine = char;
+          currentWidth = charWidth;
+        } else {
+          currentLine += char;
+          currentWidth += charWidth;
+        }
+      }
+
+      // 마지막 줄 추가
+      if (currentLine.length > 0) {
+        resultLines.push(currentLine);
+      }
+    }
+  }
+
+  return resultLines.join('\n');
+}
