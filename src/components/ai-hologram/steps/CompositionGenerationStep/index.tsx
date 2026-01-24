@@ -1,10 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { CompositionGenerationStepProps, GenerationPhase, SceneProgress } from './types';
 import { useVideoGeneration } from './hooks/useVideoGeneration';
 import SceneGrid from './components/SceneGrid';
 import ProgressPanel from './components/ProgressPanel';
+
+// Premium 모드 색상
+const PREMIUM_COLOR = '#E66B33';
 
 // 테스트 모드에서 사용할 모델
 const TEST_MODEL = 'kling-2.5-turbo-pro';
@@ -102,15 +106,20 @@ export default function CompositionGenerationStep({ data, generatedFrames, onCom
   }, [phase]);
 
   return (
-    <div className="animate-fade-in h-full flex flex-col overflow-hidden">
+    <div className="w-full h-full flex flex-col p-4 md:p-6 lg:p-8 overflow-auto">
       {/* 상단 헤더 */}
-      <div className="flex-none mb-6 text-center lg:text-left">
-        <h1 className="text-3xl font-extrabold text-white mb-2 drop-shadow-sm">
-          <span className="text-amber-500 mr-2">Premium</span>
-          영상 생성 진행
-        </h1>
-        <p className="text-gray-400 text-sm">여러 개의 장면을 동시에 생성하고 하나로 연결합니다.</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex-none mb-6 text-center"
+      >
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <span className="headline-step" style={{ color: PREMIUM_COLOR }}>PREMIUM</span>
+          <span className="text-xl text-gray-300">✦</span>
+          <span className="headline-step text-gray-900">영상 생성</span>
+        </div>
+        <p className="text-gray-500 text-sm md:text-base">여러 개의 장면을 동시에 생성하고 하나로 연결합니다.</p>
+      </motion.div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
         <SceneGrid generatedFrames={generatedFrames} progress={progress} phase={phase} sceneCount={sceneCount} />

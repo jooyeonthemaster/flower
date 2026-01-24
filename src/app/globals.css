@@ -70,6 +70,26 @@
 :root {
   --background: #fefefe;
   --foreground: #1a1a1a;
+
+  /* Brutalist Editorial Color System (follow.art inspired) */
+  --color-orange: #E66B33;           /* International Orange - CTA, 액센트 */
+  --color-cream: #F5F5F0;            /* Off-White - 메인 배경 */
+  --color-black: #0a0a0a;            /* Deep Black - 대비, 텍스트 */
+  --color-white: #FFFFFF;            /* Pure White */
+
+  /* Transition Colors (섹션별 배경) */
+  --color-dusty-rose: #D4A5A5;       /* Premium 모드 배경 */
+  --color-moss-green: #8A9A5B;       /* Standard 모드 배경 */
+  --color-warm-gray: #BDBDBD;        /* 중립 배경 */
+
+  /* Semantic Colors */
+  --color-success: #4CAF50;
+  --color-warning: #E66B33;
+  --color-error: #E53935;
+
+  /* Mode-specific accents */
+  --standard-accent: var(--color-moss-green);
+  --premium-accent: var(--color-orange);
 }
 
 /* 커스텀 스크롤바 스타일 */
@@ -158,4 +178,195 @@
 
 .animate-pulse-slow {
   animation: pulse-slow 4s ease-in-out infinite;
+}
+
+/* ========================================
+   Brutalist Editorial Design System
+   ======================================== */
+
+/* Background Morph Transitions */
+.bg-morph {
+  transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-cream { background-color: var(--color-cream); }
+.bg-deep-black { background-color: var(--color-black); }
+.bg-dusty-rose { background-color: var(--color-dusty-rose); }
+.bg-moss-green { background-color: var(--color-moss-green); }
+.bg-orange { background-color: var(--color-orange); }
+
+/* Text Colors */
+.text-orange { color: var(--color-orange); }
+.text-cream { color: var(--color-cream); }
+.text-deep-black { color: var(--color-black); }
+
+/* Brutalist Typography */
+.headline-hero {
+  font-family: 'Anton', 'Impact', sans-serif;
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+
+.headline-large {
+  font-family: 'Bebas Neue', 'Impact', sans-serif;
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Step page headlines - Anton font with balanced size */
+.headline-step {
+  font-family: 'Anton', 'Impact', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.headline-step-sub {
+  font-family: 'Bebas Neue', 'Impact', sans-serif;
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.accent-script {
+  font-family: 'Permanent Marker', cursive;
+}
+
+/* Hover Effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* Floating Card (Tilted) */
+.card-tilt-left {
+  transform: rotate(-3deg);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.card-tilt-left:hover {
+  transform: rotate(0deg) scale(1.05);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.card-tilt-right {
+  transform: rotate(3deg);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.card-tilt-right:hover {
+  transform: rotate(0deg) scale(1.05);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Brutalist Input Style */
+.input-brutalist {
+  border: 3px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: white;
+}
+.input-brutalist:focus {
+  border-color: var(--color-orange);
+  box-shadow: 4px 4px 0 var(--color-black);
+  outline: none;
+}
+
+/* Fan Spin Animations */
+@keyframes fan-spin-90 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(90deg); }
+}
+
+@keyframes fan-spin-reverse-90 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-90deg); }
+}
+
+@keyframes fan-blade-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px var(--color-orange));
+    opacity: 1;
+  }
+  50% {
+    filter: drop-shadow(0 0 20px var(--color-orange));
+    opacity: 0.9;
+  }
+}
+
+.animate-fan-glow {
+  animation: fan-blade-glow 2s ease-in-out infinite;
+}
+
+/* Turbo spin animations for TurbineCard compatibility */
+@keyframes spin-turbo {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-turbo-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+.animate-spin-turbo {
+  animation: spin-turbo 1.5s linear infinite;
+}
+
+.animate-spin-turbo-reverse {
+  animation: spin-turbo-reverse 1.5s linear infinite;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-turbo-reverse 8s linear infinite;
+}
+
+/* Perspective utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+/* Custom scrollbar for light theme */
+.custom-scrollbar-light::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar-light::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.custom-scrollbar-light::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.custom-scrollbar-light::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.custom-scrollbar-light {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05);
 }

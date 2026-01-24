@@ -7,26 +7,24 @@ interface StyleSelectorProps {
 
 export default function StyleSelector({ style, onStyleChange }: StyleSelectorProps) {
   return (
-    <div className="mb-4 flex-1 flex flex-col justify-center">
-      <label className="block text-sm font-bold text-gray-300 mb-3">AI 스타일</label>
-      <div className="grid grid-cols-1 gap-3 h-full">
+    <div className="flex flex-col">
+      <label className="block text-sm font-bold text-gray-700 mb-2">AI 스타일</label>
+      <div className="grid grid-cols-1 gap-2">
         {styles.map((s) => (
           <button
             key={s.id}
             onClick={() => onStyleChange(s.id)}
-            className={`flex items-center gap-4 p-4 rounded-xl border transition-all text-left group h-full ${
+            className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left group ${
               style === s.id
-                ? 'border-amber-500 bg-amber-500/20 shadow-[0_0_15px_-3px_rgba(245,158,11,0.3)]'
-                : 'border-slate-800 bg-slate-900/50 hover:border-amber-500/30'
+                ? 'border-[#E66B33] bg-[#E66B33]/10 shadow-md'
+                : 'border-gray-200 bg-white hover:border-[#E66B33]/50 hover:bg-gray-50'
             }`}
           >
             <div
-              className={`w-10 h-10 rounded-full bg-gradient-to-br ${s.color} shadow-lg shrink-0 group-hover:scale-110 transition-transform`}
+              className={`w-8 h-8 rounded-full bg-gradient-to-br ${s.color} shadow-md shrink-0 group-hover:scale-110 transition-transform`}
             ></div>
-            <div>
-              <div className={`text-base font-bold ${style === s.id ? 'text-white' : 'text-gray-500 group-hover:text-white'}`}>
-                {s.label}
-              </div>
+            <div className={`text-sm font-bold ${style === s.id ? 'text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
+              {s.label}
             </div>
           </button>
         ))}

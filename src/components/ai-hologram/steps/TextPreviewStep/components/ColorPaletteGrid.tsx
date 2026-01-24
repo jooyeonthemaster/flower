@@ -1,5 +1,8 @@
 import { generateColorPalette } from '../utils/colorPalette';
 
+// Standard 모드 색상
+const STANDARD_COLOR = '#8A9A5B';
+
 interface ColorPaletteGridProps {
   currentColor: string;
   onSelect: (color: string) => void;
@@ -14,7 +17,11 @@ export default function ColorPaletteGrid({ currentColor, onSelect }: ColorPalett
         <button
           key={idx}
           onClick={() => onSelect(color)}
-          className={`w-4 h-4 border ${currentColor === color ? 'border-blue-400 ring-1 ring-blue-400' : 'border-black/20 hover:border-white/60'}`}
+          className={`w-4 h-4 border-2 rounded-sm transition-all ${
+            currentColor === color
+              ? 'border-[#8A9A5B] ring-2 ring-[#8A9A5B]/50 scale-110'
+              : 'border-gray-300 hover:border-[#8A9A5B]/60 hover:scale-105'
+          }`}
           style={{ backgroundColor: color }}
           title={color}
         />

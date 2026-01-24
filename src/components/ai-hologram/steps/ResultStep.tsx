@@ -1,7 +1,12 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { SceneData } from './MultiSceneStep';
+
+// 모드별 색상
+const PREMIUM_COLOR = '#E66B33';
+const STANDARD_COLOR = '#8A9A5B';
 
 interface ResultStepProps {
   videoUrl: string;
@@ -85,41 +90,41 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
 
   // Theme helpers
   const isPremium = isCompositionMode;
-  const theme = {
-    panel: isPremium
-      ? 'bg-gradient-to-br from-slate-900/80 to-black/80 border-amber-500/20 shadow-[0_0_30px_-5px_rgba(245,158,11,0.1)]'
-      : 'bg-slate-900/40 border-blue-500/10 shadow-lg',
-    accentText: isPremium ? 'text-amber-500' : 'text-blue-500',
-    accentBg: isPremium ? 'bg-amber-500' : 'bg-blue-500',
-    accentBorder: isPremium ? 'border-amber-500/50' : 'border-blue-500/50',
-    buttonPrimary: isPremium ? 'bg-gradient-to-r from-amber-600 to-amber-500 hover:shadow-amber-500/30' : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:shadow-blue-500/30',
-    badge: isPremium ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'
-  };
+  const accentColor = isPremium ? PREMIUM_COLOR : STANDARD_COLOR;
 
   return (
-    <div className="animate-fade-in h-full flex flex-col overflow-hidden">
+    <div className="w-full h-full flex flex-col p-4 md:p-6 lg:p-8 overflow-auto custom-scrollbar-light">
       {/* Header */}
-      <div className="flex-none mb-6 text-center lg:text-left">
-        <h1 className="text-3xl font-extrabold text-white mb-2 drop-shadow-sm flex items-center justify-center lg:justify-start gap-3">
-          {isPremium && <span className="text-amber-500">Premium</span>}
-          <span>나만의 홀로그램 완성</span>
-        </h1>
-        <p className="text-gray-400 text-sm">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex-none mb-6 text-center"
+      >
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <span className="headline-step" style={{ color: accentColor }}>{isPremium ? 'PREMIUM' : 'STANDARD'}</span>
+          <span className="text-xl text-gray-300">✦</span>
+          <span className="headline-step text-gray-900">완성!</span>
+        </div>
+        <p className="text-gray-500 text-sm md:text-base">
           모든 작업이 완료되었습니다. 영상을 확인하고 저장하세요.
         </p>
-      </div>
+      </motion.div>
 
       {/* Main Content - 1:1 Split on Desktop */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 items-center justify-center">
         {/* Left Side: Video Output */}
-        <div className="flex flex-col items-center justify-center min-h-0 w-full">
-          <div className={`w-full max-w-[700px] aspect-square flex flex-col items-center justify-center rounded-[1.5rem] backdrop-blur-md overflow-hidden relative group border ${theme.panel}`}>
-
-            {/* Ambient Glow */}
-            <div className={`absolute inset-0 ${isPremium ? 'bg-amber-500/5' : 'bg-blue-500/5'} blur-3xl rounded-full scale-150 pointer-events-none`}></div>
-
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col items-center justify-center min-h-0 w-full"
+        >
+          <div
+            className="w-full max-w-[700px] aspect-square flex flex-col items-center justify-center rounded-2xl overflow-hidden relative group bg-white border-2 shadow-xl"
+            style={{ borderColor: `${accentColor}30` }}
+          >
             <div className="relative w-full h-full flex items-center justify-center p-4">
-              <div className="relative w-full h-full rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 bg-black">
+              <div className="relative w-full h-full rounded-xl overflow-hidden shadow-2xl bg-black">
                 <video
                   ref={videoRef}
                   src={videoUrl}
@@ -135,43 +140,59 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
 
             {/* Status Badge */}
             <div className="absolute top-6 left-6 z-20">
-              <div className={`px-4 py-2 rounded-full border backdrop-blur-md text-sm font-bold flex items-center gap-2 ${isPremium ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-blue-500/10 border-blue-500/30 text-blue-400'}`}>
-                <span className="w-2 h-2 rounded-full bg-current animate-pulse"></span>
+              <div
+                className="px-4 py-2 rounded-full border-2 backdrop-blur-md text-sm font-bold flex items-center gap-2 bg-white"
+                style={{ borderColor: `${accentColor}50`, color: accentColor }}
+              >
+                <span
+                  className="w-2 h-2 rounded-full animate-pulse"
+                  style={{ backgroundColor: accentColor }}
+                ></span>
                 최종 완성본
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Side: Actions & Details */}
-        <div className="flex flex-col items-center justify-center min-h-0 w-full">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-col items-center justify-center min-h-0 w-full"
+        >
           <div className="w-full max-w-[700px] aspect-square flex flex-col gap-4 min-h-0">
-            <div className={`flex-1 flex flex-col rounded-[1.5rem] backdrop-blur-sm overflow-hidden border ${theme.panel}`}>
-              <div className="p-6 pb-4 border-b border-white/5 bg-white/5">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${theme.badge}`}>✓</span>
+            <div className="flex-1 flex flex-col rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-lg">
+              <div className="p-6 pb-4 border-b border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <span
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                    style={{ backgroundColor: accentColor }}
+                  >
+                    ✓
+                  </span>
                   결과 관리
                 </h3>
               </div>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto custom-scrollbar-light p-6 space-y-6">
 
                 {/* Scene Info Summary */}
-                <div className="bg-black/20 rounded-xl p-5 border border-white/5">
-                  <p className="text-sm text-gray-400 mb-3 font-bold uppercase tracking-wider">Project Summary</p>
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <p className="text-sm text-gray-500 mb-3 font-bold uppercase tracking-wider">Project Summary</p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Video Type</span>
-                      <span className="text-white font-medium">{isPremium ? 'Premium Composition' : 'Standard Template'}</span>
+                      <span className="text-gray-900 font-medium">{isPremium ? 'Premium Composition' : 'Standard Template'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Duration</span>
-                      <span className="text-white font-medium">30s Loop</span>
+                      <span className="text-gray-900 font-medium">30s Loop</span>
                     </div>
                     {scenes && scenes.length > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Text Scenes</span>
-                        <span className={`font-bold ${theme.accentText}`}>{scenes.length} Scenes</span>
+                        <span className="font-bold" style={{ color: accentColor }}>{scenes.length} Scenes</span>
                       </div>
                     )}
                   </div>
@@ -181,7 +202,8 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
                 <div className="space-y-4">
                   <button
                     onClick={handleSendToAdmin}
-                    className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all hover:-translate-y-1 flex items-center justify-center gap-2 ${theme.buttonPrimary}`}
+                    className="w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl flex items-center justify-center gap-2"
+                    style={{ backgroundColor: accentColor }}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                     관리자에게 전송
@@ -191,14 +213,14 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
                     <a
                       href={videoUrl}
                       download="my-hologram.mp4"
-                      className="py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                      className="py-3 rounded-xl bg-gray-100 border-2 border-gray-200 text-gray-700 font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                       다운로드
                     </a>
                     <button
                       onClick={onReset}
-                      className="py-3 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 font-bold transition-all"
+                      className="py-3 rounded-xl border-2 border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50 font-bold transition-all"
                     >
                       처음으로
                     </button>
@@ -208,7 +230,7 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

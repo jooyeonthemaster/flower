@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   CompositionData,
   EventInfo,
@@ -18,6 +19,9 @@ export type { CompositionData, EventInfo } from './types';
 
 const DEFAULT_MESSAGES = ['', '', ''];
 
+// Premium 모드 색상
+const PREMIUM_COLOR = '#E66B33'; // International Orange
+
 export default function CompositionInputStep({ onNext, initialData, onBack }: CompositionInputStepProps) {
   const [category, setCategory] = useState(initialData?.category || 'wedding');
   const [style, setStyle] = useState(initialData?.style || 'fancy');
@@ -31,17 +35,12 @@ export default function CompositionInputStep({ onNext, initialData, onBack }: Co
     setMessages(messages.map((msg, i) => (i === index ? text : msg)));
   };
 
-  // 키워드 선택 시 해당 문구 세트 즉시 적용
   const selectKeyword = (keyword: string) => {
-    setSelectedKeywords([keyword]); // 단일 선택
-
-    // 해당 키워드의 문구 세트 가져오기
+    setSelectedKeywords([keyword]);
     const messageSet = keywordMessageSets[category]?.[keyword];
     if (!messageSet) return;
 
-    // 문구 세트 적용 (첫 번째 문구에 이벤트 정보 반영)
     const newMessages = messageSet.map((text, index) => {
-      // 첫 번째 장면에 이벤트 정보 적용
       if (index === 0) {
         if (category === 'wedding' && eventInfo.groomName && eventInfo.brideName) {
           return `${eventInfo.groomName} & ${eventInfo.brideName}\n결혼을 축하합니다`;
@@ -57,7 +56,6 @@ export default function CompositionInputStep({ onNext, initialData, onBack }: Co
     setMessages(newMessages);
   };
 
-  // 행사 정보 기반으로 첫 번째 문구 자동 생성
   const updateTitleFromEventInfo = () => {
     const newMessages = [...messages];
 
@@ -76,7 +74,6 @@ export default function CompositionInputStep({ onNext, initialData, onBack }: Co
     setCategory(newCategory);
     setSelectedKeywords([]);
     setEventInfo({});
-    // 카테고리 변경 시 초기화
     setMessages(DEFAULT_MESSAGES);
   };
 
@@ -92,7 +89,6 @@ export default function CompositionInputStep({ onNext, initialData, onBack }: Co
   };
 
   const handleSubmit = () => {
-    // 최소 1개 이상의 문구가 있어야 함
     const filledMessages = messages.filter(m => m.trim());
     if (filledMessages.length === 0) return;
 
@@ -109,45 +105,61 @@ export default function CompositionInputStep({ onNext, initialData, onBack }: Co
   const isValid = filledCount >= 1;
 
   return (
-    <div className="animate-fade-in-down h-full flex flex-col overflow-hidden">
-      {/* 상단 헤더: Premium 테마 */}
-      <div className="flex-none mb-6 text-center lg:text-left">
-        <h1 className="text-3xl font-extrabold text-white mb-2 drop-shadow-sm">
-          AI 프리미엄 홀로그램 제작
-        </h1>
-        <p className="text-gray-400 text-sm">
-          AI가 당신만의 특별한 스토리를 완전히 새로운 영상으로 창조합니다.
+    <div className="w-full h-full flex flex-col p-4 md:p-6 lg:p-8 overflow-auto custom-scrollbar-light">
+      {/* 헤더 */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex-none mb-6 text-center"
+      >
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <span className="headline-step text-[#E66B33]">PREMIUM</span>
+          <span className="text-xl text-gray-300">✦</span>
+          <span className="headline-step text-gray-900">AI 홀로그램</span>
+        </div>
+        <p className="text-gray-500 text-sm md:text-base">
+          AI가 당신만의 특별한 스토리를 완전히 새로운 영상으로 창조합니다
         </p>
-      </div>
+      </motion.div>
 
-      {/* 메인 3단 레이아웃 (균등 분할) */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+      {/* 메인 3단 레이아웃 */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 min-h-0">
 
-        {/* ================= 1. 영상 설정 패널 ================= */}
-        <div className="flex flex-col gap-6 min-h-0 overflow-y-auto custom-scrollbar">
-          {/* Premium Card Style */}
-          <div className="bg-gradient-to-br from-slate-900/80 to-black/80 border border-amber-500/20 rounded-[1.5rem] p-5 backdrop-blur-md flex-1 flex flex-col justify-between shadow-[0_0_40px_-10px_rgba(251,191,36,0.05)]">
-            <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-amber-500/20 text-white flex items-center justify-center text-sm font-bold border border-amber-500/20">1</span>
-              영상 설정
-            </h3>
+        {/* 1. 영상 설정 패널 */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col min-h-0"
+        >
+          <div className="flex-1 bg-white rounded-2xl p-5 shadow-lg border border-gray-100 flex flex-col gap-4 overflow-y-auto custom-scrollbar-light">
+            {/* Section Header */}
+            <div className="flex items-center gap-3">
+              <span
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                style={{ backgroundColor: PREMIUM_COLOR }}
+              >
+                1
+              </span>
+              <h3 className="text-xl font-bold text-gray-900">영상 설정</h3>
+            </div>
 
-            {/* 1. 행사 유형 */}
+            {/* 행사 유형 */}
             <CategorySelector
               category={category}
               onCategoryChange={handleCategoryChange}
             />
 
-            {/* 2. 스타일 */}
+            {/* 스타일 */}
             <StyleSelector
               style={style}
               onStyleChange={setStyle}
             />
 
-            {/* 3. 상세 정보 */}
-            <div className="flex-1 flex flex-col justify-center">
-              <label className="block text-sm font-bold text-gray-300 mb-3">상세 정보 입력</label>
-              <div className="bg-black/40 rounded-xl p-5 border border-amber-500/10 h-full flex flex-col justify-center">
+            {/* 상세 정보 */}
+            <div className="flex-1 flex flex-col">
+              <label className="block text-sm font-bold text-gray-700 mb-2">상세 정보 입력</label>
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 flex-1">
                 <EventInfoFields
                   category={category}
                   eventInfo={eventInfo}
@@ -157,31 +169,43 @@ export default function CompositionInputStep({ onNext, initialData, onBack }: Co
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* ================= 2. 미리보기 패널 ================= */}
-        <PreviewPanel
-          category={category}
-          style={style}
-          previewUrl={previewUrl}
-          onFileChange={handleFileChange}
-          onDelete={() => setPreviewUrl(null)}
-        />
+        {/* 2. 미리보기 패널 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <PreviewPanel
+            category={category}
+            style={style}
+            previewUrl={previewUrl}
+            onFileChange={handleFileChange}
+            onDelete={() => setPreviewUrl(null)}
+          />
+        </motion.div>
 
-        {/* ================= 3. 문구 입력 패널 ================= */}
-        <MessageInputPanel
-          category={category}
-          messages={messages}
-          messageMode={messageMode}
-          selectedKeywords={selectedKeywords}
-          filledCount={filledCount}
-          isValid={isValid}
-          onMessageChange={handleMessageChange}
-          onMessageModeChange={setMessageMode}
-          onKeywordSelect={selectKeyword}
-          onSubmit={handleSubmit}
-          onBack={onBack}
-        />
+        {/* 3. 문구 입력 패널 */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <MessageInputPanel
+            category={category}
+            messages={messages}
+            messageMode={messageMode}
+            selectedKeywords={selectedKeywords}
+            filledCount={filledCount}
+            isValid={isValid}
+            onMessageChange={handleMessageChange}
+            onMessageModeChange={setMessageMode}
+            onKeywordSelect={selectKeyword}
+            onSubmit={handleSubmit}
+            onBack={onBack}
+          />
+        </motion.div>
 
       </div>
     </div>

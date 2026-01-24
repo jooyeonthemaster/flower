@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { SceneData } from './MultiSceneStep';
 import { CustomSettings } from './TextPreviewStep';
 import {
@@ -13,6 +14,9 @@ import {
   type CharEffectMode,
 } from '@/lib/canvas-renderer';
 import { createMP4FromFrames, checkWebCodecsSupport } from '@/lib/video-encoder';
+
+// Standard 모드 색상
+const STANDARD_COLOR = '#8A9A5B';
 
 // 템플릿 이미지/영상 경로 생성 헬퍼 함수
 const getTemplateImagePath = (category: string, style: string): string => {
@@ -333,67 +337,102 @@ export default function MultiSceneGenerationStep({
   ];
 
   return (
-    <div className="animate-fade-in h-full flex flex-col overflow-hidden">
-      <div className="flex-none mb-6 text-center lg:text-left">
-        <h1 className="text-3xl font-extrabold text-white mb-2 drop-shadow-sm">
-          영상 생성 중
-        </h1>
-        <p className="text-gray-400 text-sm">
+    <div className="w-full h-full flex flex-col p-4 md:p-6 lg:p-8 overflow-auto custom-scrollbar-light">
+      {/* 헤더 */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex-none mb-6 text-center"
+      >
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <span className="headline-step text-[#8A9A5B]">STANDARD</span>
+          <span className="text-xl text-gray-300">✦</span>
+          <span className="headline-step text-gray-900">생성 중</span>
+        </div>
+        <p className="text-gray-500 text-sm md:text-base">
           브라우저에서 직접 렌더링합니다. 빠르게 완료됩니다!
         </p>
-      </div>
+      </motion.div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0 items-center justify-center">
         {/* Left Side: Preview Visual */}
-        <div className="flex flex-col items-center justify-center min-h-0 w-full">
-          <div className="w-full max-w-[700px] aspect-square bg-gradient-to-br from-slate-900/80 to-black/80 border border-blue-500/20 rounded-[1.5rem] p-8 backdrop-blur-md flex flex-col items-center justify-center shadow-[0_0_40px_-10px_rgba(59,130,246,0.05)] relative overflow-hidden">
-            <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full scale-150 animate-pulse-slow pointer-events-none"></div>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col items-center justify-center min-h-0 w-full"
+        >
+          <div className="w-full max-w-[600px] aspect-square bg-white border-2 border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center shadow-xl relative overflow-hidden">
+            <div
+              className="absolute inset-0 blur-3xl rounded-full scale-150 animate-pulse-slow pointer-events-none opacity-5"
+              style={{ backgroundColor: STANDARD_COLOR }}
+            />
 
-            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10 group">
+            <div className="relative w-full h-full rounded-xl overflow-hidden shadow-xl ring-2 ring-gray-200 group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={templateImageUrl} alt="Preview" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-6">
                 <div className="flex items-center gap-3">
                   {currentPhase === 'completed' ? (
-                    <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/30">
-                      <span className="text-xl">✓</span>
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                      style={{ backgroundColor: STANDARD_COLOR }}
+                    >
+                      <span className="text-xl text-white">✓</span>
                     </div>
                   ) : (
-                    <div className="w-10 h-10 rounded-full border-2 border-blue-500 border-t-transparent animate-spin"></div>
+                    <div
+                      className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin"
+                      style={{ borderColor: `${STANDARD_COLOR} transparent ${STANDARD_COLOR} ${STANDARD_COLOR}` }}
+                    />
                   )}
                   <div>
                     <p className="text-white font-bold text-lg">{getPhaseLabel()}</p>
-                    <p className="text-blue-200 text-xs">{getPhaseDescription()}</p>
+                    <p className="text-gray-200 text-xs">{getPhaseDescription()}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Side: Progress Info */}
-        <div className="flex flex-col items-center justify-center min-h-0 w-full">
-          <div className="w-full max-w-[700px] aspect-square flex flex-col gap-4 min-h-0">
-            <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-900/80 to-black/80 backdrop-blur-md border border-blue-500/20 rounded-[1.5rem] overflow-hidden shadow-[0_0_40px_-10px_rgba(59,130,246,0.05)] min-h-0">
-              <div className="p-6 pb-4 bg-slate-900/40 backdrop-blur-md sticky top-0 z-10 border-b border-blue-500/10">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">i</span>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-col items-center justify-center min-h-0 w-full"
+        >
+          <div className="w-full max-w-[600px] flex flex-col gap-4 min-h-0">
+            <div className="flex-1 flex flex-col bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl min-h-0">
+              <div className="p-5 border-b border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <span
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                    style={{ backgroundColor: STANDARD_COLOR }}
+                  >
+                    i
+                  </span>
                   진행 상황
                 </h3>
               </div>
 
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4 space-y-8">
+              <div className="flex-1 overflow-y-auto custom-scrollbar-light p-5 space-y-6">
                 {/* Overall Progress Bar */}
                 <div>
-                  <div className="flex justify-between text-sm font-bold text-gray-300 mb-2">
+                  <div className="flex justify-between text-sm font-bold text-gray-600 mb-2">
                     <span>Total Progress</span>
-                    <span className="text-blue-400">{Math.round(overallProgress)}%</span>
+                    <span style={{ color: STANDARD_COLOR }}>{Math.round(overallProgress)}%</span>
                   </div>
-                  <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-600 to-purple-500 transition-all duration-500 ease-out shadow-[0_0_15px_rgba(59,130,246,0.6)]"
-                      style={{ width: `${overallProgress}%` }}
+                      className="h-full transition-all duration-500 ease-out"
+                      style={{
+                        width: `${overallProgress}%`,
+                        backgroundColor: STANDARD_COLOR,
+                        boxShadow: `0 0 10px ${STANDARD_COLOR}60`,
+                      }}
                     />
                   </div>
 
@@ -401,18 +440,18 @@ export default function MultiSceneGenerationStep({
                     {currentPhase !== 'completed' && currentPhase !== 'error' && (
                       <>
                         <div className="flex justify-between text-xs">
-                          <span className="text-gray-400">경과 시간: <span className="text-white font-mono">{formatTime(elapsedTime)}</span></span>
-                          <span className="text-gray-400">전체 예상: <span className="text-green-300">{getTotalEstimatedTime()}</span></span>
+                          <span className="text-gray-500">경과 시간: <span className="text-gray-700 font-mono">{formatTime(elapsedTime)}</span></span>
+                          <span className="text-gray-500">전체 예상: <span className="text-green-600">{getTotalEstimatedTime()}</span></span>
                         </div>
                         {getEstimatedTime() && (
                           <div className="text-xs text-gray-500">
-                            현재 단계 예상: <span className="text-blue-300">{getEstimatedTime()}</span>
+                            현재 단계 예상: <span style={{ color: STANDARD_COLOR }}>{getEstimatedTime()}</span>
                           </div>
                         )}
                       </>
                     )}
                     {currentPhase === 'completed' && (
-                      <div className="text-xs text-green-400">
+                      <div className="text-xs text-green-600">
                         ✓ 총 소요 시간: <span className="font-mono">{formatTime(elapsedTime)}</span>
                       </div>
                     )}
@@ -420,19 +459,44 @@ export default function MultiSceneGenerationStep({
                 </div>
 
                 {/* Steps List */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {phases.map((phase) => {
                     const isActive = isPhaseActive(phase.id);
                     const isDone = isPhaseComplete(phase.id);
 
                     return (
-                      <div key={phase.id} className={`flex items-center gap-4 p-4 rounded-xl transition-all ${isActive ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-transparent border border-transparent opacity-60'}`}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-inner ${isDone ? 'bg-green-500 text-white' : isActive ? 'bg-blue-500 text-white animate-pulse' : 'bg-gray-800 text-gray-500'}`}>
+                      <div
+                        key={phase.id}
+                        className={`flex items-center gap-4 p-4 rounded-xl transition-all ${
+                          isActive
+                            ? 'bg-gray-50 border-2'
+                            : 'bg-transparent border-2 border-transparent opacity-60'
+                        }`}
+                        style={{
+                          borderColor: isActive ? `${STANDARD_COLOR}50` : 'transparent',
+                        }}
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm ${
+                            isDone
+                              ? 'text-white'
+                              : isActive
+                                ? 'text-white animate-pulse'
+                                : 'bg-gray-200 text-gray-500'
+                          }`}
+                          style={{
+                            backgroundColor: isDone || isActive ? STANDARD_COLOR : undefined,
+                          }}
+                        >
                           {isDone ? '✓' : phase.icon}
                         </div>
                         <div className="flex-1">
-                          <p className={`font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>{phase.label}</p>
-                          {isActive && <p className="text-xs text-blue-300 mt-0.5 animate-pulse">작업 진행 중...</p>}
+                          <p className={`font-bold ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>{phase.label}</p>
+                          {isActive && (
+                            <p className="text-xs mt-0.5 animate-pulse" style={{ color: STANDARD_COLOR }}>
+                              작업 진행 중...
+                            </p>
+                          )}
                         </div>
                       </div>
                     );
@@ -440,24 +504,23 @@ export default function MultiSceneGenerationStep({
                 </div>
 
                 {/* Text Info */}
-                <div className="bg-black/40 rounded-xl p-4 border border-blue-500/10 -mt-4">
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <p className="text-xs text-gray-500 mb-2 font-bold uppercase">포함된 문구</p>
                   <div className="space-y-1">
                     {sceneData.scenes.map((scene, idx) => (
-                      <div key={idx} className="flex gap-2 text-sm text-gray-300 items-start">
-                        <span className="text-blue-500 font-bold">{idx + 1}.</span>
+                      <div key={idx} className="flex gap-2 text-sm text-gray-600 items-start">
+                        <span style={{ color: STANDARD_COLOR }} className="font-bold">{idx + 1}.</span>
                         <span className="opacity-80 line-clamp-1">{scene.text}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-
               </div>
             </div>
 
             {/* 오류 발생 시 버튼 */}
             {currentPhase === 'error' && (
-              <div className="flex-none bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-center justify-between">
+              <div className="flex-none bg-red-500/10 border-2 border-red-500/30 rounded-xl p-4 flex items-center justify-between">
                 <span className="text-red-400 text-sm font-bold flex items-center gap-2">⚠️ {errorMessage}</span>
                 <button
                   onClick={onBack}
@@ -468,7 +531,7 @@ export default function MultiSceneGenerationStep({
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

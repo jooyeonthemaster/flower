@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { removeBackground } from '@imgly/background-removal';
 
 export interface SceneData {
@@ -82,6 +83,9 @@ const getDefaultScenes = (category: string, eventInfo: EventInfo): SceneData[] =
   return templates[category] || templates['wedding'];
 };
 
+// Standard 모드 색상
+const STANDARD_COLOR = '#8A9A5B'; // Moss Green
+
 export default function MultiSceneStep({ onNext, initialData, onBack }: MultiSceneStepProps) {
   const [category, setCategory] = useState(initialData?.category || 'wedding');
   const [style, setStyle] = useState(initialData?.style || 'fancy');
@@ -115,10 +119,8 @@ export default function MultiSceneStep({ onNext, initialData, onBack }: MultiSce
     setBackgroundRemovalProgress(0);
 
     try {
-      // 배경 제거 처리 (브라우저에서 실행)
       const blob = await removeBackground(file, {
         progress: (key, current, total) => {
-          // 진행률 계산 (downloading, computing 등의 단계)
           if (total > 0) {
             const progress = Math.round((current / total) * 100);
             setBackgroundRemovalProgress(progress);
@@ -126,7 +128,6 @@ export default function MultiSceneStep({ onNext, initialData, onBack }: MultiSce
         },
       });
 
-      // Blob을 Data URL로 변환
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
@@ -136,7 +137,6 @@ export default function MultiSceneStep({ onNext, initialData, onBack }: MultiSce
       reader.readAsDataURL(blob);
     } catch (error) {
       console.error('배경 제거 실패:', error);
-      // 배경 제거 실패 시 원본 이미지 사용
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
@@ -164,7 +164,6 @@ export default function MultiSceneStep({ onNext, initialData, onBack }: MultiSce
     });
   };
 
-  // 카테고리별 미리보기 이미지 (템플릿 버전용)
   const categoryPreviewImages: Record<string, { fancy: string; simple: string }> = {
     wedding: { fancy: '/previews/wedding-fancy.png', simple: '/previews/wedding-simple.png' },
     opening: { fancy: '/previews/opening-fancy.png', simple: '/previews/opening-simple.png' },
@@ -173,58 +172,58 @@ export default function MultiSceneStep({ onNext, initialData, onBack }: MultiSce
 
   const currentPreviewImage = categoryPreviewImages[category]?.[style as 'fancy' | 'simple'] || '';
 
-  // 행사별 입력 필드 (Premium 스타일 적용)
+  // 행사별 입력 필드 - 라이트 테마 스타일
   const renderEventInfoFields = () => {
+    const inputClass = "w-full h-12 px-4 rounded-xl border-2 border-gray-200 bg-white text-gray-900 text-sm font-medium placeholder:text-gray-400 focus:border-[#8A9A5B] focus:ring-2 focus:ring-[#8A9A5B]/20 transition-all outline-none";
+
     switch (category) {
       case 'wedding':
         return (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <input
               type="text"
               value={eventInfo.groomName || ''}
               onChange={(e) => setEventInfo({ ...eventInfo, groomName: e.target.value })}
               placeholder="신랑 이름"
-              className="w-full h-14 px-4 rounded-xl border border-blue-500/20 bg-black/60 text-white text-base font-bold placeholder:text-gray-500 focus:border-blue-400 focus:bg-black/80 focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
+              className={inputClass}
             />
             <input
               type="text"
               value={eventInfo.brideName || ''}
               onChange={(e) => setEventInfo({ ...eventInfo, brideName: e.target.value })}
               placeholder="신부 이름"
-              className="w-full h-14 px-4 rounded-xl border border-blue-500/20 bg-black/60 text-white text-base font-bold placeholder:text-gray-500 focus:border-blue-400 focus:bg-black/80 focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
+              className={inputClass}
             />
           </div>
         );
       case 'opening':
         return (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <input
               type="text"
               value={eventInfo.businessName || ''}
               onChange={(e) => setEventInfo({ ...eventInfo, businessName: e.target.value })}
               placeholder="상호명"
-              className="w-full h-14 px-4 rounded-xl border border-blue-500/20 bg-black/60 text-white text-base font-bold placeholder:text-gray-500 focus:border-blue-400 focus:bg-black/80 focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
+              className={inputClass}
             />
-            {/* Layout Spacer for consistency with 2-input categories */}
-            <div className="w-full h-14 hidden lg:block" aria-hidden="true" />
           </div>
         );
       case 'event':
         return (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <input
               type="text"
               value={eventInfo.eventName || ''}
               onChange={(e) => setEventInfo({ ...eventInfo, eventName: e.target.value })}
               placeholder="행사명"
-              className="w-full h-14 px-4 rounded-xl border border-blue-500/20 bg-black/60 text-white text-base font-bold placeholder:text-gray-500 focus:border-blue-400 focus:bg-black/80 focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
+              className={inputClass}
             />
             <input
               type="text"
               value={eventInfo.organizer || ''}
               onChange={(e) => setEventInfo({ ...eventInfo, organizer: e.target.value })}
               placeholder="주관 기관 (선택)"
-              className="w-full h-14 px-4 rounded-xl border border-blue-500/20 bg-black/60 text-white text-base font-bold placeholder:text-gray-500 focus:border-blue-400 focus:bg-black/80 focus:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all outline-none"
+              className={inputClass}
             />
           </div>
         );
@@ -234,146 +233,184 @@ export default function MultiSceneStep({ onNext, initialData, onBack }: MultiSce
   };
 
   return (
-    <div className="animate-fade-in-down w-full flex flex-col pb-6 lg:pb-0">
+    <div className="w-full h-full flex flex-col p-4 md:p-6 lg:p-8 overflow-auto custom-scrollbar-light">
       {/* 헤더 */}
-      <div className="flex-none mb-3 lg:mb-4 text-center lg:text-left">
-        <h1 className="text-xl font-extrabold text-white mb-0.5">
-          템플릿 기반 홀로그램 제작
-        </h1>
-        <p className="text-gray-400 text-xs">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex-none mb-6 text-center"
+      >
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <span className="headline-step text-[#8A9A5B]">STANDARD</span>
+          <span className="text-xl text-gray-300">✦</span>
+          <span className="headline-step text-gray-900">홀로그램 제작</span>
+        </div>
+        <p className="text-gray-500 text-sm md:text-base">
           행사 유형과 스타일을 선택하세요
         </p>
-      </div>
+      </motion.div>
 
       {/* 메인 컨텐츠 - 2단 레이아웃 */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-stretch">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 min-h-0">
 
         {/* 좌측: 설정 */}
-        <div className="flex flex-col">
-          <div className="flex-1 bg-gradient-to-br from-slate-900/80 to-black/80 border border-blue-500/20 rounded-[1.5rem] p-5 backdrop-blur-md flex flex-col gap-5 shadow-[0_0_40px_-10px_rgba(59,130,246,0.05)]">
-            <h3 className="text-xl font-bold text-white flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-sm font-bold">1</span>
-              영상 설정
-            </h3>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col min-h-0"
+        >
+          <div className="flex-1 bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex flex-col gap-6 overflow-y-auto custom-scrollbar-light">
+            {/* Section Header */}
+            <div className="flex items-center gap-3">
+              <span
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                style={{ backgroundColor: STANDARD_COLOR }}
+              >
+                1
+              </span>
+              <h3 className="text-xl font-bold text-gray-900">영상 설정</h3>
+            </div>
 
             {/* 행사 유형 */}
             <div>
-              <label className="block text-sm font-bold text-gray-300 mb-2">행사 유형</label>
-              <div className="grid grid-cols-3 gap-2">
+              <label className="block text-sm font-bold text-gray-700 mb-3">행사 유형</label>
+              <div className="grid grid-cols-3 gap-3">
                 {categories.map((cat) => (
-                  <button
+                  <motion.button
                     key={cat.id}
                     onClick={() => handleCategoryChange(cat.id)}
-                    className={`flex flex-col items-center justify-center h-28 rounded-xl border transition-all duration-300 ${category === cat.id
-                      ? 'border-blue-500 bg-blue-500/20 text-white shadow-[0_0_15px_-3px_rgba(59,130,246,0.3)]'
-                      : 'border-slate-800 bg-slate-900/50 text-gray-500 hover:border-blue-500/30 hover:text-white'
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`flex flex-col items-center justify-center h-24 rounded-xl border-2 transition-all duration-300 ${category === cat.id
+                      ? 'border-[#8A9A5B] bg-[#8A9A5B]/10 shadow-md'
+                      : 'border-gray-200 bg-gray-50 hover:border-[#8A9A5B]/50 hover:bg-gray-100'
                       }`}
                   >
-                    <span className="text-3xl mb-2 filter drop-shadow-md">{cat.icon}</span>
-                    <span className="text-sm font-bold">{cat.label}</span>
-                  </button>
+                    <span className="text-3xl mb-2">{cat.icon}</span>
+                    <span className={`text-sm font-bold ${category === cat.id ? 'text-[#8A9A5B]' : 'text-gray-600'}`}>
+                      {cat.label}
+                    </span>
+                  </motion.button>
                 ))}
               </div>
             </div>
 
-            {/* 스타일 및 상세 정보 */}
-            <div className="flex flex-col gap-4">
-              {/* 스타일 */}
-              <div>
-                <label className="block text-sm font-bold text-gray-300 mb-2">AI 스타일</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {styles.map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => setStyle(s.id)}
-                      className={`flex items-center gap-3 px-4 h-14 rounded-xl border transition-all text-left group ${style === s.id
-                        ? 'border-blue-500 bg-blue-500/20 shadow-[0_0_15px_-3px_rgba(59,130,246,0.3)]'
-                        : 'border-slate-800 bg-slate-900/50 hover:border-blue-500/30'
-                        }`}
-                    >
-                      <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${s.color} shrink-0 ring-2 ring-white/10 shadow-lg group-hover:scale-110 transition-transform`}></div>
-                      <span className={`text-lg font-bold ${style === s.id ? 'text-white' : 'text-gray-500 group-hover:text-white'}`}>{s.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 상세 정보 */}
-              <div className="flex flex-col">
-                <label className="block text-sm font-bold text-gray-300 mb-2">상세 정보 입력</label>
-                <div className="flex-1 flex flex-col gap-2">
-                  {renderEventInfoFields()}
-                </div>
+            {/* 스타일 */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">AI 스타일</label>
+              <div className="grid grid-cols-2 gap-3">
+                {styles.map((s) => (
+                  <motion.button
+                    key={s.id}
+                    onClick={() => setStyle(s.id)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`flex items-center gap-3 px-4 h-14 rounded-xl border-2 transition-all ${style === s.id
+                      ? 'border-[#8A9A5B] bg-[#8A9A5B]/10 shadow-md'
+                      : 'border-gray-200 bg-gray-50 hover:border-[#8A9A5B]/50'
+                      }`}
+                  >
+                    <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${s.color} shrink-0 shadow-md`}></div>
+                    <span className={`text-sm font-bold ${style === s.id ? 'text-[#8A9A5B]' : 'text-gray-600'}`}>
+                      {s.label}
+                    </span>
+                  </motion.button>
+                ))}
               </div>
             </div>
 
-            {/* 참조 이미지 업로드 - 임시 비활성화 (docs/REFERENCE-IMAGE-BACKUP.md 참고) */}
-            {/* TODO: 참조 이미지 기능 버그 해결 후 복원 필요 */}
+            {/* 상세 정보 */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">상세 정보 입력</label>
+              {renderEventInfoFields()}
+            </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* 우측: 미리보기 및 액션 */}
-        <div className="flex flex-col gap-4">
-          {/* 미리보기 영역 - flex-1로 남은 공간 채우기 */}
-          <div className="flex-1 bg-gradient-to-br from-slate-900/80 to-black/80 border border-blue-500/20 rounded-[1.5rem] p-5 backdrop-blur-md flex flex-col relative overflow-hidden group shadow-[0_0_40px_-10px_rgba(59,130,246,0.05)]">
-            {/* Background Glow */}
-            <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full scale-150 pointer-events-none group-hover:bg-blue-500/10 transition-colors duration-700"></div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-col gap-4"
+        >
+          {/* 미리보기 영역 */}
+          <div className="flex-1 bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex flex-col relative overflow-hidden">
+            {/* Section Header */}
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                style={{ backgroundColor: STANDARD_COLOR }}
+              >
+                2
+              </span>
+              <h3 className="text-xl font-bold text-gray-900">미리보기</h3>
+            </div>
 
-            <div className="relative z-10 w-full h-full flex flex-col">
-              {/* 제목 - 1번 박스와 동일한 스타일 */}
-              <h3 className="text-xl font-bold text-white flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-sm font-bold">2</span>
-                미리보기
-              </h3>
-
-              {/* 이미지 - 세로 중앙 정렬 */}
-              <div className="flex-1 flex items-center justify-center py-4">
-                <div className="relative w-full max-w-[320px] lg:max-w-[380px] aspect-square bg-black rounded-xl border border-blue-500/10 overflow-hidden shadow-2xl ring-1 ring-white/5 group-hover:scale-[1.02] transition-transform duration-500">
-                  {currentPreviewImage ? (
-                    <Image src={currentPreviewImage} alt="Preview" fill className="object-cover" />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center flex-col gap-2 text-gray-500">
-                      <span className="text-4xl opacity-20">🖼️</span>
-                      <span className="text-sm">설정을 선택하면 미리보기가 표시됩니다</span>
-                    </div>
-                  )}
-
-                  {/* Badge */}
-                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-xs font-bold text-white border border-white/10 flex items-center gap-1.5 shadow-lg">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    1:1 Preview
+            {/* 이미지 */}
+            <div className="flex-1 flex items-center justify-center py-4">
+              <motion.div
+                className="relative w-full max-w-[320px] lg:max-w-[380px] aspect-square bg-gray-100 rounded-2xl border border-gray-200 overflow-hidden shadow-xl"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+              >
+                {currentPreviewImage ? (
+                  <Image src={currentPreviewImage} alt="Preview" fill className="object-cover" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center flex-col gap-2 text-gray-400">
+                    <span className="text-5xl opacity-30">🖼️</span>
+                    <span className="text-sm">미리보기</span>
                   </div>
-                </div>
-              </div>
+                )}
 
-              {/* Tip 문구 - 이미지 아래 */}
-              <div className="text-sm text-gray-400 text-center">
-                <span className="text-blue-400 font-bold">Tip:</span> 다음 단계에서 30초 영상을 확인하고 문구를 수정할 수 있습니다.
-              </div>
+                {/* Badge */}
+                <div
+                  className="absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-2 shadow-lg"
+                  style={{ backgroundColor: STANDARD_COLOR }}
+                >
+                  <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                  1:1 Preview
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Tip */}
+            <div className="text-sm text-gray-500 text-center">
+              <span className="font-bold" style={{ color: STANDARD_COLOR }}>Tip:</span> 다음 단계에서 30초 영상을 확인하고 문구를 수정할 수 있습니다.
             </div>
           </div>
 
           {/* 하단 액션 버튼 */}
-          <div className="flex-none h-16 lg:h-18 bg-gradient-to-br from-slate-900/80 to-black/80 border border-blue-500/20 rounded-[1.5rem] p-2 backdrop-blur-md flex items-center gap-2 shadow-[0_0_20px_-10px_rgba(59,130,246,0.1)] z-20">
+          <div className="flex-none flex items-center gap-3">
             {onBack && (
-              <button
+              <motion.button
                 onClick={onBack}
-                className="h-full aspect-square rounded-xl flex items-center justify-center border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-colors bg-white/5"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="h-14 aspect-square rounded-xl flex items-center justify-center border-2 border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors bg-white shadow-md"
                 title="이전 단계"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-              </button>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </motion.button>
             )}
 
-            <button
+            <motion.button
               onClick={handleSubmit}
-              className="flex-1 h-full rounded-xl font-bold text-base lg:text-lg shadow-lg flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 text-white hover:scale-[1.01] hover:shadow-blue-500/30"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex-1 h-14 rounded-xl font-bold text-base lg:text-lg shadow-lg flex items-center justify-center gap-2 text-white transition-all"
+              style={{ backgroundColor: STANDARD_COLOR }}
             >
               축하 문구 작성하러 가기
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-            </button>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
       </div>
     </div>
