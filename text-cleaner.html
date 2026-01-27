@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심플 텍스트 클리너</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            gap: 2rem;
+            flex: 1;
+            height: 100%;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            background: #f1f5f9;
+            font-weight: 600;
+            color: var(--text-sub);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        textarea {
+            flex: 1;
+            width: 100%;
+            border: none;
+            padding: 1.5rem;
+            resize: none;
+            font-size: 16px;
+            line-height: 1.6;
+            outline: none;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        textarea::placeholder {
+            color: #cbd5e1;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .controls {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="margin-bottom: 1.5rem; text-align: center;">
+        <h1 style="margin: 0; font-size: 1.5rem;">소설 텍스트 클리너</h1>
+        <p style="margin: 0.5rem 0 0; color: var(--text-sub);">불필요한 메뉴, 댓글, 내비게이션을 제거하고 본문만 추출합니다.</p>
+    </div>
+
+    <div class="container">
+        <!-- Input Panel -->
+        <div class="panel">
+            <div class="header">원본 텍스트</div>
+            <textarea id="input" placeholder="여기에 복사한 텍스트를 붙여넣으세요..."></textarea>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn-primary" onclick="cleanText()">변환 및 추가하기 (Ctrl+D)</button>
+
+            <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+                <button id="modeBtn" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem;"
+                    onclick="toggleMode()">모드: 누적 저장 ON</button>
+                <button class="btn-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem;"
+                    onclick="downloadText()">💾 .txt 저장</button>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem;">
+                <button class="btn-secondary" onclick="copyResult()">전체 복사</button>
+                <button class="btn-secondary" onclick="reset()">전체 초기화</button>
+            </div>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="panel">
+            <div class="header">
+                추출 결과
+                <span id="status" style="font-size: 0.8rem; font-weight: normal; color: #16a34a;"></span>
+            </div>
+            <textarea id="output" readonly placeholder="여기에 정리된 내용이 나타납니다."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // 설정 상태
+        let isAccumulateMode = true; // 기본적으로 누적 모드 사용
+
+        function cleanText() {
+            const inputEl = document.getElementById('input');
+            const input = inputEl.value;
+            if (!input.trim()) return;
+
+            // 라인 분리 (빈 줄도 포함해서 인덱스 계산)
+            const rawLines = input.split('\n');
+            let startIndex = 0;
+            let endIndex = rawLines.length;
+
+            // ---------------------------------------------------------
+            // 1. 구분선(Separator) 분석
+            // ---------------------------------------------------------
+            const separators = [];
+            rawLines.forEach((line, index) => {
+                // 대시(-)나 별표(*) 등이 5개 이상 연속되거나 점선 등
+                if (/^-{5,}/.test(line.trim()) || /^\*{5,}/.test(line.trim()) || /^={5,}/.test(line.trim())) {
+                    separators.push(index);
+                }
+            });
+
+            // ---------------------------------------------------------
+            // 2. 시작점(Start) 찾기
+            // ---------------------------------------------------------
+            // 전략: 문서 상단부(30% 이내)의 강력한 시작 패턴 찾기
+
+            // 2-1. 상단 구분선 확인
+            // 구분선이 존재하고, 문서의 초반 30% 이내에 있다면 그 다음 줄을 시작점으로 봄
+            const headerSeparator = separators.find(idx => idx < rawLines.length * 0.3);
+
+            // 2-2. 페이지 표시 "(숫자/숫자)" 패턴 확인 (가장 강력한 본문 시작 신호)
+            const pageNumIndex = rawLines.findIndex(line => /^\(\d+\/\d+\)/.test(line.trim()));
+
+            // 2-3. 전체목록 링크 확인
+            const listIndex = rawLines.findIndex(line => line.includes('전체목록'));
+
+            if (headerSeparator !== undefined) {
+                // 구분선이 있으면 가장 우선
+                startIndex = headerSeparator + 1;
+            } else if (pageNumIndex !== -1 && pageNumIndex < rawLines.length * 0.5) {
+                // 구분선이 없는데 페이지 번호가 상단에 있으면 그 다음 줄부터
+                startIndex = pageNumIndex + 1;
+            } else if (listIndex !== -1 && listIndex < rawLines.length * 0.3) {
+                // 전체목록이 있으면 그 다음부터
+                startIndex = listIndex + 1;
+            } else {
+                // 아무런 표식이 없으면 상단 메뉴 키워드 루프 돌려서 찾기
+                for (let i = 0; i < Math.min(30, rawLines.length); i++) {
+                    const line = rawLines[i].trim();
+                    if (line === '') continue; // 빈 줄은 패스
+
+                    const isMenu = [
+                        'Toggle navigation', '소설', '웹툰', '일본만화', '보증토토', '커뮤니티',
+                        '로그인', '회원가입', '마이페이지', '전체목록', '완결소설'
+                    ].some(keyword => line.includes(keyword));
+
+                    // 메뉴가 아닌 의미 있는 긴 문장이 나오면 거기서부터일 확률 높음
+                    if (!isMenu && line.length > 20) {
+                        // 제목일 수도 있으니 바로 시작하지 말고, 이 줄을 포함
+                        startIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // 시작점 보정: 시작점 줄이 제목 라인("[1] 마법을 만나다")일 수 있으므로
+            // 시작점 줄부터 본문이라고 가정하되, 만약 시작점 줄이 비어있으면 그 다음 줄로
+            while (startIndex < rawLines.length && rawLines[startIndex].trim() === '') {
+                startIndex++;
+            }
+
+
+            // ---------------------------------------------------------
+            // 3. 종료점(End) 찾기
+            // ---------------------------------------------------------
+            // 전략: 시작점 이후에 나오는 구분선이나 푸터 키워드 찾기
+
+            // 3-1. 하단 구분선 확인 (시작점보다 뒤에 있어야 함)
+            const footerSeparator = separators.find(idx => idx > startIndex + 5); // 본문이 최소 5줄은 된다고 가정
+
+            if (footerSeparator !== undefined) {
+                endIndex = footerSeparator;
+            } else {
+                // 3-2. 푸터 키워드 매칭
+                // 아래에서부터 위로 올라오는 게 더 안전할 수 있음 (본문에 '댓글' 단어 방지)
+                // 하지만 여기선 위에서 아래로 찾되, 특정 키워드 그룹이 나오면 종료
+
+                const footerKeywords = [
+                    /^[\d\s]*Comments/i,
+                    /^[\d\.]+\s*\/\s*[\d\.]+\s*$/, // "3.2 / 56" 점수판
+                    /^로그인한 회원만/,
+                    /^주간 베스트/,
+                    /^New\s+/,
+                    /^[\d\s]*판타지,/,
+                    /^[\d\s]*무협,/,
+                    /^[\d\s]*로판,/,
+                    /^\d+\s*$/ // 숫자만 딸랑 있는 줄 (댓글 수 등) - 이건 좀 위험하므로 문맥 봐야 함
+                ];
+
+                // 시작점 이후부터 탐색
+                for (let i = startIndex + 1; i < rawLines.length; i++) {
+                    const line = rawLines[i].trim();
+
+                    // 푸터 키워드 발견
+                    if (footerKeywords.some(regex => regex.test(line))) {
+                        endIndex = i;
+                        break;
+                    }
+
+                    // 추가 로직: "아이디" + "날짜" + "신고" 패턴의 댓글 라인 감지
+                    // 예: irelia12 2023.01.05 09:55 신고
+                    if (/\d{4}\.\d{2}\.\d{2}\s+\d{2}:\d{2}\s+신고/.test(line)) {
+                        // 댓글이 시작되었다고 판단, 그 전전 줄(아이디 줄)부터 잘라야 함
+                        // 보통 [아이디] [날짜] [신고] 한 줄에 있거나
+                        // [아이디]
+                        // [날짜] [신고] 형식이거나.
+                        // 안전하게 현재 줄의 -1 또는 -2를 끝점으로 잡음
+                        endIndex = Math.max(startIndex, i - 1);
+                        break;
+                    }
+                }
+            }
+
+            // ---------------------------------------------------------
+            // 4. 추출 및 정제
+            // ---------------------------------------------------------
+            // 범위가 꼬였으면 전체 반환 (안전장치)
+            if (startIndex >= endIndex) {
+                startIndex = 0;
+                endIndex = rawLines.length;
+            }
+
+            let extractedLines = rawLines.slice(startIndex, endIndex);
+
+            // 앞뒤 공백 제거
+            while (extractedLines.length > 0 && extractedLines[0].trim() === '') {
+                extractedLines.shift();
+            }
+            while (extractedLines.length > 0 && extractedLines[extractedLines.length - 1].trim() === '') {
+                extractedLines.pop();
+            }
+
+            const cleanContent = extractedLines.join('\n');
+            const outputEl = document.getElementById('output');
+            const statusEl = document.getElementById('status');
+
+            if (isAccumulateMode && outputEl.value.trim() !== '') {
+                // 중복 체크: 이미 있는 내용인지 확인 (공백 제거 후 비교 등으로 더 정교하게 할 수도 있지만, 일단 includes로)
+                // 내용이 어느 정도 길 때만 체크 (너무 짧으면 오탐 가능성)
+                if (cleanContent.length > 20 && outputEl.value.includes(cleanContent)) {
+                    statusEl.style.color = 'red';
+                    statusEl.innerText = '⚠️ 이미 누적된 내용입니다! (추가 안됨)';
+
+                    // 시각적 알림 (화면 깜빡임)
+                    document.body.style.backgroundColor = '#fecaca'; // 연한 빨강
+                    setTimeout(() => document.body.style.backgroundColor = '', 300);
+                    setTimeout(() => {
+                        statusEl.innerText = '';
+                        statusEl.style.color = '#16a34a';
+                    }, 3000);
+
+                    // 입력창은 초기화하지 않음 (사용자가 확인하도록)
+                    return;
+                }
+
+                outputEl.value += "\n\n" + cleanContent;
+            } else {
+                outputEl.value = cleanContent;
+            }
+
+            // 입력창 초기화
+            inputEl.value = '';
+            inputEl.focus();
+
+            statusEl.style.color = '#16a34a';
+            statusEl.innerText = '추가 완료! (총 ' + outputEl.value.split('\n').length + '줄)';
+            setTimeout(() => statusEl.innerText = '', 3000);
+
+            // 스크롤 맨 아래로
+            outputEl.scrollTop = outputEl.scrollHeight;
+        }
+
+        function copyResult() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+
+            const btn = document.querySelector('button[onclick="copyResult()"]');
+            const originalText = btn.innerText;
+            btn.innerText = '전체 복사됨!';
+
+            setTimeout(() => {
+                btn.innerText = originalText;
+            }, 1000);
+        }
+
+        function downloadText() {
+            const text = document.getElementById('output').value;
+            if (!text.trim()) {
+                alert('저장할 내용이 없습니다.');
+                return;
+            }
+            const blob = new Blob([text], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = 'cleaned_novel.txt';
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.target = '_blank';
+            anchor.style.display = 'none'; // just in case
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        }
+
+        function reset() {
+            if (confirm('정말 모든 내용을 초기화하시겠습니까?')) {
+                document.getElementById('input').value = '';
+                document.getElementById('output').value = '';
+                document.getElementById('input').focus();
+            }
+        }
+
+        // Mode toggle helper
+        function toggleMode() {
+            const btn = document.getElementById('modeBtn');
+            isAccumulateMode = !isAccumulateMode;
+            btn.innerText = isAccumulateMode ? '모드: 누적 저장 ON' : '모드: 덮어쓰기 ON';
+            btn.className = isAccumulateMode ? 'btn-primary' : 'btn-secondary';
+        }
+
+        // 단축키 추가: 입력창에서 Ctrl+D 누르면 바로 변환 (브라우저 북마크 방지)
+        document.getElementById('input').addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D')) {
+                e.preventDefault(); // 북마크 추가 등 기본 동작 막기
+                cleanText();
+            }
+        });
+    </script>
+</body>
+
+</html>

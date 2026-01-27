@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import ResultStep from './steps/ResultStep';
 import MultiSceneStep, { SceneData } from './steps/MultiSceneStep';
 import TextPreviewStep, { CustomSettings } from './steps/TextPreviewStep';
@@ -217,39 +218,24 @@ export default function HologramWizard() {
         <div className="min-h-screen flex flex-col">
 
           {/* Header */}
-          <header className={`flex-none px-4 md:px-6 py-3 md:py-4 flex items-center justify-between border-b z-50 transition-colors duration-500 ${
-            isDark
+          <header className={`flex-none px-4 md:px-6 py-3 md:py-4 flex items-center justify-between border-b z-50 transition-colors duration-500 ${isDark
               ? 'border-white/10 bg-black/50 backdrop-blur-md'
               : 'border-gray-200 bg-white/80 backdrop-blur-md'
-          }`}>
-            {/* Logo & Mode */}
-            <div className="flex items-center gap-3 cursor-pointer group" onClick={handleReset}>
+            }`}>
+            {/* Logo */}
+            <div className="cursor-pointer" onClick={handleReset}>
               <motion.div
-                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all"
-                style={{
-                  backgroundColor: isPremium ? 'rgba(230, 107, 51, 0.1)' : 'rgba(138, 154, 91, 0.1)',
-                  border: `1px solid ${isPremium ? 'rgba(230, 107, 51, 0.3)' : 'rgba(138, 154, 91, 0.3)'}`,
-                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {isPremium ? (
-                  <span className="text-xl">✨</span>
-                ) : (
-                  <span className="text-xl">💠</span>
-                )}
+                <Image
+                  src="/images/logo.png"
+                  alt="Flower Hologram"
+                  width={120}
+                  height={48}
+                  className="h-10 md:h-12 w-auto object-contain"
+                />
               </motion.div>
-              <div>
-                <h1 className={`text-base md:text-lg font-bold tracking-tight leading-none ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  FLOWER HOLOGRAM
-                </h1>
-                <span
-                  className="text-[10px] font-mono tracking-widest"
-                  style={{ color: isPremium ? '#E66B33' : '#8A9A5B' }}
-                >
-                  {isPremium ? 'PREMIUM AI ENGINE' : 'STANDARD TEMPLATE'}
-                </span>
-              </div>
             </div>
 
             {/* Progress Indicator */}
@@ -264,11 +250,10 @@ export default function HologramWizard() {
             {/* Exit Button */}
             <motion.button
               onClick={handleReset}
-              className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
-                isDark
+              className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${isDark
                   ? 'text-gray-400 hover:text-white border border-white/10 hover:bg-white/5'
                   : 'text-gray-500 hover:text-gray-900 border border-gray-200 hover:bg-gray-100'
-              }`}
+                }`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

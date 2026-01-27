@@ -70,30 +70,27 @@ export default function FloatingModeCard({
               backgroundColor: `${accentColor}15`,
               border: `2px solid ${accentColor}30`,
             }}
-            animate={{
-              // Premium: 시계 방향 (양수), Standard: 반시계 방향 (음수)
-              rotate: isHovered
-                ? (isPremium ? [0, 10, 0] : [0, -10, 0])
-                : 0,
-            }}
-            transition={{
-              duration: 0.6,
-              ease: 'easeInOut',
-            }}
           >
-            {isPremium ? (
-              <span className="text-4xl md:text-5xl">✨</span>
-            ) : (
-              <svg
-                className="w-8 h-8 md:w-10 md:h-10"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke={accentColor}
-                strokeWidth="2"
-              >
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-            )}
+            <motion.div
+              className="relative w-full h-full p-2"
+              animate={{
+                rotate: isHovered
+                  ? (isPremium ? 360 : -360)
+                  : 0,
+              }}
+              transition={{
+                duration: 2,
+                repeat: isHovered ? Infinity : 0,
+                ease: "linear",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={isPremium ? "/icon-premium-ai.png" : "/icon-standard-template.png"}
+                alt={label}
+                className="w-full h-full object-contain drop-shadow-lg"
+              />
+            </motion.div>
           </motion.div>
 
           {/* Title */}
@@ -181,9 +178,9 @@ export default function FloatingModeCard({
           </motion.div>
         </div>
 
-        {/* Premium badge */}
-        {isPremium && (
-          <div className="absolute top-4 right-4">
+        {/* Badge - Premium: AI, Standard: Chrome 필수 */}
+        <div className="absolute top-4 right-4">
+          {isPremium ? (
             <motion.div
               className="px-3 py-1 rounded-full text-xs font-bold text-white"
               style={{ backgroundColor: accentColor }}
@@ -197,8 +194,12 @@ export default function FloatingModeCard({
             >
               AI
             </motion.div>
-          </div>
-        )}
+          ) : (
+            <div className="px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-300">
+              Chrome 필수
+            </div>
+          )}
+        </div>
       </motion.div>
 
       {/* Floor shadow */}

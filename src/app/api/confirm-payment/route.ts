@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAdminDb, incrementUserStats } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export async function POST(request: NextRequest) {
   try {
-    const { paymentId, amount } = await request.json();
+    const { paymentId, amount, txId } = await request.json();
 
     // 포트원 V2 API Secret 키
     const apiSecret = process.env.PORTONE_API_SECRET!;
-    
+
     // 포트원 V2 결제 정보 조회 API 호출
     const response = await fetch(`https://api.portone.io/payments/${paymentId}`, {
       method: 'GET',
@@ -47,12 +49,67 @@ export async function POST(request: NextRequest) {
     // 결제 검증 성공
     console.log('포트원 결제 검증 성공:', data);
 
-    // TODO: 여기서 데이터베이스에 주문 정보를 저장하거나 업데이트
-    // await saveOrderToDatabase(data);
+    // Firestore에 주문 정보 저장
+    let orderId: string | null = null;
+    const customData = data.customData ? JSON.parse(data.customData) : {};
+    const userId = customData.userId;
+
+    try {
+      const db = getAdminDb();
+
+      // 주문 데이터 생성
+      const orderData = {
+        userId: userId || null,
+        userEmail: data.customer?.email || '',
+        userName: data.customer?.fullName || data.customer?.name || '',
+
+        paymentId: data.paymentId,
+        txId: txId || data.txId || null,
+        amount: data.amount.total,
+        currency: data.currency || 'KRW',
+        payMethod: data.method?.type || 'CARD',
+
+        orderName: data.orderName || '홀로그램 영상',
+        productType: data.orderName?.includes('프리미엄') || data.orderName?.includes('Premium')
+          ? 'premium'
+          : 'standard',
+
+        status: 'paid',
+
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        paidAt: FieldValue.serverTimestamp(),
+
+        customData,
+      };
+
+      // 주문 저장
+      const orderRef = await db.collection('orders').add(orderData);
+      orderId = orderRef.id;
+      console.log('주문 저장 완료:', orderId);
+
+      // 사용자 통계 업데이트
+      if (userId) {
+        try {
+          await incrementUserStats(userId, {
+            totalOrders: 1,
+            totalSpent: data.amount.total,
+          });
+          console.log('사용자 통계 업데이트 완료:', userId);
+        } catch (statsError) {
+          // 통계 업데이트 실패해도 주문은 성공으로 처리
+          console.error('사용자 통계 업데이트 실패:', statsError);
+        }
+      }
+    } catch (dbError) {
+      // DB 저장 실패해도 결제는 성공으로 처리
+      console.error('주문 저장 실패:', dbError);
+    }
 
     return NextResponse.json({
       success: true,
       payment: data,
+      orderId,
     });
 
   } catch (error) {
@@ -63,23 +120,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// 주문 정보를 데이터베이스에 저장하는 함수 (예시)
-// async function saveOrderToDatabase(paymentData: unknown) {
-//   // Firebase Firestore에 저장하는 예시
-//   // const { db } = await import('@/lib/firebase');
-//   // const { addDoc, collection } = await import('firebase/firestore');
-//   
-//   // await addDoc(collection(db, 'orders'), {
-//   //   paymentKey: paymentData.paymentKey,
-//   //   orderId: paymentData.orderId,
-//   //   amount: paymentData.totalAmount,
-//   //   status: paymentData.status,
-//   //   method: paymentData.method,
-//   //   customerEmail: paymentData.customerEmail,
-//   //   customerName: paymentData.customerName,
-//   //   orderName: paymentData.orderName,
-//   //   createdAt: new Date(),
-//   //   updatedAt: new Date(),
-//   // });
-// } 

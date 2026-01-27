@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 import { SceneData } from './MultiSceneStep';
 
 // 모드별 색상
@@ -11,26 +12,153 @@ const STANDARD_COLOR = '#8A9A5B';
 interface ResultStepProps {
   videoUrl: string;
   onReset: () => void;
-  scenes?: SceneData[]; // Composition 모드에서 사용
-  isCompositionMode?: boolean; // AI 영상 합성 모드
+  scenes?: SceneData[];
+  isCompositionMode?: boolean;
+  category?: string;
+  style?: string;
+  eventInfo?: {
+    groomName?: string;
+    brideName?: string;
+    businessName?: string;
+    eventName?: string;
+    organizer?: string;
+    date?: string;
+  };
 }
 
-export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMode = false }: ResultStepProps) {
+export default function ResultStep({
+  videoUrl,
+  onReset,
+  scenes,
+  isCompositionMode = false,
+  category,
+  style,
+  eventInfo
+}: ResultStepProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isReversing, setIsReversing] = useState(false);
   const [playCount, setPlayCount] = useState(0);
+  const { user, userProfile } = useAuth();
+
+  // 영상 저장 및 전송 상태
+  const [savedVideoId, setSavedVideoId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   console.log('ResultStep - videoUrl:', videoUrl?.substring(0, 50) + '...');
   console.log('ResultStep - isCompositionMode:', isCompositionMode);
 
-  const handleSendToAdmin = () => {
-    alert('관리자에게 영상이 전송되었습니다. 확인 후 연락드리겠습니다.');
+  // 영상 저장 함수 - videoId 반환
+  const saveVideoToDatabase = useCallback(async (): Promise<string | null> => {
+    if (!user || !videoUrl) return null;
+    if (savedVideoId) return savedVideoId;
+    if (isSaving) return null;
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      const response = await fetch('/api/videos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.uid,
+          userEmail: user.email,
+          title: `홀로그램 영상 ${new Date().toLocaleDateString('ko-KR')}`,
+          mode: isCompositionMode ? 'composition' : 'single',
+          category: category || 'general',
+          style: style || 'default',
+          videoUrl,
+          duration: 30,
+          sceneData: scenes ? { scenes, eventInfo } : null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('영상 저장 실패');
+      }
+
+      const data = await response.json();
+      setSavedVideoId(data.videoId);
+      console.log('영상 저장 완료:', data.videoId);
+      return data.videoId;
+    } catch (error) {
+      console.error('영상 저장 오류:', error);
+      setSaveError('영상 저장 중 오류가 발생했습니다.');
+      return null;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [user, videoUrl, savedVideoId, isSaving, isCompositionMode, category, style, scenes, eventInfo]);
+
+  // 영상 자동 저장 (최초 렌더링 시)
+  useEffect(() => {
+    if (user && videoUrl && !savedVideoId && !isSaving) {
+      saveVideoToDatabase();
+    }
+  }, [user, videoUrl, savedVideoId, isSaving, saveVideoToDatabase]);
+
+  // 관리자에게 전송
+  const handleSendToAdmin = async () => {
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    let videoIdToUse = savedVideoId;
+
+    if (!videoIdToUse) {
+      if (isSaving) {
+        alert('영상 저장 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+      // 저장이 실패했으면 다시 시도하고 반환된 값 사용
+      videoIdToUse = await saveVideoToDatabase();
+      if (!videoIdToUse) {
+        alert('영상 저장에 실패했습니다. 다시 시도해주세요.');
+        return;
+      }
+    }
+
+    setIsSending(true);
+
+    try {
+      const response = await fetch('/api/admin-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.uid,
+          userEmail: user.email,
+          userName: userProfile?.displayName || user.displayName || '',
+          userPhone: userProfile?.phoneNumber,
+          videoId: videoIdToUse,
+          videoUrl,
+          videoTitle: `홀로그램 영상 ${new Date().toLocaleDateString('ko-KR')}`,
+          videoMode: isCompositionMode ? 'composition' : 'single',
+          requestType: 'review',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('요청 전송 실패');
+      }
+
+      setRequestSent(true);
+      alert('관리자에게 영상이 전송되었습니다.\n마이페이지에서 처리 현황을 확인하실 수 있습니다.');
+    } catch (error) {
+      console.error('관리자 전송 오류:', error);
+      alert('전송 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   // Composition 모드가 아닌 경우 (Single Mode) - 이미 완성된 30초 영상이므로 loop 속성만 사용
   // Composition 모드인 경우 - ping-pong 재생 로직 사용
   useEffect(() => {
-    if (!isCompositionMode) return; // Single Mode는 video loop 속성으로 처리
+    if (!isCompositionMode) return;
 
     const video = videoRef.current;
     if (!video) return;
@@ -39,7 +167,6 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
     let lastTime = 0;
 
     const handleTimeUpdate = () => {
-      // 정방향 재생 중 끝에 도달
       if (!isReversing && video.currentTime >= video.duration - 0.1) {
         setIsReversing(true);
         video.pause();
@@ -52,11 +179,9 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
       const step = () => {
         if (!videoRef.current) return;
 
-        // 역재생: 시간을 뒤로 감기
-        lastTime -= 0.033; // 약 30fps
+        lastTime -= 0.033;
 
         if (lastTime <= 0) {
-          // 역재생 완료 → 다시 정방향
           videoRef.current.currentTime = 0;
           setIsReversing(false);
           setPlayCount(prev => prev + 1);
@@ -81,14 +206,12 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
     };
   }, [isReversing, isCompositionMode]);
 
-  // 4회 ping-pong 후 계속 반복 (무한 루프)
   useEffect(() => {
     if (playCount >= 4) {
       setPlayCount(0);
     }
   }, [playCount]);
 
-  // Theme helpers
   const isPremium = isCompositionMode;
   const accentColor = isPremium ? PREMIUM_COLOR : STANDARD_COLOR;
 
@@ -151,6 +274,47 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
                 최종 완성본
               </div>
             </div>
+
+            {/* Save Status Badge */}
+            {user && (
+              <div className="absolute top-6 right-6 z-20">
+                <div
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 ${
+                    savedVideoId
+                      ? 'bg-green-100 text-green-700'
+                      : isSaving
+                      ? 'bg-yellow-100 text-yellow-700'
+                      : saveError
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-gray-100 text-gray-500'
+                  }`}
+                >
+                  {savedVideoId ? (
+                    <>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      저장됨
+                    </>
+                  ) : isSaving ? (
+                    <>
+                      <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      저장 중...
+                    </>
+                  ) : saveError ? (
+                    <>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01" />
+                      </svg>
+                      저장 실패
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -195,6 +359,12 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
                         <span className="font-bold" style={{ color: accentColor }}>{scenes.length} Scenes</span>
                       </div>
                     )}
+                    {user && savedVideoId && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">저장 상태</span>
+                        <span className="text-green-600 font-medium">마이페이지에서 확인 가능</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -202,12 +372,46 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
                 <div className="space-y-4">
                   <button
                     onClick={handleSendToAdmin}
-                    className="w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl flex items-center justify-center gap-2"
-                    style={{ backgroundColor: accentColor }}
+                    disabled={isSending || requestSent || !user}
+                    className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-lg transition-all flex items-center justify-center gap-2 ${
+                      requestSent
+                        ? 'bg-green-500 cursor-default'
+                        : !user
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'hover:-translate-y-1 hover:shadow-xl'
+                    }`}
+                    style={{ backgroundColor: requestSent ? undefined : accentColor }}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                    관리자에게 전송
+                    {isSending ? (
+                      <>
+                        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        전송 중...
+                      </>
+                    ) : requestSent ? (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        전송 완료
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        관리자에게 전송
+                      </>
+                    )}
                   </button>
+
+                  {!user && (
+                    <p className="text-center text-sm text-gray-500">
+                      관리자에게 전송하려면 로그인이 필요합니다.
+                    </p>
+                  )}
 
                   <div className="grid grid-cols-2 gap-3">
                     <a
@@ -215,7 +419,9 @@ export default function ResultStep({ videoUrl, onReset, scenes, isCompositionMod
                       download="my-hologram.mp4"
                       className="py-3 rounded-xl bg-gray-100 border-2 border-gray-200 text-gray-700 font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
                       다운로드
                     </a>
                     <button

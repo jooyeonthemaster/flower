@@ -1,6 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
+import Image from 'next/image';
 import FloatingModeCard from './components/FloatingModeCard';
 
 interface ModeSelectLandingProps {
@@ -10,6 +12,34 @@ interface ModeSelectLandingProps {
 export default function ModeSelectLanding({ onSelectMode }: ModeSelectLandingProps) {
   return (
     <div className="min-h-screen bg-cream flex flex-col">
+      {/* Header with Home Button */}
+      <header className="flex-none px-4 md:px-6 py-3 md:py-4 flex items-center justify-between border-b border-gray-200 bg-white/80 backdrop-blur-md z-50">
+        <Link href="/" className="flex items-center group">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Image
+              src="/images/logo.png"
+              alt="Flower Hologram"
+              width={120}
+              height={48}
+              className="h-10 md:h-12 w-auto object-contain"
+            />
+          </motion.div>
+        </Link>
+
+        <Link href="/">
+          <motion.button
+            className="text-xs font-bold px-3 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 border border-gray-200 hover:bg-gray-100 transition-colors"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            홈으로
+          </motion.button>
+        </Link>
+      </header>
+
       {/* Hero Section */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-20 relative overflow-hidden">
 
@@ -103,31 +133,14 @@ export default function ModeSelectLanding({ onSelectMode }: ModeSelectLandingPro
             />
           </motion.div>
 
-          {/* Fan icon/symbol */}
-          <motion.div
-            initial={{ opacity: 0, rotate: -180 }}
-            animate={{ opacity: 1, rotate: 0 }}
-            transition={{ delay: 0.6, duration: 0.8, type: 'spring' }}
-            className="my-6 md:my-8"
-          >
-            <div className="inline-flex items-center gap-3 text-gray-400">
-              <span className="text-2xl">✦</span>
-              <span
-                className="text-lg md:text-xl tracking-widest uppercase"
-                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-              >
-                FAN
-              </span>
-              <span className="text-2xl">✦</span>
-            </div>
-          </motion.div>
+
 
           {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="text-gray-500 text-base md:text-lg max-w-md mx-auto mb-12 md:mb-16"
+            className="text-gray-500 text-base md:text-lg max-w-md mx-auto mb-12 md:mb-16 mt-8"
           >
             원하시는 제작 방식을 선택해주세요
           </motion.p>

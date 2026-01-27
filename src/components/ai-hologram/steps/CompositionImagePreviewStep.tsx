@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import StepActionBar from '../components/StepActionBar';
 import { CompositionData } from './CompositionInputStep';
 
 // 테스트 모드: true면 1개만 생성 (API 비용 절약)
@@ -269,308 +270,299 @@ export default function CompositionImagePreviewStep({
   };
 
   return (
-    <div className="animate-fade-in h-full flex flex-col overflow-hidden p-4 md:p-6 lg:p-8">
-      {/* 상단 헤더 */}
-      <div className="flex-none mb-6 text-center">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <span className="headline-step text-[#E66B33]">PREMIUM</span>
-          <span className="text-xl text-gray-300">✦</span>
-          <span className="headline-step text-gray-900">AI 이미지</span>
-        </div>
-        <p className="text-gray-500 text-sm">
-          AI가 생성한 고품질 이미지를 확인하고 영상을 생성하세요.
-        </p>
-      </div>
-
-      <div className="flex-1 flex flex-col justify-center min-h-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-full mx-auto items-center justify-center">
-
-          {/* ================= 좌측: 프리뷰 및 썸네일 ================= */}
-          <div className="flex flex-col items-center justify-center min-h-0 w-full">
-            <div className="w-full max-w-[700px] aspect-square flex flex-col bg-white border-2 border-gray-200 rounded-2xl p-5 shadow-xl relative overflow-hidden">
-              <div className="flex-none mb-4">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-full bg-[#E66B33]/10 text-[#E66B33] flex items-center justify-center text-sm font-bold border border-[#E66B33]/20">P</span>
-                  AI 생성 이미지
-                </h3>
-              </div>
-
-              <div className="flex-1 flex flex-col justify-center min-h-0 overflow-hidden">
-                {state === 'idle' && (
-                  <div className="flex flex-col items-center justify-center text-center h-full">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#E66B33]/10 to-[#E66B33]/20 border border-[#E66B33]/30 flex items-center justify-center mb-6">
-                      <span className="text-5xl filter drop-shadow-lg">🎨</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">이미지 생성 준비</h3>
-                    <p className="text-gray-500 max-w-md mb-8 leading-relaxed text-sm">
-                      입력하신 <span className="text-[#E66B33] font-bold">{data.messages.length}개의 문구</span>를 바탕으로<br />
-                      AI가 1:1 맞춤형 3D 아트웍을 생성합니다.
-                    </p>
-                    <button
-                      onClick={handleGenerateImages}
-                      className="px-10 py-4 rounded-xl bg-[#E66B33] text-white font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-                    >
-                      AI 이미지 생성 시작
-                    </button>
-                  </div>
-                )}
-
-                {state === 'generating' && (
-                  <div className="flex flex-col items-center justify-center text-center h-full">
-                    <div className="relative w-24 h-24 mb-6">
-                      <div className="absolute inset-0 rounded-full border-4 border-[#E66B33]/20"></div>
-                      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#E66B33] animate-spin"></div>
-                      <div className="absolute inset-2 rounded-full bg-[#E66B33]/10 flex items-center justify-center">
-                        <span className="text-3xl animate-pulse">✨</span>
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">프리미엄 아트웍 생성 중...</h3>
-                    <p className="text-gray-500 mb-4 font-mono text-sm">
-                      {generationPhase === 'background' ? 'Phase 1: 배경 이미지 생성' : 'Phase 2: 텍스트 프레임 생성'}
-                    </p>
-                    <div className="text-[#E66B33] text-xs mb-4">
-                      {generationPhase === 'background'
-                        ? `배경 ${completedBackgrounds}/${messageCount} 완료`
-                        : `텍스트 ${completedTextFrames}/${messageCount} 완료`}
-                    </div>
-                    <div className="w-64 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#E66B33] transition-all duration-500 ease-out"
-                        style={{ width: `${totalProgress}%` }}
-                      />
-                    </div>
-                    <p className="text-gray-500 text-xs mt-2">
-                      병렬 처리 중 ({Math.round(totalProgress)}%)
-                    </p>
-                  </div>
-                )}
-
-                {state === 'error' && (
-                  <div className="flex flex-col items-center justify-center text-center h-full">
-                    <div className="w-24 h-24 rounded-full bg-red-100 border border-red-300 flex items-center justify-center mb-6">
-                      <span className="text-5xl">❌</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">생성 실패</h3>
-                    <p className="text-gray-500 max-w-md mb-6 text-sm">
-                      {errorMessage || '이미지 생성 중 오류가 발생했습니다.'}
-                    </p>
-                    <button
-                      onClick={handleRegenerate}
-                      className="px-8 py-3 rounded-xl bg-[#E66B33] text-white font-bold shadow-lg hover:scale-105 transition-all"
-                    >
-                      다시 시도
-                    </button>
-                  </div>
-                )}
-
-                {(state === 'completed' || (state === 'generating' && generatedFrames.length > 0)) && generatedFrames.length > 0 && (
-                  <div className="flex flex-col h-full min-h-0">
-                    {/* 메인 뷰어 */}
-                    <div className="flex-1 relative flex items-center justify-center mb-4 min-h-0">
-                      <div className="relative w-full h-full max-h-full aspect-square rounded-2xl overflow-hidden shadow-xl border-2 border-gray-200 bg-gray-100 group">
-                        <Image
-                          src={generatedFrames[selectedIndex].endFrameUrl}
-                          alt={`Scene ${selectedIndex + 1}`}
-                          fill
-                          className="object-contain"
-                        />
-                        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-6 pt-12 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <p className="text-center text-white font-medium text-lg drop-shadow-md">{generatedFrames[selectedIndex].message}</p>
-                        </div>
-                      </div>
-
-                      {/* 좌우 네비게이션 (오버레이) */}
-                      <button
-                        onClick={() => setSelectedIndex(Math.max(0, selectedIndex - 1))}
-                        disabled={selectedIndex === 0}
-                        className="absolute left-4 p-3 rounded-full bg-white/90 text-gray-700 backdrop-blur-md border border-gray-200 hover:bg-[#E66B33]/10 hover:border-[#E66B33]/50 disabled:opacity-0 transition-all z-10 shadow-md"
-                      >
-                        ←
-                      </button>
-                      <button
-                        onClick={() => setSelectedIndex(Math.min(generatedFrames.length - 1, selectedIndex + 1))}
-                        disabled={selectedIndex === generatedFrames.length - 1}
-                        className="absolute right-4 p-3 rounded-full bg-white/90 text-gray-700 backdrop-blur-md border border-gray-200 hover:bg-[#E66B33]/10 hover:border-[#E66B33]/50 disabled:opacity-0 transition-all z-10 shadow-md"
-                      >
-                        →
-                      </button>
-                    </div>
-
-                    {/* 하단 썸네일 리스트 */}
-                    <div className="h-20 min-h-[5rem] overflow-x-auto custom-scrollbar-light flex gap-2 px-1 pb-1 flex-none">
-                      {generatedFrames.map((frame, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedIndex(index)}
-                          className={`relative flex-shrink-0 aspect-square h-full rounded-lg overflow-hidden border-2 transition-all ${selectedIndex === index
-                            ? 'border-[#E66B33] ring-2 ring-[#E66B33]/20 scale-105 z-10'
-                            : 'border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-400'
-                            }`}
-                        >
-                          <Image
-                            src={frame.endFrameUrl}
-                            alt={`Thumbnail ${index + 1}`}
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-700">
-                            {index + 1}
-                          </div>
-                        </button>
-                      ))}
-                      {state === 'generating' && Array.from({ length: messageCount - generatedFrames.length }).map((_, i) => (
-                        <div key={`idx-${i}`} className="flex-shrink-0 aspect-square h-full rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
-                          <div className="w-4 h-4 border-2 border-gray-300 border-t-[#E66B33] rounded-full animate-spin"></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+    <div className="w-full h-full flex flex-col relative overflow-hidden">
+      <div className="flex-1 overflow-y-auto custom-scrollbar-light p-4 md:p-6 lg:p-8 pb-32">
+        {/* 상단 헤더 */}
+        <div className="flex-none mb-6 text-center">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <span className="headline-step text-[#E66B33]">PREMIUM</span>
+            <span className="text-xl text-gray-300">✦</span>
+            <span className="headline-step text-gray-900">AI 이미지</span>
           </div>
+          <p className="text-gray-500 text-sm">
+            AI가 생성한 고품질 이미지를 확인하고 영상을 생성하세요.
+          </p>
+        </div>
 
-          {/* ================= 우측: 진행 정보 및 액션 ================= */}
-          <div className="flex flex-col items-center justify-center min-h-0 w-full">
-            <div className="w-full max-w-[700px] aspect-square flex flex-col gap-4 min-h-0">
-              <div className="flex-1 flex flex-col bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl min-h-0">
-                {/* 헤더 */}
-                <div className="p-6 pb-4 bg-white sticky top-0 z-10 border-b border-gray-100 flex-none">
+        <div className="flex-1 flex flex-col justify-center min-h-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-full mx-auto items-center justify-center">
+
+            {/* ================= 좌측: 프리뷰 및 썸네일 ================= */}
+            <div className="flex flex-col items-center justify-center min-h-0 w-full">
+              <div className="w-full max-w-[700px] aspect-square flex flex-col bg-white border-2 border-gray-200 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div className="flex-none mb-4">
                   <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-[#E66B33]/10 text-[#E66B33] flex items-center justify-center text-sm font-bold border border-[#E66B33]/20">i</span>
-                    생성 현황
+                    <span className="w-8 h-8 rounded-full bg-[#E66B33]/10 text-[#E66B33] flex items-center justify-center text-sm font-bold border border-[#E66B33]/20">P</span>
+                    AI 생성 이미지
                   </h3>
                 </div>
 
-                {/* 컨텐츠 */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar-light p-6 pt-4 space-y-6">
-
-                  {/* Progress Bar (생성 중일 때만) */}
-                  {state === 'generating' && (
-                    <div>
-                      <div className="flex justify-between text-sm font-bold text-gray-600 mb-2">
-                        <span>Total Progress</span>
-                        <span className="text-[#E66B33]">{Math.round(totalProgress)}%</span>
+                <div className="flex-1 flex flex-col justify-center min-h-0 overflow-hidden">
+                  {state === 'idle' && (
+                    <div className="flex flex-col items-center justify-center text-center h-full">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#E66B33]/10 to-[#E66B33]/20 border border-[#E66B33]/30 flex items-center justify-center mb-6">
+                        <span className="text-5xl filter drop-shadow-lg">🎨</span>
                       </div>
-                      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">이미지 생성 준비</h3>
+                      <p className="text-gray-500 max-w-md mb-8 leading-relaxed text-sm">
+                        입력하신 <span className="text-[#E66B33] font-bold">{data.messages.length}개의 문구</span>를 바탕으로<br />
+                        AI가 1:1 맞춤형 3D 아트웍을 생성합니다.
+                      </p>
+                      <button
+                        onClick={handleGenerateImages}
+                        className="px-10 py-4 rounded-xl bg-[#E66B33] text-white font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                      >
+                        AI 이미지 생성 시작
+                      </button>
+                    </div>
+                  )}
+
+                  {state === 'generating' && (
+                    <div className="flex flex-col items-center justify-center text-center h-full">
+                      <div className="relative w-24 h-24 mb-6">
+                        <div className="absolute inset-0 rounded-full border-4 border-[#E66B33]/20"></div>
+                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#E66B33] animate-spin"></div>
+                        <div className="absolute inset-2 rounded-full bg-[#E66B33]/10 flex items-center justify-center">
+                          <span className="text-3xl animate-pulse">✨</span>
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">프리미엄 아트웍 생성 중...</h3>
+                      <p className="text-gray-500 mb-4 font-mono text-sm">
+                        {generationPhase === 'background' ? 'Phase 1: 배경 이미지 생성' : 'Phase 2: 텍스트 프레임 생성'}
+                      </p>
+                      <div className="text-[#E66B33] text-xs mb-4">
+                        {generationPhase === 'background'
+                          ? `배경 ${completedBackgrounds}/${messageCount} 완료`
+                          : `텍스트 ${completedTextFrames}/${messageCount} 완료`}
+                      </div>
+                      <div className="w-64 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-[#E66B33] transition-all duration-500 ease-out"
                           style={{ width: `${totalProgress}%` }}
                         />
                       </div>
-                      <div className="mt-3 flex justify-between text-xs">
-                        <span className="text-gray-500">
-                          경과 시간: <span className="text-gray-700 font-mono">{formatTime(elapsedTime)}</span>
-                        </span>
-                        <span className="text-gray-500">
-                          전체 예상: <span className="text-green-600">약 5~10분</span>
-                        </span>
+                      <p className="text-gray-500 text-xs mt-2">
+                        병렬 처리 중 ({Math.round(totalProgress)}%)
+                      </p>
+                    </div>
+                  )}
+
+                  {state === 'error' && (
+                    <div className="flex flex-col items-center justify-center text-center h-full">
+                      <div className="w-24 h-24 rounded-full bg-red-100 border border-red-300 flex items-center justify-center mb-6">
+                        <span className="text-5xl">❌</span>
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">생성 실패</h3>
+                      <p className="text-gray-500 max-w-md mb-6 text-sm">
+                        {errorMessage || '이미지 생성 중 오류가 발생했습니다.'}
+                      </p>
+                      <button
+                        onClick={handleRegenerate}
+                        className="px-8 py-3 rounded-xl bg-[#E66B33] text-white font-bold shadow-lg hover:scale-105 transition-all"
+                      >
+                        다시 시도
+                      </button>
+                    </div>
+                  )}
+
+                  {(state === 'completed' || (state === 'generating' && generatedFrames.length > 0)) && generatedFrames.length > 0 && (
+                    <div className="flex flex-col h-full min-h-0">
+                      {/* 메인 뷰어 */}
+                      <div className="flex-1 relative flex items-center justify-center mb-4 min-h-0">
+                        <div className="relative w-full h-full max-h-full aspect-square rounded-2xl overflow-hidden shadow-xl border-2 border-gray-200 bg-gray-100 group">
+                          <Image
+                            src={generatedFrames[selectedIndex].endFrameUrl}
+                            alt={`Scene ${selectedIndex + 1}`}
+                            fill
+                            className="object-contain"
+                          />
+                          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-6 pt-12 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p className="text-center text-white font-medium text-lg drop-shadow-md">{generatedFrames[selectedIndex].message}</p>
+                          </div>
+                        </div>
+
+                        {/* 좌우 네비게이션 (오버레이) */}
+                        <button
+                          onClick={() => setSelectedIndex(Math.max(0, selectedIndex - 1))}
+                          disabled={selectedIndex === 0}
+                          className="absolute left-4 p-3 rounded-full bg-white/90 text-gray-700 backdrop-blur-md border border-gray-200 hover:bg-[#E66B33]/10 hover:border-[#E66B33]/50 disabled:opacity-0 transition-all z-10 shadow-md"
+                        >
+                          ←
+                        </button>
+                        <button
+                          onClick={() => setSelectedIndex(Math.min(generatedFrames.length - 1, selectedIndex + 1))}
+                          disabled={selectedIndex === generatedFrames.length - 1}
+                          className="absolute right-4 p-3 rounded-full bg-white/90 text-gray-700 backdrop-blur-md border border-gray-200 hover:bg-[#E66B33]/10 hover:border-[#E66B33]/50 disabled:opacity-0 transition-all z-10 shadow-md"
+                        >
+                          →
+                        </button>
+                      </div>
+
+                      {/* 하단 썸네일 리스트 */}
+                      <div className="h-20 min-h-[5rem] overflow-x-auto custom-scrollbar-light flex gap-2 px-1 pb-1 flex-none">
+                        {generatedFrames.map((frame, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedIndex(index)}
+                            className={`relative flex-shrink-0 aspect-square h-full rounded-lg overflow-hidden border-2 transition-all ${selectedIndex === index
+                              ? 'border-[#E66B33] ring-2 ring-[#E66B33]/20 scale-105 z-10'
+                              : 'border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-400'
+                              }`}
+                          >
+                            <Image
+                              src={frame.endFrameUrl}
+                              alt={`Thumbnail ${index + 1}`}
+                              fill
+                              className="object-cover"
+                            />
+                            <div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-700">
+                              {index + 1}
+                            </div>
+                          </button>
+                        ))}
+                        {state === 'generating' && Array.from({ length: messageCount - generatedFrames.length }).map((_, i) => (
+                          <div key={`idx-${i}`} className="flex-shrink-0 aspect-square h-full rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
+                            <div className="w-4 h-4 border-2 border-gray-300 border-t-[#E66B33] rounded-full animate-spin"></div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
-
-                  {/* 완료 시 소요 시간 */}
-                  {state === 'completed' && (
-                    <div className="text-xs text-green-600">
-                      ✓ 총 소요 시간: <span className="font-mono">{formatTime(elapsedTime)}</span>
-                    </div>
-                  )}
-
-                  {/* 정보 요약 */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
-                      <p className="text-xs text-gray-500 mb-1">카테고리</p>
-                      <p className="text-sm font-bold text-gray-700">{categoryLabels[data.category]}</p>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
-                      <p className="text-xs text-gray-500 mb-1">스타일</p>
-                      <p className="text-sm font-bold text-[#E66B33]">{styleLabels[data.style]}</p>
-                    </div>
-                  </div>
-
-                  {/* 진행 리스트 */}
-                  <div>
-                    <h4 className="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center justify-between">
-                      <span>Processing Queue</span>
-                      <span className="text-[#E66B33]">{generatedFrames.length} / {messageCount}</span>
-                    </h4>
-                    <div className="space-y-2">
-                      {data.messages.slice(0, messageCount).map((msg, idx) => {
-                        const bgDone = backgroundProgress[idx];
-                        const textDone = textFrameProgress[idx];
-                        const isProcessing = state === 'generating' && (!bgDone || !textDone);
-
-                        return (
-                          <div
-                            key={idx}
-                            onClick={() => generatedFrames[idx] && setSelectedIndex(idx)}
-                            className={`group p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${generatedFrames[idx]
-                              ? selectedIndex === idx
-                                ? 'bg-[#E66B33]/10 border-[#E66B33]/50'
-                                : 'bg-gray-50 border-gray-200 hover:bg-[#E66B33]/5 cursor-pointer'
-                              : isProcessing
-                                ? 'bg-[#E66B33]/5 border-[#E66B33]/30 animate-pulse'
-                                : 'bg-gray-50 border-gray-100 opacity-50'
-                              }`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${generatedFrames[idx] ? 'bg-[#E66B33] text-white shadow-md scale-110' : 'bg-gray-200 text-gray-500'
-                              }`}>
-                              {generatedFrames[idx] ? '✓' : idx + 1}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-medium truncate ${generatedFrames[idx] ? 'text-gray-700' : 'text-gray-500'}`}>{msg}</p>
-                              {state === 'generating' && !generatedFrames[idx] && (
-                                <p className="text-[10px] text-[#E66B33] mt-0.5">
-                                  {!bgDone ? '배경 생성 중...' : !textDone ? '텍스트 생성 중...' : '완료'}
-                                </p>
-                              )}
-                            </div>
-                            {generatedFrames[idx] && (
-                              <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 relative">
-                                <Image src={generatedFrames[idx].endFrameUrl} alt="" fill className="object-cover" />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* 안내 */}
-                  {TEST_MODE && (
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex gap-2 items-start">
-                      <span className="text-blue-500 text-lg">ⓘ</span>
-                      <p className="text-blue-600 text-xs leading-relaxed mt-1">시스템 최적화를 위해 현재 테스트 모드로 동작중입니다. (1컷만 생성)</p>
-                    </div>
-                  )}
-
                 </div>
               </div>
+            </div>
 
-              {/* 하단 액션 버튼 */}
-              <div className="flex gap-3 min-h-[56px] flex-none">
-                <button
-                  onClick={onBack}
-                  disabled={state === 'generating'}
-                  className="w-16 rounded-xl flex items-center justify-center border-2 border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors bg-white disabled:opacity-50"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <button
-                  onClick={handleNext}
-                  disabled={state !== 'completed'}
-                  className={`flex-1 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all ${state === 'completed'
-                    ? 'bg-[#E66B33] text-white shadow-lg hover:scale-[1.02] hover:shadow-xl'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
-                >
-                  <span>최종 영상 생성하기</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                </button>
+            {/* ================= 우측: 진행 정보 및 액션 ================= */}
+            <div className="flex flex-col items-center justify-center min-h-0 w-full">
+              <div className="w-full max-w-[700px] aspect-square flex flex-col gap-4 min-h-0">
+                <div className="flex-1 flex flex-col bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-xl min-h-0">
+                  {/* 헤더 */}
+                  <div className="p-6 pb-4 bg-white sticky top-0 z-10 border-b border-gray-100 flex-none">
+                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <span className="w-8 h-8 rounded-full bg-[#E66B33]/10 text-[#E66B33] flex items-center justify-center text-sm font-bold border border-[#E66B33]/20">i</span>
+                      생성 현황
+                    </h3>
+                  </div>
+
+                  {/* 컨텐츠 */}
+                  <div className="flex-1 overflow-y-auto custom-scrollbar-light p-6 pt-4 space-y-6">
+
+                    {/* Progress Bar (생성 중일 때만) */}
+                    {state === 'generating' && (
+                      <div>
+                        <div className="flex justify-between text-sm font-bold text-gray-600 mb-2">
+                          <span>Total Progress</span>
+                          <span className="text-[#E66B33]">{Math.round(totalProgress)}%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#E66B33] transition-all duration-500 ease-out"
+                            style={{ width: `${totalProgress}%` }}
+                          />
+                        </div>
+                        <div className="mt-3 flex justify-between text-xs">
+                          <span className="text-gray-500">
+                            경과 시간: <span className="text-gray-700 font-mono">{formatTime(elapsedTime)}</span>
+                          </span>
+                          <span className="text-gray-500">
+                            전체 예상: <span className="text-green-600">약 5~10분</span>
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 완료 시 소요 시간 */}
+                    {state === 'completed' && (
+                      <div className="text-xs text-green-600">
+                        ✓ 총 소요 시간: <span className="font-mono">{formatTime(elapsedTime)}</span>
+                      </div>
+                    )}
+
+                    {/* 정보 요약 */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <p className="text-xs text-gray-500 mb-1">카테고리</p>
+                        <p className="text-sm font-bold text-gray-700">{categoryLabels[data.category]}</p>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <p className="text-xs text-gray-500 mb-1">스타일</p>
+                        <p className="text-sm font-bold text-[#E66B33]">{styleLabels[data.style]}</p>
+                      </div>
+                    </div>
+
+                    {/* 진행 리스트 */}
+                    <div>
+                      <h4 className="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center justify-between">
+                        <span>Processing Queue</span>
+                        <span className="text-[#E66B33]">{generatedFrames.length} / {messageCount}</span>
+                      </h4>
+                      <div className="space-y-2">
+                        {data.messages.slice(0, messageCount).map((msg, idx) => {
+                          const bgDone = backgroundProgress[idx];
+                          const textDone = textFrameProgress[idx];
+                          const isProcessing = state === 'generating' && (!bgDone || !textDone);
+
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => generatedFrames[idx] && setSelectedIndex(idx)}
+                              className={`group p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${generatedFrames[idx]
+                                ? selectedIndex === idx
+                                  ? 'bg-[#E66B33]/10 border-[#E66B33]/50'
+                                  : 'bg-gray-50 border-gray-200 hover:bg-[#E66B33]/5 cursor-pointer'
+                                : isProcessing
+                                  ? 'bg-[#E66B33]/5 border-[#E66B33]/30 animate-pulse'
+                                  : 'bg-gray-50 border-gray-100 opacity-50'
+                                }`}
+                            >
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${generatedFrames[idx] ? 'bg-[#E66B33] text-white shadow-md scale-110' : 'bg-gray-200 text-gray-500'
+                                }`}>
+                                {generatedFrames[idx] ? '✓' : idx + 1}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-medium truncate ${generatedFrames[idx] ? 'text-gray-700' : 'text-gray-500'}`}>{msg}</p>
+                                {state === 'generating' && !generatedFrames[idx] && (
+                                  <p className="text-[10px] text-[#E66B33] mt-0.5">
+                                    {!bgDone ? '배경 생성 중...' : !textDone ? '텍스트 생성 중...' : '완료'}
+                                  </p>
+                                )}
+                              </div>
+                              {generatedFrames[idx] && (
+                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 relative">
+                                  <Image src={generatedFrames[idx].endFrameUrl} alt="" fill className="object-cover" />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 안내 */}
+                    {TEST_MODE && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex gap-2 items-start">
+                        <span className="text-blue-500 text-lg">ⓘ</span>
+                        <p className="text-blue-600 text-xs leading-relaxed mt-1">시스템 최적화를 위해 현재 테스트 모드로 동작중입니다. (1컷만 생성)</p>
+                      </div>
+                    )}
+
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <StepActionBar
+        onNext={handleNext}
+        onBack={onBack}
+        isNextDisabled={state !== 'completed'}
+        nextLabel="최종 영상 생성하기"
+        color="#E66B33"
+        isLoading={state === 'generating'}
+      />
     </div>
   );
 }
