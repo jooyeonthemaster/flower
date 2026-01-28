@@ -182,4 +182,4 @@ export default function Footer() {
       <div className="absolute bottom-20 left-10 w-24 h-24 border border-blue-200 transform -rotate-12 opacity-50"></div>
     </footer>
   )
-} 
+}
