@@ -72,7 +72,7 @@ export default function StepNavigation({
                 isNextDisabled()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : selectedColor === 'blue'
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
+                  ? 'bg-gradient-to-r from-orange to-dusty-rose hover:from-[#d15a1f] hover:to-[#c78a8a] text-white shadow-lg hover:shadow-xl'
                   : 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl'
               }`}
             >

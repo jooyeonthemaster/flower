@@ -97,13 +97,13 @@ export default function FAQPage() {
       
       <main className="pt-20">
         {/* 헤더 섹션 */}
-        <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+        <section className="bg-cream border-b-4 border-orange text-white py-20">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 자주 묻는 질문
               </h1>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              <p className="text-xl text-white/90 max-w-3xl mx-auto">
                 디지털화환에 대해 고객들이 자주 묻는 질문들을 모았습니다.
               </p>
             </div>
@@ -122,7 +122,7 @@ export default function FAQPage() {
                   onClick={() => setSelectedCategory(category)}
                   className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                     selectedCategory === category
-                      ? 'bg-blue-600 text-white shadow-lg'
+                      ? 'bg-orange text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -140,7 +140,7 @@ export default function FAQPage() {
                     className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-100 transition-colors duration-200"
                   >
                     <div className="flex items-center space-x-4">
-                      <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
+                      <span className="bg-orange/20 text-orange px-3 py-1 rounded-full text-sm font-medium">
                         {item.category}
                       </span>
                       <h3 className="font-semibold text-gray-900">{item.question}</h3>
@@ -159,7 +159,7 @@ export default function FAQPage() {
                   
                   {openItems.includes(index) && (
                     <div className="px-6 pb-4">
-                      <div className="bg-white rounded-lg p-4 border-l-4 border-blue-500">
+                      <div className="bg-white rounded-lg p-4 border-l-4 border-orange">
                         <p className="text-gray-700 leading-relaxed">{item.answer}</p>
                       </div>
                     </div>
@@ -170,21 +170,21 @@ export default function FAQPage() {
 
             {/* 추가 문의 */}
             <div className="mt-16 text-center">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+              <div className="bg-cream border-b-4 border-orange rounded-2xl p-8 text-white">
                 <h3 className="text-2xl font-semibold mb-4">원하는 답변을 찾지 못하셨나요?</h3>
-                <p className="text-blue-100 mb-6">
+                <p className="text-white/90 mb-6">
                   전문 상담사가 직접 답변해드리겠습니다.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a
                     href="/contact"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-300"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-300"
                   >
                     온라인 문의하기
                   </a>
                   <a
                     href="tel:02-336-0250"
-                    className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-colors duration-300"
+                    className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-orange transition-colors duration-300"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />

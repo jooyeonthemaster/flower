@@ -39,12 +39,12 @@ export default function HeroSection() {
               {/* 메인 헤딩 */}
               <div className="space-y-4">
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight">
-                  디지털 홀로그램 <span className="text-blue-400">화환</span>
+                  디지털 홀로그램 <span className="text-orange">화환</span>
                 </h1>
               </div>
 
               {/* 구분선 */}
-              <div className="w-24 h-1 bg-blue-500"></div>
+              <div className="w-24 h-1 bg-orange"></div>
 
               {/* 설명 텍스트 */}
               <div className="space-y-6 max-w-lg">
@@ -60,7 +60,7 @@ export default function HeroSection() {
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link
                   href="/products"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 transition-all duration-300 group"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-orange text-white font-semibold text-lg hover:bg-[#d15a1f] transition-all duration-300 group"
                 >
                   <span>제품 둘러보기</span>
                   <svg className="ml-3 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +69,7 @@ export default function HeroSection() {
                 </Link>
                 <Link
                   href="/ai-hologram"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-lg hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 group relative overflow-hidden"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-dusty-rose to-moss-green text-white font-semibold text-lg hover:shadow-lg hover:shadow-dusty-rose/30 transition-all duration-300 group relative overflow-hidden"
                 >
                   <span className="relative z-10 flex items-center">
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +77,7 @@ export default function HeroSection() {
                     </svg>
                     AI 홀로그램 만들기
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-dusty-rose to-moss-green opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </Link>
               </div>
 
@@ -85,14 +85,14 @@ export default function HeroSection() {
               <div className="grid grid-cols-2 gap-6 pt-8">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-orange rounded-full"></div>
                     <span className="text-white font-medium">8K 해상도</span>
                   </div>
                   <p className="text-gray-400 text-sm pl-4">초고화질 홀로그램</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-orange rounded-full"></div>
                     <span className="text-white font-medium">프리미엄 품질</span>
                   </div>
                   <p className="text-gray-400 text-sm pl-4">최고급 디스플레이</p>
@@ -114,7 +114,7 @@ export default function HeroSection() {
       </div>
 
       {/* 우측 장식 라인 */}
-      <div className="absolute right-0 top-1/4 w-1 h-1/2 bg-gradient-to-b from-transparent via-blue-500/50 to-transparent hidden lg:block"></div>
+      <div className="absolute right-0 top-1/4 w-1 h-1/2 bg-gradient-to-b from-transparent via-orange/50 to-transparent hidden lg:block"></div>
     </section>
   )
 } 

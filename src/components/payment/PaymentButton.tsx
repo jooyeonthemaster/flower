@@ -63,8 +63,8 @@ export default function PaymentButton({
       onClick={handlePayment}
       disabled={disabled || isLoading}
       className={`
-        relative px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg
-        transition-all duration-200 transform hover:scale-105 hover:shadow-lg
+        relative px-6 py-3 bg-orange hover:bg-[#d15a1f] text-white font-medium rounded-lg
+        transition-all duration-200 hover-lift hover:shadow-xl
         disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
         ${className}
       `}

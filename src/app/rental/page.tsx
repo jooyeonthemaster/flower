@@ -53,19 +53,19 @@ function RentalContent() {
             <h3 className="font-bold text-gray-900 mb-4 lg:text-lg">제품 특징</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <div className="flex items-center space-x-3 text-sm lg:text-base">
-                <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                <div className="w-3 h-3 bg-orange/100 rounded-full flex-shrink-0"></div>
                 <span className="font-medium">8K Ultra HD 홀로그램 디스플레이</span>
               </div>
               <div className="flex items-center space-x-3 text-sm lg:text-base">
-                <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                <div className="w-3 h-3 bg-orange/100 rounded-full flex-shrink-0"></div>
                 <span className="font-medium">무선 스마트 제어 시스템</span>
               </div>
               <div className="flex items-center space-x-3 text-sm lg:text-base">
-                <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                <div className="w-3 h-3 bg-orange/100 rounded-full flex-shrink-0"></div>
                 <span className="font-medium">전용 스탠드 및 설치 키트 포함</span>
               </div>
               <div className="flex items-center space-x-3 text-sm lg:text-base">
-                <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                <div className="w-3 h-3 bg-orange/100 rounded-full flex-shrink-0"></div>
                 <span className="font-medium">24시간 기술 지원 서비스</span>
               </div>
             </div>
@@ -82,11 +82,11 @@ function RentalContent() {
                 onClick={() => setSelectedColor('blue')}
                 className={`p-4 border-2 rounded-lg transition-all duration-200 ${
                   selectedColor === 'blue'
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-orange bg-orange/10'
                     : 'border-gray-200 bg-gray-50'
                 }`}
               >
-                <div className="w-10 h-10 bg-blue-500 rounded mx-auto mb-3"></div>
+                <div className="w-10 h-10 bg-orange/100 rounded mx-auto mb-3"></div>
                 <div className="text-sm lg:text-base font-medium">블루 타입</div>
               </button>
               <button
@@ -113,7 +113,7 @@ function RentalContent() {
                   onClick={() => setSelectedPeriod(key as 'daily' | 'weekly' | 'monthly')}
                   className={`w-full p-4 lg:p-5 border-2 rounded-lg text-left transition-all duration-200 ${
                     selectedPeriod === key
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-orange bg-orange/10'
                       : 'border-gray-200 bg-gray-50'
                   }`}
                 >
@@ -158,7 +158,7 @@ function RentalContent() {
                 </div>
                 <div className="flex justify-between font-bold text-lg lg:text-xl pt-3 border-t">
                   <span>렌트 비용</span>
-                  <span className="text-blue-600">₩{rentalPrices[selectedPeriod].toLocaleString()}/일</span>
+                  <span className="text-orange">₩{rentalPrices[selectedPeriod].toLocaleString()}/일</span>
                 </div>
               </div>
             </div>
@@ -211,7 +211,7 @@ function RentalContent() {
           <div className="p-4 lg:p-6 space-y-3 border-t bg-gray-50">
             <Link
               href={`/templates?rental=true&period=${selectedPeriod}&color=${selectedColor}&amount=${rentalPrices[selectedPeriod]}`}
-              className="block w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 text-center"
+              className="block w-full py-3 bg-orange text-white font-medium rounded-lg hover:bg-[#d15a1f] transition-colors duration-200 text-center"
             >
               홀로그램 템플릿 선택하기
             </Link>

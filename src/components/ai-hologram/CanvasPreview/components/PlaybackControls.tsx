@@ -50,7 +50,7 @@ export function PlaybackControls({
             [&::-webkit-slider-thumb]:appearance-none
             [&::-webkit-slider-thumb]:w-4
             [&::-webkit-slider-thumb]:h-4
-            [&::-webkit-slider-thumb]:bg-blue-500
+            [&::-webkit-slider-thumb]:bg-orange/100
             [&::-webkit-slider-thumb]:rounded-full
             [&::-webkit-slider-thumb]:cursor-pointer
           "
@@ -69,7 +69,7 @@ export function PlaybackControls({
             px-6 py-2 rounded-lg font-medium transition-all
             ${isLoading || totalFrames === 0
               ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-orange text-white hover:bg-orange'
             }
           `}
         >

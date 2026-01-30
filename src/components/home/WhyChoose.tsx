@@ -73,10 +73,7 @@ export default function WhyChoose() {
 
             {/* 섹션 1: Hero (베이지) */}
             <div
-                className="flex-[45] relative px-6 lg:px-8 pt-12 lg:pt-16 pb-3 lg:pb-4 overflow-hidden flex items-center"
-                style={{
-                    background: '#E0D8CC',
-                }}
+                className="flex-[45] relative px-6 lg:px-8 pt-12 lg:pt-16 pb-3 lg:pb-4 overflow-hidden flex items-center bg-cream"
             >
                 <div className="container mx-auto max-w-7xl relative z-10">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-8">
@@ -142,10 +139,7 @@ export default function WhyChoose() {
 
             {/* 섹션 2: Features (세이지) */}
             <div
-                className="flex-[30] px-6 lg:px-8 pt-6 lg:pt-8 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30"
-                style={{
-                    background: '#D0DCD0',
-                }}
+                className="flex-[30] px-6 lg:px-8 pt-6 lg:pt-8 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30 bg-moss-green/30"
             >
                 <div className="container mx-auto max-w-7xl">
                     <motion.div
@@ -165,7 +159,7 @@ export default function WhyChoose() {
                                 className="flex flex-col items-center text-center group"
                             >
                                 {/* 아이콘 */}
-                                <div className="w-10 h-10 md:w-12 md:h-12 mb-2 relative text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                                <div className="w-10 h-10 md:w-12 md:h-12 mb-2 relative text-gray-900 group-hover:text-orange transition-colors duration-300">
                                     <Image
                                         src={feature.icon}
                                         alt={feature.title}
@@ -199,10 +193,7 @@ export default function WhyChoose() {
 
             {/* 섹션 3: Specs (민트) */}
             <div
-                className="flex-[25] px-6 lg:px-8 pt-5 lg:pt-6 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30"
-                style={{
-                    background: '#B8D8C8',
-                }}
+                className="flex-[25] px-6 lg:px-8 pt-5 lg:pt-6 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30 bg-dusty-rose/30"
             >
                 <div className="container mx-auto max-w-7xl">
                     <motion.div
@@ -222,7 +213,7 @@ export default function WhyChoose() {
                                 className="flex flex-col items-center text-center group"
                             >
                                 {/* 아이콘 */}
-                                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mb-1 relative text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mb-1 relative text-gray-900 group-hover:text-orange transition-colors duration-300">
                                     <Image
                                         src={spec.icon}
                                         alt={spec.title}

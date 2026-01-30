@@ -125,7 +125,7 @@ function TemplatesPageContent() {
                 }
               </p>
               {isRentalMode && (
-                <div className="mt-4 inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                <div className="mt-4 inline-flex items-center px-4 py-2 bg-orange/20 text-orange rounded-full text-sm font-medium">
                   렌탈 모드: {rentalInfo.period === 'daily' ? '일간' : rentalInfo.period === 'weekly' ? '주간' : '월간'} ₩{rentalInfo.amount.toLocaleString()}
                 </div>
               )}
@@ -159,7 +159,7 @@ function TemplatesPageContent() {
           <div className="space-y-8">
             {/* 브레드크럼 */}
             <div className="flex items-center space-x-2 text-sm">
-              <button onClick={handleBackToCategories} className="text-blue-600 hover:text-blue-800">
+              <button onClick={handleBackToCategories} className="text-orange hover:text-orange">
                 카테고리
               </button>
               <span className="text-gray-400">&gt;</span>
@@ -275,14 +275,14 @@ function TemplatesPageContent() {
             <div className="flex items-center space-x-2 text-sm">
               <button 
                 onClick={handleBackToCategories} 
-                className="text-blue-600 hover:text-blue-800 transition-colors duration-200 hover:underline"
+                className="text-orange hover:text-orange transition-colors duration-200 hover:underline"
               >
                 카테고리
               </button>
               <span className="text-gray-400">&gt;</span>
               <button 
                 onClick={handleBackToTemplates} 
-                className="text-blue-600 hover:text-blue-800 transition-colors duration-200 hover:underline"
+                className="text-orange hover:text-orange transition-colors duration-200 hover:underline"
               >
                 {selectedCategoryData?.name}
               </button>
@@ -313,7 +313,7 @@ function TemplatesPageContent() {
                         🎯 {selectedTemplate.difficulty === 'easy' ? '쉬움' 
                              : selectedTemplate.difficulty === 'medium' ? '보통' : '고급'}
                       </span>
-                      <span className="px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border border-blue-300 font-semibold shadow-sm hover:shadow-md transition-all duration-200">
+                      <span className="px-4 py-2 bg-gradient-to-r from-orange/10 to-orange/20 text-orange border border-orange/40 font-semibold shadow-sm hover:shadow-md transition-all duration-200">
                         ⭐ 인기도 {selectedTemplate.popularityScore}%
                       </span>
                       <span className="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border border-gray-300 font-semibold shadow-sm hover:shadow-md transition-all duration-200">
@@ -328,7 +328,7 @@ function TemplatesPageContent() {
                         ? `홀로그램 화환 렌탈 - ${selectedTemplate.name} (${rentalInfo.color === 'blue' ? '블루' : '레드'})`
                         : `홀로그램 화환 - ${selectedTemplate.name}`
                       }
-                      className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:from-blue-700 hover:to-blue-800"
+                      className="px-8 py-4 bg-gradient-to-r from-orange to-[#d15a1f] text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:from-[#d15a1f] hover:to-[#c04a15]"
                     />
                     {!isRentalMode && (
                       <Link
@@ -347,7 +347,7 @@ function TemplatesPageContent() {
                   </div>
                 </div>
               </div>
-              <div className="h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+              <div className="h-1 bg-gradient-to-r from-orange via-dusty-rose to-moss-green"></div>
             </div>
 
             {/* 메인 콘텐츠 */}
@@ -364,7 +364,7 @@ function TemplatesPageContent() {
                     </h3>
                   </div>
                   <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange/10 to-dusty-rose/10"></div>
                     <div className="text-center text-gray-500 z-10">
                       <div className="w-28 h-28 bg-gradient-to-br from-gray-300 to-gray-400 mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200">
                         <span className="text-5xl">🎬</span>
@@ -390,7 +390,7 @@ function TemplatesPageContent() {
                     <div className="p-6">
                       <div className="grid grid-cols-2 gap-6 text-center">
                         <div className="group">
-                          <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-200">
+                          <div className="text-3xl font-bold bg-gradient-to-r from-orange to-[#d15a1f] bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-200">
                             {selectedTemplate.textFields.length}
                           </div>
                           <div className="text-sm text-gray-600 font-medium">📝 텍스트 필드</div>
@@ -431,7 +431,7 @@ function TemplatesPageContent() {
                           { num: 3, title: "제작 완료", desc: `${selectedTemplate.estimatedSetupTime} 소요`, icon: "✨" }
                         ].map((step, idx) => (
                           <div key={idx} className="flex items-start space-x-3 group">
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm flex items-center justify-center font-bold shadow-md group-hover:scale-110 transition-transform duration-200">
+                            <div className="w-8 h-8 bg-gradient-to-r from-orange to-[#d15a1f] text-white text-sm flex items-center justify-center font-bold shadow-md group-hover:scale-110 transition-transform duration-200">
                               {step.num}
                             </div>
                             <div className="text-sm flex-1">
@@ -478,7 +478,7 @@ function TemplatesPageContent() {
                         </span>
                         <span className={`font-bold ${
                           item.color === 'red' ? 'text-red-600' : 
-                          item.color === 'green' ? 'text-green-600' : 'text-blue-600'
+                          item.color === 'green' ? 'text-green-600' : 'text-orange'
                         }`}>
                           {item.value}
                         </span>
@@ -500,7 +500,7 @@ function TemplatesPageContent() {
                         onClick={() => setActiveTab(tab.id as 'overview' | 'text' | 'image')}
                         className={`flex-1 p-4 text-center font-semibold transition-all duration-200 relative ${
                           activeTab === tab.id
-                            ? 'bg-gradient-to-b from-blue-50 to-blue-100 text-blue-700 shadow-inner'
+                            ? 'bg-gradient-to-b from-orange/10 to-orange/20 text-orange shadow-inner'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                         }`}
                       >
@@ -510,7 +510,7 @@ function TemplatesPageContent() {
                           {tab.count !== null && (
                             <span className={`px-2 py-1 text-xs font-bold border shadow-sm ${
                               activeTab === tab.id 
-                                ? 'bg-blue-200 text-blue-800 border-blue-300' 
+                                ? 'bg-orange/30 text-orange border-orange/40' 
                                 : 'bg-gray-200 text-gray-700 border-gray-300'
                             }`}>
                               {tab.count}
@@ -518,7 +518,7 @@ function TemplatesPageContent() {
                           )}
                         </div>
                         {activeTab === tab.id && (
-                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-cream border-b-4 border-orange"></div>
                         )}
                       </button>
                     ))}
@@ -594,8 +594,8 @@ function TemplatesPageContent() {
                             }`}>
                               <div className="p-4 bg-gradient-to-b from-gray-50 to-white border-t border-gray-200 space-y-3">
                                 <p className="text-gray-700">{field.description}</p>
-                                <div className="bg-white border-l-4 border-blue-400 p-3 shadow-sm">
-                                  <div className="text-xs text-blue-600 font-semibold mb-1">💡 예시:</div>
+                                <div className="bg-white border-l-4 border-orange/60 p-3 shadow-sm">
+                                  <div className="text-xs text-orange font-semibold mb-1">💡 예시:</div>
                                   <div className="text-gray-900 font-medium">{field.placeholder}</div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3 text-xs">
@@ -668,15 +668,15 @@ function TemplatesPageContent() {
                                     </div>
                                   ))}
                                 </div>
-                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 p-3 shadow-sm">
-                                  <div className="text-sm font-semibold text-blue-900 mb-2 flex items-center space-x-2">
+                                <div className="bg-gradient-to-r from-orange/10 to-moss-green/10 border-l-4 border-orange/60 p-3 shadow-sm">
+                                  <div className="text-sm font-semibold text-black mb-2 flex items-center space-x-2">
                                     <span>💡</span>
                                     <span>이미지 예시</span>
                                   </div>
-                                  <div className="text-sm text-blue-700 space-y-1">
+                                  <div className="text-sm text-orange space-y-1">
                                     {field.examples.map((example, exampleIdx) => (
                                       <div key={exampleIdx} className="flex items-center space-x-2">
-                                        <span className="text-blue-500">•</span>
+                                        <span className="text-orange">•</span>
                                         <span>{example}</span>
                                       </div>
                                     ))}

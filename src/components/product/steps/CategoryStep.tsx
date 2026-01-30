@@ -25,7 +25,7 @@ export default function CategoryStep({ onCategorySelect }: CategoryStepProps) {
                 disabled={!isEnabled}
                 className={`group bg-white/70 backdrop-blur-sm border-2 border-white/20 p-5 text-center transition-all duration-300 rounded-2xl ${
                   isEnabled
-                    ? 'hover:border-blue-400 hover:shadow-lg transform hover:scale-105'
+                    ? 'hover:border-orange/60 hover:shadow-lg transform hover:scale-105'
                     : 'opacity-60 cursor-not-allowed'
                 }`}
               >

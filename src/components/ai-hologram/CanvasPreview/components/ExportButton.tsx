@@ -30,7 +30,7 @@ export function ExportButton({ onExport, state, progress, disabled }: ExportButt
           transition-all duration-200
           ${isDisabled
             ? 'bg-gray-600 cursor-not-allowed'
-            : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+            : 'bg-orange hover:bg-orange active:bg-[#b84a1a]'
           }
           ${state === 'complete' ? 'bg-green-600' : ''}
           ${state === 'error' ? 'bg-red-600' : ''}
@@ -44,7 +44,7 @@ export function ExportButton({ onExport, state, progress, disabled }: ExportButt
         <div className="mt-2">
           <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 transition-all duration-200"
+              className="h-full bg-orange/100 transition-all duration-200"
               style={{ width: `${progress}%` }}
             />
           </div>

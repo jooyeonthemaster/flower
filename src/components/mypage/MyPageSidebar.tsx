@@ -98,7 +98,7 @@ export default function MyPageSidebar() {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     isActive
-                      ? 'bg-gray-900 text-white'
+                      ? 'bg-orange text-white shadow-md'
                       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >

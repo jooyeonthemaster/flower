@@ -42,11 +42,11 @@ export default function WhyChooseSection() {
               </div>
               
               <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
-                왜 <span className="text-blue-600">Digital Hologram</span><br />
+                왜 <span className="text-orange">Digital Hologram</span><br />
                 화환을 선택해야 할까요?
               </h2>
               
-              <div className="w-16 h-0.5 bg-blue-600"></div>
+              <div className="w-16 h-0.5 bg-orange"></div>
               
               <p className="text-lg text-gray-600 leading-relaxed">
                 전통적인 화환의 한계를 뛰어넘는 혁신적인 기술로,<br />
@@ -57,7 +57,7 @@ export default function WhyChooseSection() {
             {/* 특징 리스트 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {features.map((feature, index) => (
-                <div key={index} className="bg-white p-6 border-2 border-gray-200 hover:border-blue-600 transition-colors duration-300">
+                <div key={index} className="bg-white p-6 border-2 border-gray-200 hover:border-orange transition-colors duration-300">
                   <div className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-gray-100 flex items-center justify-center text-xl border border-gray-300">
                       {feature.icon}
@@ -81,10 +81,10 @@ export default function WhyChooseSection() {
             <div className="bg-white p-12 border-2 border-gray-200">
               {/* 배경 이미지 영역 */}
               <div className="relative h-80 bg-gray-100 border-2 border-gray-300 mb-8 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-50"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-orange/10 to-orange/20 opacity-50"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center text-gray-600">
-                    <div className="w-24 h-24 mx-auto bg-blue-600 border-4 border-white flex items-center justify-center mb-4">
+                    <div className="w-24 h-24 mx-auto bg-orange border-4 border-white flex items-center justify-center mb-4">
                       <span className="text-white font-bold text-2xl">DH</span>
                     </div>
                     <p className="text-sm">기술 이미지</p>

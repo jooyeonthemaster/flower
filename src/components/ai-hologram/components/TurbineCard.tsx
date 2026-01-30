@@ -16,12 +16,12 @@ export default function TurbineCard({ type, onClick, label, subLabel, price }: T
     const isPremium = type === 'premium';
 
     // Colors
-    const mainColor = isPremium ? 'text-amber-500' : 'text-blue-500';
+    const mainColor = isPremium ? 'text-amber-500' : 'text-white0';
     const glowColor = isPremium ? 'shadow-[0_0_50px_rgba(245,158,11,0.3)]' : 'shadow-[0_0_50px_rgba(59,130,246,0.3)]';
-    const borderColor = isPremium ? 'border-amber-500/30' : 'border-blue-500/30';
+    const borderColor = isPremium ? 'border-amber-500/30' : 'border-orange/30';
     const gradient = isPremium
         ? 'from-amber-500/10 via-amber-900/5 to-black'
-        : 'from-blue-600/10 via-blue-900/5 to-black';
+        : 'from-orange/10 via-black/5 to-black';
 
     return (
         <div
@@ -73,13 +73,13 @@ export default function TurbineCard({ type, onClick, label, subLabel, price }: T
                         </h3>
 
                         {/* SubLabel */}
-                        <p className={`text-xs font-mono mb-3 ${isPremium ? 'text-amber-200' : 'text-blue-200'}`}>
+                        <p className={`text-xs font-mono mb-3 ${isPremium ? 'text-amber-200' : 'text-orange/70'}`}>
                             {subLabel}
                         </p>
 
                         {/* Price Badge */}
                         {price && (
-                            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold border ${isPremium ? 'bg-amber-500/20 border-amber-500/50 text-amber-300' : 'bg-blue-500/20 border-blue-500/50 text-blue-300'}`}>
+                            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold border ${isPremium ? 'bg-amber-500/20 border-amber-500/50 text-amber-300' : 'bg-orange/100/20 border-orange/50 text-orange/80'}`}>
                                 {price}
                             </div>
                         )}

@@ -14,7 +14,7 @@ export default function TemplateStep({ selectedCategory, onTemplateSelect, onBac
     return (
       <div className="text-center">
         <p className="text-gray-600">카테고리를 찾을 수 없습니다.</p>
-        <button onClick={onBackToCategory} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+        <button onClick={onBackToCategory} className="mt-4 px-4 py-2 bg-orange text-white rounded">
           카테고리 다시 선택
         </button>
       </div>
@@ -26,7 +26,7 @@ export default function TemplateStep({ selectedCategory, onTemplateSelect, onBac
       <div className="flex items-center justify-center space-x-4 mb-6">
         <button
           onClick={onBackToCategory}
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
+          className="flex items-center space-x-2 text-orange hover:text-[#d15a1f] font-medium transition-colors duration-200"
         >
           <span>←</span>
           <span>카테고리 다시 선택</span>
@@ -41,10 +41,10 @@ export default function TemplateStep({ selectedCategory, onTemplateSelect, onBac
       {selectedCategoryData.templates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {selectedCategoryData.templates.map((template) => (
-            <div key={template.id} className="group bg-white/70 backdrop-blur-sm border-2 border-white/20 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+            <div key={template.id} className="group bg-white/70 backdrop-blur-sm border-2 border-white/20 rounded-2xl overflow-hidden hover:border-orange/60 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
               {/* 미리보기 영역 */}
               <div className="aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center border-b border-gray-200 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-orange/10 to-dusty-rose/10"></div>
                 <div className="text-center text-gray-500 z-10">
                   <div className="w-12 h-12 bg-gradient-to-br from-gray-300 to-gray-400 mx-auto mb-2 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
                     <span className="text-xl">🎬</span>
@@ -72,7 +72,7 @@ export default function TemplateStep({ selectedCategory, onTemplateSelect, onBac
 
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   <div className="text-center">
-                    <div className="text-lg font-bold text-blue-600">{template.textFields.length}</div>
+                    <div className="text-lg font-bold text-orange">{template.textFields.length}</div>
                     <div className="text-xs text-gray-500">텍스트</div>
                   </div>
                   <div className="text-center">
@@ -80,14 +80,14 @@ export default function TemplateStep({ selectedCategory, onTemplateSelect, onBac
                     <div className="text-xs text-gray-500">이미지</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-bold text-purple-600">{template.estimatedSetupTime}</div>
+                    <div className="text-lg font-bold text-dusty-rose">{template.estimatedSetupTime}</div>
                     <div className="text-xs text-gray-500">시간</div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => onTemplateSelect(template)}
-                  className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-sm"
+                  className="w-full py-3 bg-gradient-to-r from-orange to-dusty-rose text-white font-medium rounded-xl hover:from-[#d15a1f] hover:to-[#c78a8a] transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-sm"
                 >
                   이 템플릿 선택하기
                 </button>

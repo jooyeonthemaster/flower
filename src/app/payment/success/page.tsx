@@ -104,7 +104,7 @@ function PaymentSuccessContent() {
               {paymentInfo.amount && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">결제금액:</span>
-                  <span className="font-medium text-blue-600">
+                  <span className="font-medium text-orange">
                     {formatPrice(paymentInfo.amount)}원
                   </span>
                 </div>
@@ -126,7 +126,7 @@ function PaymentSuccessContent() {
         <div className="space-y-3">
           <Link 
             href="/"
-            className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+            className="block w-full bg-orange hover:bg-[#d15a1f] text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
           >
             홈으로 돌아가기
           </Link>

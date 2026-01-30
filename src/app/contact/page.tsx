@@ -62,14 +62,14 @@ export default function ContactPage() {
       
       <main className="pt-20">
         {/* 헤더 섹션 */}
-        <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+        <section className="bg-cream py-20 border-b-4 border-orange">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 text-black">
                 상담 문의
               </h1>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                디지털화환에 대한 궁금한 점이나 상담이 필요하시면 언제든지 연락주세요. 
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                디지털화환에 대한 궁금한 점이나 상담이 필요하시면 언제든지 연락주세요.
                 전문 상담사가 친절하게 안내해드리겠습니다.
               </p>
             </div>
@@ -83,26 +83,26 @@ export default function ContactPage() {
               
               {/* 전화 상담 */}
               <div className="text-center p-8 bg-gray-50 rounded-2xl">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold mb-2">전화 상담</h3>
                 <p className="text-gray-600 mb-4">평일 09:00 - 18:00</p>
-                <p className="text-2xl font-bold text-blue-600">02-336-0250</p>
+                <p className="text-2xl font-bold text-orange">02-336-0250</p>
               </div>
 
               {/* 이메일 문의 */}
               <div className="text-center p-8 bg-gray-50 rounded-2xl">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-dusty-rose/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-dusty-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold mb-2">이메일 문의</h3>
                 <p className="text-gray-600 mb-4">24시간 접수 가능</p>
-                <p className="text-lg font-semibold text-purple-600">baikal86@naver.com</p>
+                <p className="text-lg font-semibold text-dusty-rose">baikal86@naver.com</p>
               </div>
 
               {/* 방문 상담 */}
@@ -167,7 +167,7 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent"
                       placeholder="홍길동"
                     />
                   </div>
@@ -183,7 +183,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent"
                       placeholder="example@email.com"
                     />
                   </div>
@@ -198,7 +198,7 @@ export default function ContactPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent"
                       placeholder="010-0000-0000"
                     />
                   </div>
@@ -213,7 +213,7 @@ export default function ContactPage() {
                       name="company"
                       value={formData.company}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent"
                       placeholder="회사명을 입력해주세요"
                     />
                   </div>
@@ -229,7 +229,7 @@ export default function ContactPage() {
                     value={formData.inquiryType}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent"
                   >
                     {inquiryTypes.map((type) => (
                       <option key={type} value={type}>{type}</option>
@@ -248,7 +248,7 @@ export default function ContactPage() {
                     onChange={handleInputChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent resize-none"
                     placeholder="문의하실 내용을 자세히 작성해 주세요."
                   />
                 </div>
@@ -257,7 +257,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="px-8 py-4 bg-orange hover:bg-[#d15a1f] text-white font-semibold rounded-full hover:shadow-xl hover-lift transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {isSubmitting ? (
                       <div className="flex items-center">

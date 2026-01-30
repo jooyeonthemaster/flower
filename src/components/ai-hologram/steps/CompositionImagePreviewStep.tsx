@@ -540,9 +540,9 @@ export default function CompositionImagePreviewStep({
 
                     {/* 안내 */}
                     {TEST_MODE && (
-                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex gap-2 items-start">
-                        <span className="text-blue-500 text-lg">ⓘ</span>
-                        <p className="text-blue-600 text-xs leading-relaxed mt-1">시스템 최적화를 위해 현재 테스트 모드로 동작중입니다. (1컷만 생성)</p>
+                      <div className="p-3 bg-orange/10 border border-orange/30 rounded-lg flex gap-2 items-start">
+                        <span className="text-white0 text-lg">ⓘ</span>
+                        <p className="text-orange text-xs leading-relaxed mt-1">시스템 최적화를 위해 현재 테스트 모드로 동작중입니다. (1컷만 생성)</p>
                       </div>
                     )}
 

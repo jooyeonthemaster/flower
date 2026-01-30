@@ -103,7 +103,7 @@ export default function MultiSceneStep({ onNext, initialData, onBack }: MultiSce
   ];
 
   const styles = [
-    { id: 'fancy', label: '화려하게', color: 'from-pink-500 via-purple-500 to-indigo-500' },
+    { id: 'fancy', label: '화려하게', color: 'from-dusty-rose via-orange to-moss-green' },
     { id: 'simple', label: '심플하게', color: 'from-gray-400 to-gray-600' },
   ];
 

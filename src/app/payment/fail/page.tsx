@@ -123,7 +123,7 @@ function PaymentFailContent() {
         <div className="space-y-3">
           <button 
             onClick={() => window.history.back()}
-            className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+            className="block w-full bg-orange hover:bg-[#d15a1f] text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
           >
             다시 시도하기
           </button>
@@ -137,7 +137,7 @@ function PaymentFailContent() {
           
           <Link 
             href="/contact"
-            className="block w-full text-blue-600 hover:text-blue-700 font-medium py-2 transition-colors duration-200"
+            className="block w-full text-orange hover:text-orange font-medium py-2 transition-colors duration-200"
           >
             고객센터 문의하기
           </Link>

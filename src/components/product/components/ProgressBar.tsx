@@ -37,7 +37,7 @@ export default function ProgressBar({ currentStep, totalSteps = 6 }: ProgressBar
                 <div className="flex items-center space-x-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                     currentStep === step.num 
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' 
+                      ? 'bg-gradient-to-r from-orange to-dusty-rose text-white shadow-md' 
                       : currentStep > step.num
                       ? 'bg-green-500 text-white'
                       : 'bg-gray-200 text-gray-500'
@@ -58,7 +58,7 @@ export default function ProgressBar({ currentStep, totalSteps = 6 }: ProgressBar
                   <div className="flex-1 mx-4 sm:mx-6">
                     <div className={`h-0.5 w-full transition-all duration-300 ${
                       currentStep > step.num 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600' 
+                        ? 'bg-gradient-to-r from-orange to-dusty-rose' 
                         : 'bg-gray-300'
                     }`}></div>
                   </div>
@@ -70,10 +70,10 @@ export default function ProgressBar({ currentStep, totalSteps = 6 }: ProgressBar
         
         {/* 현재 단계 정보 */}
         <div className="text-center mt-3">
-          <div className="inline-flex items-center space-x-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm font-medium border border-blue-200">
+          <div className="inline-flex items-center space-x-2 bg-orange/10 text-orange px-3 py-1.5 rounded-full text-sm font-medium border border-orange/30">
             <span>{stepConfig[currentStep - 1]?.icon}</span>
             <span>{stepConfig[currentStep - 1]?.label} 단계</span>
-            <span className="text-blue-500">({currentStep}/{totalSteps})</span>
+            <span className="text-orange">({currentStep}/{totalSteps})</span>
           </div>
         </div>
       </div>
@@ -81,7 +81,7 @@ export default function ProgressBar({ currentStep, totalSteps = 6 }: ProgressBar
       {/* 단계별 제목 */}
       <div className="text-center mb-4 mt-4">
         <h3 className="text-xl font-bold text-gray-900 mb-2">{getStepTitle()}</h3>
-        <div className="w-16 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
+        <div className="w-16 h-0.5 bg-gradient-to-r from-orange to-dusty-rose mx-auto rounded-full"></div>
       </div>
     </div>
   )

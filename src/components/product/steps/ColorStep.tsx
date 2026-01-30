@@ -43,14 +43,14 @@ export default function ColorStep({ selectedColor, onColorSelect }: ColorStepPro
                 className={`group p-8 border-2 rounded-3xl text-center transition-all duration-500 transform hover:scale-105 ${
                   selectedColor === color
                     ? color === 'blue'
-                      ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-2xl shadow-blue-500/25'
+                      ? 'border-orange bg-gradient-to-br from-orange/10 to-orange/20 shadow-2xl shadow-orange/25'
                       : 'border-red-500 bg-gradient-to-br from-red-50 to-red-100 shadow-2xl shadow-red-500/25'
                     : 'border-gray-200 bg-white/50 backdrop-blur-sm hover:border-gray-300 hover:shadow-xl'
                 }`}
               >
                 <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl border-3 flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
                   color === 'blue' 
-                    ? 'bg-gradient-to-br from-blue-600 to-blue-800 border-blue-700 shadow-lg shadow-blue-500/50' 
+                    ? 'bg-gradient-to-br from-orange to-[#c04a15] border-[#d15a1f] shadow-lg shadow-orange/50' 
                     : 'bg-gradient-to-br from-red-600 to-red-800 border-red-700 shadow-lg shadow-red-500/50'
                 }`}>
                   <span className="text-2xl text-white">

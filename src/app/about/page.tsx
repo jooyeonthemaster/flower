@@ -8,13 +8,13 @@ export default function AboutPage() {
       
       <main className="pt-20">
         {/* 헤더 섹션 */}
-        <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+        <section className="bg-cream py-20 border-b-4 border-orange">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 text-black">
                 회사 소개
               </h1>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 디지털화환은 첨단 홀로그램 기술로 전통적인 화환의 새로운 패러다임을 제시합니다.
               </p>
             </div>
@@ -37,21 +37,21 @@ export default function AboutPage() {
                 </p>
                 
                 <div className="grid grid-cols-2 gap-6">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <h3 className="text-2xl font-bold text-blue-600 mb-2">2024</h3>
+                  <div className="text-center p-4 bg-white rounded-lg shadow-md border-2 border-orange/20">
+                    <h3 className="text-2xl font-bold text-orange mb-2">2024</h3>
                     <p className="text-gray-600 text-sm">설립년도</p>
                   </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <h3 className="text-2xl font-bold text-purple-600 mb-2">100%</h3>
+                  <div className="text-center p-4 bg-white rounded-lg shadow-md border-2 border-moss-green/20">
+                    <h3 className="text-2xl font-bold text-moss-green mb-2">100%</h3>
                     <p className="text-gray-600 text-sm">고객 만족도</p>
                   </div>
                 </div>
               </div>
 
               <div className="relative">
-                <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-8 h-96 flex items-center justify-center">
+                <div className="bg-cream rounded-2xl p-8 h-96 flex items-center justify-center border-2 border-gray-200">
                   <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-24 h-24 bg-orange rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                       <span className="text-white font-bold text-3xl">디</span>
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">디지털화환</h3>
@@ -77,13 +77,13 @@ export default function AboutPage() {
               {/* 비전 */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-semibold text-blue-600">비전</h3>
+                  <h3 className="text-2xl font-semibold text-orange">비전</h3>
                 </div>
                 <p className="text-gray-700 leading-relaxed text-center">
                   디지털 기술을 통해 전통적인 추모 및 축하 문화를 혁신하여, 
@@ -94,12 +94,12 @@ export default function AboutPage() {
               {/* 미션 */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-dusty-rose/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-dusty-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-semibold text-purple-600">미션</h3>
+                  <h3 className="text-2xl font-semibold text-dusty-rose">미션</h3>
                 </div>
                 <p className="text-gray-700 leading-relaxed text-center">
                   첨단 홀로그램 기술을 활용하여 고객의 소중한 순간을 아름답게 기념하고, 
@@ -122,8 +122,8 @@ export default function AboutPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <div className="text-center p-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
@@ -142,8 +142,8 @@ export default function AboutPage() {
               </div>
 
               <div className="text-center p-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-dusty-rose/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-dusty-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
@@ -227,11 +227,11 @@ export default function AboutPage() {
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">사업 영역</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  <div className="bg-blue-50 rounded-lg p-3 text-center">
-                    <p className="text-sm font-medium text-blue-800">제조업</p>
+                  <div className="bg-orange/10 rounded-lg p-3 text-center">
+                    <p className="text-sm font-medium text-orange">제조업</p>
                   </div>
-                  <div className="bg-purple-50 rounded-lg p-3 text-center">
-                    <p className="text-sm font-medium text-purple-800">전자 및 광학 조립</p>
+                  <div className="bg-moss-green/10 rounded-lg p-3 text-center">
+                    <p className="text-sm font-medium text-moss-green">전자 및 광학 조립</p>
                   </div>
                   <div className="bg-green-50 rounded-lg p-3 text-center">
                     <p className="text-sm font-medium text-green-800">섬유 및 의류</p>
@@ -242,8 +242,8 @@ export default function AboutPage() {
                   <div className="bg-red-50 rounded-lg p-3 text-center">
                     <p className="text-sm font-medium text-red-800">광고 대행업</p>
                   </div>
-                  <div className="bg-indigo-50 rounded-lg p-3 text-center">
-                    <p className="text-sm font-medium text-indigo-800">도매 및 소매업</p>
+                  <div className="bg-dusty-rose/10 rounded-lg p-3 text-center">
+                    <p className="text-sm font-medium text-dusty-rose">도매 및 소매업</p>
                   </div>
                   <div className="bg-pink-50 rounded-lg p-3 text-center">
                     <p className="text-sm font-medium text-pink-800">광고 관련 서비스</p>
@@ -268,27 +268,27 @@ export default function AboutPage() {
             </div>
 
             <div className="relative">
-              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-blue-600 to-purple-600"></div>
+              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-orange"></div>
               
               <div className="space-y-12">
                 <div className="relative flex items-center">
                   <div className="flex-1 text-right pr-8">
-                    <div className="bg-blue-50 rounded-lg p-6">
-                      <h3 className="text-lg font-semibold text-blue-800 mb-2">2024년 6월</h3>
+                    <div className="bg-orange/10 rounded-lg p-6">
+                      <h3 className="text-lg font-semibold text-orange mb-2">2024년 6월</h3>
                       <p className="text-gray-700">디지털화환 법인 설립</p>
                       <p className="text-sm text-gray-600 mt-1">혁신적인 디지털 화환 기술 개발 시작</p>
                     </div>
                   </div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-blue-600 rounded-full border-4 border-white"></div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-orange rounded-full border-4 border-white"></div>
                   <div className="flex-1 pl-8"></div>
                 </div>
 
                 <div className="relative flex items-center">
                   <div className="flex-1 pr-8"></div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-purple-600 rounded-full border-4 border-white"></div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-orange rounded-full border-4 border-white"></div>
                   <div className="flex-1 pl-8">
-                    <div className="bg-purple-50 rounded-lg p-6">
-                      <h3 className="text-lg font-semibold text-purple-800 mb-2">2024년 하반기</h3>
+                    <div className="bg-dusty-rose/10 rounded-lg p-6">
+                      <h3 className="text-lg font-semibold text-dusty-rose mb-2">2024년 하반기</h3>
                       <p className="text-gray-700">첫 번째 홀로그램 화환 프로토타입 완성</p>
                       <p className="text-sm text-gray-600 mt-1">기술 특허 출원 및 시장 진입 준비</p>
                     </div>
@@ -303,7 +303,7 @@ export default function AboutPage() {
                       <p className="text-sm text-gray-600 mt-1">전국 배송망 구축 및 파트너십 확대</p>
                     </div>
                   </div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-green-600 rounded-full border-4 border-white"></div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-orange rounded-full border-4 border-white"></div>
                   <div className="flex-1 pl-8"></div>
                 </div>
               </div>
@@ -312,23 +312,23 @@ export default function AboutPage() {
         </section>
 
         {/* 연락처 */}
-        <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <section className="py-16 bg-moss-green text-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
             <h2 className="text-3xl font-bold mb-6">함께 만들어가는 미래</h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
               디지털화환과 함께 새로운 기념 문화를 만들어가실 파트너를 찾습니다.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a
                 href="/contact"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-300"
+                className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-300"
               >
                 상담 문의하기
               </a>
               <a
                 href="tel:02-336-0250"
-                className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-colors duration-300"
+                className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-orange transition-colors duration-300"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />

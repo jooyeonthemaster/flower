@@ -45,7 +45,7 @@ export default function DataInputStep({
                           placeholder={field.placeholder}
                           value={templateData.textData[field.name] || ''}
                           onChange={(e) => onTextFieldChange(field.name, e.target.value)}
-                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 resize-none text-sm"
+                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all duration-200 resize-none text-sm"
                           rows={2}
                           maxLength={field.maxLength}
                         />
@@ -55,7 +55,7 @@ export default function DataInputStep({
                           placeholder={field.placeholder}
                           value={templateData.textData[field.name] || ''}
                           onChange={(e) => onTextFieldChange(field.name, e.target.value)}
-                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 text-sm"
+                          className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all duration-200 text-sm"
                           maxLength={field.maxLength}
                         />
                       )}
@@ -84,7 +84,7 @@ export default function DataInputStep({
                       {field.label}
                       {field.required && <span className="text-red-500 ml-1">*</span>}
                     </label>
-                    <div className={`border-2 border-dashed rounded-lg p-3 text-center hover:border-blue-400 transition-all duration-200 ${
+                    <div className={`border-2 border-dashed rounded-lg p-3 text-center hover:border-orange/60 transition-all duration-200 ${
                       templateData.imageData[field.name] ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-gray-50/50'
                     }`}>
                       <input

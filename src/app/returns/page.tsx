@@ -8,13 +8,13 @@ export default function ReturnsPage() {
       
       <main className="pt-20">
         {/* 헤더 섹션 */}
-        <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+        <section className="bg-cream border-b-4 border-orange text-white py-20">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 교환 및 환불 규정
               </h1>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              <p className="text-xl text-white/90 max-w-3xl mx-auto">
                 디지털화환의 교환 및 환불 정책에 대한 상세한 안내입니다.
               </p>
             </div>
@@ -33,9 +33,9 @@ export default function ReturnsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center p-8 bg-blue-50 rounded-2xl">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center p-8 bg-orange/10 rounded-2xl">
+                <div className="w-16 h-16 bg-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -53,9 +53,9 @@ export default function ReturnsPage() {
                 <p className="text-gray-600">제품 하자 시 1년간 무료 수리 서비스</p>
               </div>
 
-              <div className="text-center p-8 bg-purple-50 rounded-2xl">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center p-8 bg-moss-green/10 rounded-2xl">
+                <div className="w-16 h-16 bg-moss-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-moss-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 002 2z" />
                   </svg>
                 </div>
@@ -171,16 +171,16 @@ export default function ReturnsPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span className="text-lg font-bold text-blue-600">1</span>
+                  <div className="w-12 h-12 bg-orange/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-lg font-bold text-orange">1</span>
                   </div>
                   <h4 className="font-semibold mb-2">환불 신청</h4>
                   <p className="text-sm text-gray-600">고객센터 연락 또는 온라인 신청</p>
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span className="text-lg font-bold text-purple-600">2</span>
+                  <div className="w-12 h-12 bg-moss-green/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-lg font-bold text-moss-green">2</span>
                   </div>
                   <h4 className="font-semibold mb-2">제품 회수</h4>
                   <p className="text-sm text-gray-600">전문 기술진이 직접 방문하여 회수</p>
@@ -207,7 +207,7 @@ export default function ReturnsPage() {
             {/* 환불 금액 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
-                <h3 className="text-2xl font-semibold mb-6 text-blue-600">환불 금액 기준</h3>
+                <h3 className="text-2xl font-semibold mb-6 text-orange">환불 금액 기준</h3>
                 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center py-3 border-b border-gray-200">
@@ -241,19 +241,19 @@ export default function ReturnsPage() {
 
               {/* 환불 방법 */}
               <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
-                <h3 className="text-2xl font-semibold mb-6 text-purple-600">환불 방법</h3>
+                <h3 className="text-2xl font-semibold mb-6 text-moss-green">환불 방법</h3>
                 
                 <div className="space-y-6">
-                  <div className="border-l-4 border-blue-500 pl-4">
+                  <div className="border-l-4 border-orange pl-4">
                     <h4 className="font-semibold text-gray-900 mb-2">계좌 이체</h4>
                     <p className="text-gray-600 text-sm">고객 지정 계좌로 직접 이체 (가장 빠른 방법)</p>
-                    <p className="text-blue-600 text-sm font-medium">처리 기간: 1-2일</p>
+                    <p className="text-orange text-sm font-medium">처리 기간: 1-2일</p>
                   </div>
                   
-                  <div className="border-l-4 border-purple-500 pl-4">
+                  <div className="border-l-4 border-dusty-rose pl-4">
                     <h4 className="font-semibold text-gray-900 mb-2">카드 승인 취소</h4>
                     <p className="text-gray-600 text-sm">신용카드 결제 시 카드사를 통한 승인 취소</p>
-                    <p className="text-purple-600 text-sm font-medium">처리 기간: 3-5일</p>
+                    <p className="text-moss-green text-sm font-medium">처리 기간: 3-5일</p>
                   </div>
                   
                   <div className="border-l-4 border-green-500 pl-4">
@@ -263,8 +263,8 @@ export default function ReturnsPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
+                <div className="mt-6 p-4 bg-orange/10 border border-orange/30 rounded-lg">
+                  <p className="text-sm text-orange">
                     <strong>안내:</strong> 환불 계좌는 주문자 본인 명의 계좌만 가능합니다.
                   </p>
                 </div>
@@ -360,35 +360,35 @@ export default function ReturnsPage() {
               {/* 연장 보증 */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-blue-600">연장 보증</h3>
+                  <h3 className="text-xl font-semibold text-orange">연장 보증</h3>
                   <p className="text-gray-600 text-sm">추가 1-2년 연장 가능</p>
                 </div>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center">
-                    <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     제품 가격의 10% (1년)
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     제품 가격의 15% (2년)
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     우선 A/S 서비스
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     정기 점검 서비스
@@ -404,7 +404,7 @@ export default function ReturnsPage() {
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">교환/환불 신청 방법</h2>
             
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+            <div className="bg-cream border-b-4 border-orange rounded-2xl p-8 text-white">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-2xl font-semibold mb-6">연락처</h3>

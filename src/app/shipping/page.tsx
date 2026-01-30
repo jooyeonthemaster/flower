@@ -8,13 +8,13 @@ export default function ShippingPage() {
       
       <main className="pt-20">
         {/* 헤더 섹션 */}
-        <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+        <section className="bg-cream border-b-4 border-orange text-white py-20">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 배송 정보
               </h1>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              <p className="text-xl text-white/90 max-w-3xl mx-auto">
                 디지털화환의 배송 및 설치 서비스에 대한 상세 정보를 확인하세요.
               </p>
             </div>
@@ -32,9 +32,9 @@ export default function ShippingPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center p-8 bg-blue-50 rounded-2xl">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center p-8 bg-orange/10 rounded-2xl">
+                <div className="w-16 h-16 bg-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 9l6-6m0 0l6 6m-6-6v9a6 6 0 01-12 0v-9a6 6 0 016-6z" />
                   </svg>
                 </div>
@@ -42,9 +42,9 @@ export default function ShippingPage() {
                 <p className="text-gray-600">전문 기술진이 직접 배송하여 제품 손상을 방지합니다.</p>
               </div>
 
-              <div className="text-center p-8 bg-purple-50 rounded-2xl">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center p-8 bg-moss-green/10 rounded-2xl">
+                <div className="w-16 h-16 bg-moss-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-moss-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                   </svg>
                 </div>
@@ -76,16 +76,16 @@ export default function ShippingPage() {
                 <h3 className="text-2xl font-semibold mb-6">배송 가능 지역</h3>
                 
                 <div className="space-y-6">
-                  <div className="border-l-4 border-blue-500 pl-4">
+                  <div className="border-l-4 border-orange pl-4">
                     <h4 className="font-semibold text-gray-900 mb-2">서울/경기 지역</h4>
                     <p className="text-gray-600 text-sm">서울특별시, 경기도 전 지역</p>
-                    <p className="text-blue-600 font-semibold">무료 배송 및 설치</p>
+                    <p className="text-orange font-semibold">무료 배송 및 설치</p>
                   </div>
                   
-                  <div className="border-l-4 border-purple-500 pl-4">
+                  <div className="border-l-4 border-dusty-rose pl-4">
                     <h4 className="font-semibold text-gray-900 mb-2">수도권 인근</h4>
                     <p className="text-gray-600 text-sm">인천광역시, 충청남북도 일부</p>
-                    <p className="text-purple-600 font-semibold">배송비 5만원</p>
+                    <p className="text-moss-green font-semibold">배송비 5만원</p>
                   </div>
                   
                   <div className="border-l-4 border-orange-500 pl-4">
@@ -121,7 +121,7 @@ export default function ShippingPage() {
                   </div>
                   <div className="flex items-center justify-between py-3">
                     <span className="text-gray-600 font-semibold">총 소요시간</span>
-                    <span className="text-blue-600 font-bold">3-5일</span>
+                    <span className="text-orange font-bold">3-5일</span>
                   </div>
                 </div>
 
@@ -151,16 +151,16 @@ export default function ShippingPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-blue-600">1</span>
+                <div className="w-16 h-16 bg-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-orange">1</span>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">현장 확인</h3>
                 <p className="text-gray-600 text-sm">설치 위치 및 환경을 확인하고 최적의 설치 방안을 결정합니다.</p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-purple-600">2</span>
+                <div className="w-16 h-16 bg-moss-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-moss-green">2</span>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">장비 설치</h3>
                 <p className="text-gray-600 text-sm">홀로그램 프로젝터와 제어 시스템을 안전하게 설치합니다.</p>
@@ -193,28 +193,28 @@ export default function ShippingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* 배송 전 준비사항 */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-2xl font-semibold mb-6 text-blue-600">배송 전 준비사항</h3>
+                <h3 className="text-2xl font-semibold mb-6 text-orange">배송 전 준비사항</h3>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-gray-700">설치 공간 확보 (최소 2m × 2m × 3m)</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-gray-700">전원 공급 장치 준비 (220V, 30A)</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-gray-700">인터넷 연결 환경 (유선 권장)</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-gray-700">설치 당일 담당자 입회</span>
@@ -224,28 +224,28 @@ export default function ShippingPage() {
 
               {/* 환경 요구사항 */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-2xl font-semibold mb-6 text-purple-600">환경 요구사항</h3>
+                <h3 className="text-2xl font-semibold mb-6 text-moss-green">환경 요구사항</h3>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-purple-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-dusty-rose mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-gray-700">실내 온도: 15°C ~ 30°C</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-purple-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-dusty-rose mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-gray-700">습도: 40% ~ 70%</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-purple-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-dusty-rose mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-gray-700">직사광선 차단 필요</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-purple-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-dusty-rose mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-gray-700">진동이 적은 안정적인 바닥</span>
@@ -255,7 +255,7 @@ export default function ShippingPage() {
             </div>
 
             {/* 연락처 안내 */}
-            <div className="mt-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white text-center">
+            <div className="mt-12 bg-cream border-b-4 border-orange rounded-2xl p-8 text-white text-center">
               <h3 className="text-2xl font-semibold mb-4">배송 관련 문의</h3>
               <p className="mb-6">배송 일정이나 설치 관련 궁금한 점이 있으시면 언제든지 연락주세요.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

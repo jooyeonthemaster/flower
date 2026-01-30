@@ -41,10 +41,10 @@ export default function TestimonialSection() {
           </div>
           
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-            고객들의 <span className="text-blue-600">생생한 후기</span>
+            고객들의 <span className="text-orange">생생한 후기</span>
           </h2>
           
-          <div className="w-16 h-0.5 bg-blue-600 mx-auto mb-8"></div>
+          <div className="w-16 h-0.5 bg-orange mx-auto mb-8"></div>
           
           <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             실제 기업 고객분들이 경험한 Digital Hologram Wreaths의 전문성을 확인해보세요
@@ -56,7 +56,7 @@ export default function TestimonialSection() {
           {testimonials.map((testimonial, index) => (
             <div 
               key={index} 
-              className="bg-gray-50 p-8 border-2 border-gray-200 hover:border-blue-600 transition-colors duration-300 group"
+              className="bg-gray-50 p-8 border-2 border-gray-200 hover:border-orange transition-colors duration-300 group"
             >
               <div className="space-y-6">
                 {/* 별점 */}
@@ -64,7 +64,7 @@ export default function TestimonialSection() {
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <div 
                       key={i} 
-                      className="w-4 h-4 bg-blue-600 border border-blue-700"
+                      className="w-4 h-4 bg-orange border border-[#d15a1f]"
                     ></div>
                   ))}
                 </div>
@@ -79,7 +79,7 @@ export default function TestimonialSection() {
 
                 {/* 고객 정보 */}
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-600 border-2 border-blue-700 flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-orange border-2 border-[#d15a1f] flex items-center justify-center text-white font-bold">
                     {testimonial.name.charAt(0)}
                   </div>
                   <div>
@@ -105,7 +105,7 @@ export default function TestimonialSection() {
               ].map((stat, index) => (
                 <div key={index} className="space-y-3">
                   <div className="text-3xl font-bold text-white">{stat.number}</div>
-                  <div className="h-0.5 bg-blue-600 mx-auto w-12"></div>
+                  <div className="h-0.5 bg-orange mx-auto w-12"></div>
                   <div className="text-sm text-gray-300 uppercase tracking-wider font-medium">{stat.label}</div>
                 </div>
               ))}

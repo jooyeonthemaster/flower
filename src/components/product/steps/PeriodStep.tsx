@@ -58,13 +58,13 @@ export default function PeriodStep({ selectedPeriod, onPeriodSelect }: PeriodSte
             onClick={() => onPeriodSelect(period as 'daily' | 'weekly' | 'monthly')}
             className={`p-5 border-2 rounded-2xl text-center transition-all duration-300 hover:scale-105 ${
               selectedPeriod === period
-                ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 shadow-lg shadow-blue-500/20'
+                ? 'border-orange bg-gradient-to-br from-orange/10 to-dusty-rose/10 shadow-lg shadow-orange/20'
                 : 'border-gray-200 bg-white/70 backdrop-blur-sm hover:border-gray-300 hover:shadow-md'
             }`}
           >
             <div className={`w-10 h-10 mx-auto mb-3 rounded-xl flex items-center justify-center text-lg ${
               selectedPeriod === period 
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' 
+                ? 'bg-gradient-to-r from-orange to-dusty-rose text-white' 
                 : 'bg-gray-100 text-gray-600'
             }`}>
               {period === 'daily' ? '📅' : period === 'weekly' ? '📊' : '📈'}
@@ -76,7 +76,7 @@ export default function PeriodStep({ selectedPeriod, onPeriodSelect }: PeriodSte
                 일당 ₩{option.dailyPrice.toLocaleString()} ({Math.round((1 - option.dailyPrice / productInfo.rentalOptions.daily.price) * 100)}% 절약)
               </div>
             )}
-            <div className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 bg-clip-text text-transparent">
+            <div className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent">
               ₩{option.price.toLocaleString()}
             </div>
             <div className="text-sm text-gray-500">/ {option.unit}</div>

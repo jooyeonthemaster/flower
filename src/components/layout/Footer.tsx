@@ -176,10 +176,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
-      {/* 장식 요소 */}
-      <div className="absolute top-20 right-10 w-32 h-32 border border-gray-200 transform rotate-45 opacity-30"></div>
-      <div className="absolute bottom-20 left-10 w-24 h-24 border border-blue-200 transform -rotate-12 opacity-50"></div>
     </footer>
   )
 }

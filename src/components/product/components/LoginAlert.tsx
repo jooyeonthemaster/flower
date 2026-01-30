@@ -39,7 +39,7 @@ export default function LoginAlert({ show, onClose }: LoginAlertProps) {
                   console.error('로그인 실패:', error)
                 }
               }}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex-1 px-4 py-2 bg-orange text-white rounded-lg hover:bg-[#d15a1f]"
             >
               로그인하기
             </button>

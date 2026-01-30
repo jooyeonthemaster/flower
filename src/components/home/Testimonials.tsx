@@ -10,7 +10,7 @@ const REVIEWS = [
         role: "기업 대표",
         company: "테크놀로지 그룹",
         rating: 5,
-        color: "bg-blue-600"
+        color: "bg-orange"
     },
     {
         id: 2,
@@ -28,7 +28,7 @@ const REVIEWS = [
         role: "병원 원장",
         company: "서울대학교병원",
         rating: 5,
-        color: "bg-purple-600"
+        color: "bg-dusty-rose"
     }
 ];
 
@@ -50,11 +50,11 @@ export default function Testimonials() {
                     transition={{ duration: 0.8 }}
                     className="mb-8 lg:mb-10 text-center flex-none"
                 >
-                    <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-xs font-bold mb-3">CUSTOMER TESTIMONIALS</span>
+                    <span className="inline-block px-3 py-1 rounded-full bg-orange/20 text-orange text-xs font-bold mb-3">CUSTOMER TESTIMONIALS</span>
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-black" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
-                        고객들의 <span className="text-blue-600 relative inline-block">
+                        고객들의 <span className="text-orange relative inline-block">
                             생생한 후기
-                            <span className="absolute bottom-1 left-0 w-full h-3 bg-blue-100 -z-10 opacity-50"></span>
+                            <span className="absolute bottom-1 left-0 w-full h-3 bg-orange/20 -z-10 opacity-50"></span>
                         </span>
                     </h2>
                     <p className="mt-2 text-gray-500 text-sm">실제 기업 고객분들이 경험한 Digital Hologram Wreaths의 전문성을 확인해보세요</p>
@@ -73,7 +73,7 @@ export default function Testimonials() {
                             <div className="mb-4">
                                 <div className="flex gap-1 mb-3">
                                     {[...Array(5)].map((_, i) => (
-                                        <div key={i} className={`w-5 h-5 ${i < review.rating ? 'bg-blue-500' : 'bg-gray-200'} rounded-sm`} />
+                                        <div key={i} className={`w-5 h-5 ${i < review.rating ? 'bg-orange' : 'bg-gray-200'} rounded-sm`} />
                                     ))}
                                 </div>
                                 <p className="text-gray-700 font-medium leading-relaxed keep-all text-sm">

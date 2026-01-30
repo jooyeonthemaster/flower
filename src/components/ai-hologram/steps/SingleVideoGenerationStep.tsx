@@ -156,7 +156,7 @@ export default function SingleVideoGenerationStep({
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">{getPhaseIcon()}</div>
           <h2 className="text-2xl font-bold text-white mb-2">배경 영상 생성</h2>
-          <p className="text-blue-300">{getPhaseLabel()}</p>
+          <p className="text-orange/80">{getPhaseLabel()}</p>
         </div>
 
         {/* Progress Bar */}
@@ -167,7 +167,7 @@ export default function SingleVideoGenerationStep({
           </div>
           <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+              className="h-full bg-cream transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -193,7 +193,7 @@ export default function SingleVideoGenerationStep({
                   isCompleted
                     ? 'border-green-500/50 bg-green-500/10'
                     : isActive
-                      ? 'border-blue-500/50 bg-blue-500/10'
+                      ? 'border-orange/50 bg-orange/100/10'
                       : 'border-white/10 bg-white/5'
                 }`}
               >
@@ -202,7 +202,7 @@ export default function SingleVideoGenerationStep({
                     isCompleted
                       ? 'bg-green-600'
                       : isActive
-                        ? 'bg-blue-600 animate-pulse'
+                        ? 'bg-orange animate-pulse'
                         : 'bg-gray-700'
                   }`}>
                     {isCompleted ? '✓' : isActive ? step.icon : (index + 1)}

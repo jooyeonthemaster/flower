@@ -14,6 +14,7 @@ export default function Header({ variant = 'default' }: HeaderProps) {
   const { user, isAdmin } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
 
   // Scroll handler for transparent variant
   useEffect(() => {
@@ -38,9 +39,14 @@ export default function Header({ variant = 'default' }: HeaderProps) {
 
   const navigation = [
     { name: '홈', href: '/' },
-    { name: '제품 소개', href: '/products' },
-    { name: '블루 타입', href: '/blue-type' },
-    { name: '레드 타입', href: '/red-type' },
+    {
+      name: '제품 소개',
+      href: '/products',
+      submenu: [
+        { name: '블루 타입', href: '/blue-type' },
+        { name: '레드 타입', href: '/red-type' },
+      ]
+    },
     { name: '공지사항', href: '/notice' },
     { name: '문의하기', href: '/contact' },
   ]
@@ -65,14 +71,37 @@ export default function Header({ variant = 'default' }: HeaderProps) {
           {/* 데스크톱 네비게이션 */}
           <div className="hidden lg:flex items-center space-x-8">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`text-sm font-bold relative group transition-colors duration-200 ${textColorClass}`}
-              >
-                {item.name}
-                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-[#E66B33] transition-all duration-300 group-hover:w-full`}></span>
-              </Link>
+              <div key={item.name} className="relative group">
+                <Link
+                  href={item.href}
+                  className={`text-sm font-bold relative transition-colors duration-200 ${textColorClass} flex items-center gap-1`}
+                >
+                  {item.name}
+                  {item.submenu && (
+                    <svg className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  )}
+                  <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-[#E66B33] transition-all duration-300 group-hover:w-full`}></span>
+                </Link>
+
+                {/* 드롭다운 메뉴 */}
+                {item.submenu && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="py-2">
+                      {item.submenu.map((subItem) => (
+                        <Link
+                          key={subItem.name}
+                          href={subItem.href}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange/10 hover:text-[#E66B33] transition-colors duration-200"
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
 
@@ -89,7 +118,7 @@ export default function Header({ variant = 'default' }: HeaderProps) {
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`text-sm font-bold relative group transition-colors duration-200 text-blue-600 hover:text-blue-700`}
+                className={`text-sm font-bold relative group transition-colors duration-200 text-orange hover:text-[#d15a1f]`}
               >
                 관리자
               </Link>
@@ -130,14 +159,55 @@ export default function Header({ variant = 'default' }: HeaderProps) {
           }`}>
           <div className="pb-4 pt-2 space-y-2 bg-white">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="block px-4 py-3 text-base font-bold text-gray-900 hover:bg-gray-50 hover:text-[#E66B33] rounded-lg transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
+              <div key={item.name}>
+                <div className="flex items-center justify-between">
+                  <Link
+                    href={item.href}
+                    className="flex-1 block px-4 py-3 text-base font-bold text-gray-900 hover:bg-gray-50 hover:text-[#E66B33] rounded-lg transition-colors duration-200"
+                    onClick={() => {
+                      if (!item.submenu) {
+                        setIsMobileMenuOpen(false);
+                      }
+                    }}
+                  >
+                    {item.name}
+                  </Link>
+                  {item.submenu && (
+                    <button
+                      onClick={() => setOpenSubmenu(openSubmenu === item.name ? null : item.name)}
+                      className="px-4 py-3 text-gray-900"
+                    >
+                      <svg
+                        className={`w-5 h-5 transition-transform duration-200 ${openSubmenu === item.name ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {/* 모바일 서브메뉴 */}
+                {item.submenu && openSubmenu === item.name && (
+                  <div className="pl-4 space-y-1">
+                    {item.submenu.map((subItem) => (
+                      <Link
+                        key={subItem.name}
+                        href={subItem.href}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange/10 hover:text-[#E66B33] rounded-lg transition-colors duration-200"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          setOpenSubmenu(null);
+                        }}
+                      >
+                        {subItem.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             <div className="pt-2 px-4 space-y-3">
               {user && (
@@ -152,7 +222,7 @@ export default function Header({ variant = 'default' }: HeaderProps) {
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="block px-4 py-3 text-base font-bold text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                  className="block px-4 py-3 text-base font-bold text-orange hover:bg-orange/10 rounded-lg transition-colors duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   관리자

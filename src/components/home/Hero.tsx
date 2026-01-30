@@ -66,7 +66,7 @@ export default function Hero() {
                 >
                     영원히 기억될
                     <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E66B33] via-pink-500 to-purple-600 animate-gradient">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E66B33] via-pink-500 to-dusty-rose animate-gradient">
                         빛나는 순간
                     </span>
                 </motion.h1>

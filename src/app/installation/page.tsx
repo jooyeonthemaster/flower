@@ -28,34 +28,34 @@ export default function InstallationPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* 공간 준비 */}
-              <div className="bg-blue-50 rounded-2xl p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-orange/10 rounded-2xl p-8">
+                <div className="w-16 h-16 bg-orange/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4a1 1 0 011-1h4m0 0V1m0 2h4m0 0V1m0 2v4m0 0h4a1 1 0 011 1v4m0 0v4m0 0v4a1 1 0 01-1 1h-4m0 0H9m0 0H5a1 1 0 01-1-1v-4m0 0V9" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-center mb-4">공간 확보</h3>
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-center">
-                    <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     최소 2m × 2m × 3m 공간
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     평평하고 안정적인 바닥
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     직사광선 차단 가능
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     진동이 적은 환경
@@ -148,8 +148,8 @@ export default function InstallationPage() {
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-xl font-bold text-blue-600">1</span>
+                    <div className="w-12 h-12 bg-orange/20 rounded-full flex items-center justify-center">
+                      <span className="text-xl font-bold text-orange">1</span>
                     </div>
                   </div>
                   <div className="flex-1">
@@ -177,8 +177,8 @@ export default function InstallationPage() {
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                      <span className="text-xl font-bold text-purple-600">2</span>
+                    <div className="w-12 h-12 bg-moss-green/20 rounded-full flex items-center justify-center">
+                      <span className="text-xl font-bold text-moss-green">2</span>
                     </div>
                   </div>
                   <div className="flex-1">
@@ -304,11 +304,11 @@ export default function InstallationPage() {
               </div>
 
               {/* 최적화 팁 */}
-              <div className="bg-blue-50 rounded-2xl p-8 border-2 border-blue-200">
-                <h3 className="text-2xl font-semibold text-blue-800 mb-6">💡 최적화 팁</h3>
+              <div className="bg-orange/10 rounded-2xl p-8 border-2 border-orange/30">
+                <h3 className="text-2xl font-semibold text-orange mb-6">💡 최적화 팁</h3>
                 <ul className="space-y-4">
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                     <div>
@@ -317,7 +317,7 @@ export default function InstallationPage() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                     <div>
@@ -326,7 +326,7 @@ export default function InstallationPage() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                     <div>

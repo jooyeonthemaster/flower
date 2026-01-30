@@ -8,7 +8,7 @@ export default function BusinessInfoPage() {
       
       <main className="pt-20">
         {/* 헤더 섹션 */}
-        <section className="bg-gradient-to-r from-gray-800 to-blue-800 text-white py-20">
+        <section className="bg-gradient-to-r from-gray-900 to-black text-white py-20">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -27,7 +27,7 @@ export default function BusinessInfoPage() {
             <div className="max-w-4xl mx-auto">
               
               {/* 기본 정보 */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-12">
+              <div className="bg-cream rounded-2xl p-8 mb-12 border-2 border-gray-200">
                 <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">사업자등록증 정보</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -86,12 +86,12 @@ export default function BusinessInfoPage() {
                 <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">사업의 종류</h2>
                 <div className="bg-white rounded-2xl shadow-lg p-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-blue-50 rounded-lg p-4 text-center">
-                      <h3 className="font-semibold text-blue-800 mb-2">제조업</h3>
+                    <div className="bg-orange/10 rounded-lg p-4 text-center">
+                      <h3 className="font-semibold text-orange mb-2">제조업</h3>
                       <p className="text-sm text-gray-600">영업 제조업</p>
                     </div>
-                    <div className="bg-purple-50 rounded-lg p-4 text-center">
-                      <h3 className="font-semibold text-purple-800 mb-2">전자 및 광학</h3>
+                    <div className="bg-moss-green/10 rounded-lg p-4 text-center">
+                      <h3 className="font-semibold text-moss-green mb-2">전자 및 광학</h3>
                       <p className="text-sm text-gray-600">종합 전자 및 광학 조립제조업</p>
                     </div>
                     <div className="bg-green-50 rounded-lg p-4 text-center">
@@ -106,8 +106,8 @@ export default function BusinessInfoPage() {
                       <h3 className="font-semibold text-red-800 mb-2">광고 대행업</h3>
                       <p className="text-sm text-gray-600">광고 투자 및 대행업</p>
                     </div>
-                    <div className="bg-indigo-50 rounded-lg p-4 text-center">
-                      <h3 className="font-semibold text-indigo-800 mb-2">도매 및 소매업</h3>
+                    <div className="bg-orange/10 rounded-lg p-4 text-center">
+                      <h3 className="font-semibold text-orange mb-2">도매 및 소매업</h3>
                       <p className="text-sm text-gray-600">상품 유통 및 판매</p>
                     </div>
                     <div className="bg-pink-50 rounded-lg p-4 text-center">
@@ -134,13 +134,13 @@ export default function BusinessInfoPage() {
                         <span className="font-semibold">사업자등록증</span>
                         <span className="text-green-600 font-bold">보유</span>
                       </div>
-                      <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                      <div className="flex items-center justify-between p-4 bg-orange/10 rounded-lg">
                         <span className="font-semibold">통신판매업 신고</span>
-                        <span className="text-blue-600 font-bold">진행중</span>
+                        <span className="text-orange font-bold">진행중</span>
                       </div>
-                      <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                      <div className="flex items-center justify-between p-4 bg-moss-green/10 rounded-lg">
                         <span className="font-semibold">KC 인증</span>
-                        <span className="text-purple-600 font-bold">진행중</span>
+                        <span className="text-moss-green font-bold">진행중</span>
                       </div>
                     </div>
                   </div>
@@ -202,7 +202,7 @@ export default function BusinessInfoPage() {
         </section>
 
         {/* 연락처 */}
-        <section className="py-16 bg-gradient-to-r from-gray-800 to-blue-800 text-white">
+        <section className="py-16 bg-gradient-to-r from-gray-900 to-black text-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
             <h2 className="text-3xl font-bold mb-6">사업자 정보 문의</h2>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">

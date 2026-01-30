@@ -8,7 +8,7 @@ export default function SupportPage() {
       
       <main className="pt-20">
         {/* 헤더 섹션 */}
-        <section className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-20">
+        <section className="bg-gradient-to-r from-moss-green to-orange text-white py-20">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -44,9 +44,9 @@ export default function SupportPage() {
               </div>
 
               {/* 원격 진단 */}
-              <div className="text-center p-8 bg-blue-50 rounded-2xl">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center p-8 bg-orange/10 rounded-2xl">
+                <div className="w-16 h-16 bg-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                   </svg>
                 </div>
@@ -55,9 +55,9 @@ export default function SupportPage() {
               </div>
 
               {/* 정기 점검 */}
-              <div className="text-center p-8 bg-purple-50 rounded-2xl">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center p-8 bg-moss-green/10 rounded-2xl">
+                <div className="w-16 h-16 bg-moss-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-moss-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                   </svg>
                 </div>
@@ -76,10 +76,10 @@ export default function SupportPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* 하드웨어 지원 */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-2xl font-semibold text-blue-600 mb-6">하드웨어 지원</h3>
+                <h3 className="text-2xl font-semibold text-orange mb-6">하드웨어 지원</h3>
                 <ul className="space-y-4">
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div>
@@ -88,7 +88,7 @@ export default function SupportPage() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div>
@@ -97,7 +97,7 @@ export default function SupportPage() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div>
@@ -106,7 +106,7 @@ export default function SupportPage() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div>
@@ -119,10 +119,10 @@ export default function SupportPage() {
 
               {/* 소프트웨어 지원 */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-2xl font-semibold text-purple-600 mb-6">소프트웨어 지원</h3>
+                <h3 className="text-2xl font-semibold text-moss-green mb-6">소프트웨어 지원</h3>
                 <ul className="space-y-4">
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-purple-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-moss-green mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div>
@@ -131,7 +131,7 @@ export default function SupportPage() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-purple-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-moss-green mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div>
@@ -140,7 +140,7 @@ export default function SupportPage() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-purple-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-moss-green mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div>
@@ -149,7 +149,7 @@ export default function SupportPage() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <svg className="w-5 h-5 text-purple-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-moss-green mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <div>
@@ -178,16 +178,16 @@ export default function SupportPage() {
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-blue-600">2</span>
+                <div className="w-16 h-16 bg-orange/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-orange">2</span>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">원격 진단</h3>
                 <p className="text-gray-600 text-sm">원격 접속을 통한 1차 진단 및 즉시 해결 시도</p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-purple-600">3</span>
+                <div className="w-16 h-16 bg-moss-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-moss-green">3</span>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">현장 지원</h3>
                 <p className="text-gray-600 text-sm">원격 해결이 어려운 경우 전문 기술진 현장 파견</p>
@@ -245,32 +245,32 @@ export default function SupportPage() {
               </div>
 
               {/* 프리미엄 지원 */}
-              <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-blue-500">
+              <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-orange">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-semibold text-blue-600">프리미엄 지원</h3>
+                  <h3 className="text-2xl font-semibold text-orange">프리미엄 지원</h3>
                   <p className="text-gray-600">프리미엄 고객 대상</p>
                 </div>
                 <ul className="space-y-3">
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm">24시간 전화 지원</span>
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm">우선 현장 지원</span>
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm">정기 점검 서비스</span>
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm">맞춤 교육 프로그램</span>
@@ -279,32 +279,32 @@ export default function SupportPage() {
               </div>
 
               {/* 엔터프라이즈 지원 */}
-              <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-purple-500">
+              <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-dusty-rose">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-semibold text-purple-600">엔터프라이즈 지원</h3>
+                  <h3 className="text-2xl font-semibold text-moss-green">엔터프라이즈 지원</h3>
                   <p className="text-gray-600">기업 고객 대상</p>
                 </div>
                 <ul className="space-y-3">
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-dusty-rose mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm">전담 기술진 배정</span>
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-dusty-rose mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm">SLA 보장 서비스</span>
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-dusty-rose mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm">맞춤형 솔루션 개발</span>
                   </li>
                   <li className="flex items-center">
-                    <svg className="w-5 h-5 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-dusty-rose mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm">예방적 유지보수</span>
@@ -370,7 +370,7 @@ export default function SupportPage() {
         </section>
 
         {/* 연락처 */}
-        <section className="py-16 bg-gradient-to-r from-green-600 to-blue-600 text-white">
+        <section className="py-16 bg-gradient-to-r from-moss-green to-orange text-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-6">기술 지원 연락처</h2>
@@ -409,10 +409,10 @@ export default function SupportPage() {
                     </svg>
                     <div>
                       <p className="font-semibold">이메일 지원</p>
-                      <p className="text-blue-100">baikal86@naver.com</p>
+                      <p className="text-white/90">baikal86@naver.com</p>
                     </div>
                   </div>
-                  <p className="text-sm text-blue-100">
+                  <p className="text-sm text-white/90">
                     평일 09:00 - 18:00 운영<br/>
                     이메일은 24시간 접수 가능
                   </p>

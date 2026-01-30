@@ -85,7 +85,7 @@ export default function PaymentStep({
             <div className="pt-6 border-t-2 border-gray-300">
               <div className="flex justify-between items-center">
                 <span className="text-2xl font-bold">총 렌트 비용</span>
-                <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-3xl font-bold text-orange">
                   ₩{currentRental.price.toLocaleString()}/{currentRental.unit}
                 </span>
               </div>
@@ -135,22 +135,22 @@ export default function PaymentStep({
       {/* 결제 전 동의 사항 및 필수 고지사항 */}
       <div className="max-w-6xl mx-auto mt-12">
         {/* 전자상거래법 필수 고지사항 */}
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6">
-          <h5 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
+        <div className="bg-orange/10 border border-orange/30 rounded-2xl p-6 mb-6">
+          <h5 className="text-lg font-bold text-black mb-4 flex items-center">
             <span className="mr-2">⚖️</span>
             전자상거래법 필수 고지사항
           </h5>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="space-y-2">
-              <div><span className="font-semibold text-blue-700">상호명:</span> 디지털화환</div>
-              <div><span className="font-semibold text-blue-700">대표자:</span> 조지형</div>
-              <div><span className="font-semibold text-blue-700">사업자등록번호:</span> 411-39-01174</div>
-              <div><span className="font-semibold text-blue-700">통신판매업번호:</span> <span className="text-orange-600">[신고 진행중]</span></div>
+              <div><span className="font-semibold text-black">상호명:</span> 디지털화환</div>
+              <div><span className="font-semibold text-black">대표자:</span> 조지형</div>
+              <div><span className="font-semibold text-black">사업자등록번호:</span> 411-39-01174</div>
+              <div><span className="font-semibold text-black">통신판매업번호:</span> <span className="text-orange">[신고 진행중]</span></div>
             </div>
             <div className="space-y-2">
-              <div><span className="font-semibold text-blue-700">연락처:</span> 02-336-0250</div>
-              <div><span className="font-semibold text-blue-700">이메일:</span> baikal86@naver.com</div>
-              <div><span className="font-semibold text-blue-700">사업장 주소:</span><br />서울특별시 중구 을지로 지하 220, 지하2층 청년창업소누리 A-8호</div>
+              <div><span className="font-semibold text-black">연락처:</span> 02-336-0250</div>
+              <div><span className="font-semibold text-black">이메일:</span> baikal86@naver.com</div>
+              <div><span className="font-semibold text-black">사업장 주소:</span><br />서울특별시 중구 을지로 지하 220, 지하2층 청년창업소누리 A-8호</div>
             </div>
           </div>
         </div>
@@ -193,10 +193,10 @@ export default function PaymentStep({
                 type="checkbox" 
                 checked={agreements.terms}
                 onChange={(e) => onAgreementChange({...agreements, terms: e.target.checked})}
-                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 w-4 h-4 text-orange border-gray-300 rounded focus:ring-orange"
               />
               <span className="text-sm">
-                <a href="/terms" target="_blank" className="text-blue-600 underline font-semibold hover:text-blue-800">이용약관</a>에 동의합니다. <span className="text-red-500">(필수)</span>
+                <a href="/terms" target="_blank" className="text-orange underline font-semibold hover:text-[#d15a1f]">이용약관</a>에 동의합니다. <span className="text-red-500">(필수)</span>
               </span>
             </label>
             
@@ -205,10 +205,10 @@ export default function PaymentStep({
                 type="checkbox" 
                 checked={agreements.privacy}
                 onChange={(e) => onAgreementChange({...agreements, privacy: e.target.checked})}
-                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 w-4 h-4 text-orange border-gray-300 rounded focus:ring-orange"
               />
               <span className="text-sm">
-                <a href="/privacy" target="_blank" className="text-blue-600 underline font-semibold hover:text-blue-800">개인정보처리방침</a>에 동의합니다. <span className="text-red-500">(필수)</span>
+                <a href="/privacy" target="_blank" className="text-orange underline font-semibold hover:text-[#d15a1f]">개인정보처리방침</a>에 동의합니다. <span className="text-red-500">(필수)</span>
               </span>
             </label>
             
@@ -217,10 +217,10 @@ export default function PaymentStep({
                 type="checkbox" 
                 checked={agreements.refund}
                 onChange={(e) => onAgreementChange({...agreements, refund: e.target.checked})}
-                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 w-4 h-4 text-orange border-gray-300 rounded focus:ring-orange"
               />
               <span className="text-sm">
-                <a href="/returns" target="_blank" className="text-blue-600 underline font-semibold hover:text-blue-800">교환 및 환불 정책</a>을 확인했습니다. <span className="text-red-500">(필수)</span>
+                <a href="/returns" target="_blank" className="text-orange underline font-semibold hover:text-[#d15a1f]">교환 및 환불 정책</a>을 확인했습니다. <span className="text-red-500">(필수)</span>
               </span>
             </label>
             
@@ -229,7 +229,7 @@ export default function PaymentStep({
                 type="checkbox" 
                 checked={agreements.ecommerce}
                 onChange={(e) => onAgreementChange({...agreements, ecommerce: e.target.checked})}
-                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 w-4 h-4 text-orange border-gray-300 rounded focus:ring-orange"
               />
               <span className="text-sm">
                 전자상거래법에 따른 필수 고지사항을 확인했으며, 위 결제 관련 유의사항에 동의합니다. <span className="text-red-500">(필수)</span>

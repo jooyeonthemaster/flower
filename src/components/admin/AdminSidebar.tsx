@@ -56,16 +56,16 @@ export default function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="w-64 min-h-screen bg-gray-900 text-white flex flex-col relative">
+    <div className="w-64 min-h-screen bg-cream text-black flex flex-col relative border-r-2 border-gray-200">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-800">
+      <div className="p-6 border-b border-gray-200">
         <Link href="/admin" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
-            <span className="text-xl">✦</span>
+          <div className="w-10 h-10 rounded-xl bg-orange flex items-center justify-center">
+            <span className="text-xl text-white">✦</span>
           </div>
           <div>
             <p className="font-bold">Digital Hologram</p>
-            <p className="text-xs text-gray-400">관리자 패널</p>
+            <p className="text-xs text-gray-600">관리자 패널</p>
           </div>
         </Link>
       </div>
@@ -83,8 +83,8 @@ export default function AdminSidebar() {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     isActive
-                      ? 'bg-white text-gray-900'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      ? 'bg-orange text-white shadow-md'
+                      : 'text-gray-700 hover:bg-warm-gray/20 hover:text-black'
                   }`}
                 >
                   {item.icon}
@@ -103,10 +103,10 @@ export default function AdminSidebar() {
       <div className="flex-1" />
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t border-gray-200">
         <Link
           href="/"
-          className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-colors"
+          className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-orange transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
