@@ -73,13 +73,13 @@ export default function WhyChoose() {
 
             {/* 섹션 1: Hero (베이지) */}
             <div
-                className="flex-[45] relative px-6 lg:px-8 overflow-hidden flex items-center"
+                className="flex-[45] relative px-6 lg:px-8 pt-12 lg:pt-16 pb-3 lg:pb-4 overflow-hidden flex items-center"
                 style={{
                     background: '#E0D8CC',
                 }}
             >
                 <div className="container mx-auto max-w-7xl relative z-10">
-                    <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-8">
                         {/* 좌측: 텍스트 콘텐츠 */}
                         <motion.div
                             initial={{ opacity: 0, x: -50 }}
@@ -89,19 +89,19 @@ export default function WhyChoose() {
                             className="flex-1 text-left max-w-xl"
                         >
                             <h2
-                                className="text-3xl md:text-4xl lg:text-5xl font-black leading-tight text-gray-900 mb-2 uppercase tracking-tight"
+                                className="text-3xl md:text-4xl lg:text-5xl font-black leading-tight text-gray-900 mb-1 uppercase tracking-tight"
                                 style={{ fontFamily: "'Inter', sans-serif" }}
                             >
                                 DIGITAL HOLOGRAM<br />
                                 <span className="text-gray-500">WREATHS:</span>
                             </h2>
                             <p
-                                className="text-lg md:text-xl text-gray-800 font-bold mb-3 leading-snug"
+                                className="text-lg md:text-xl text-gray-800 font-bold mb-1 leading-snug"
                                 style={{ fontFamily: "'Noto Sans KR', sans-serif" }}
                             >
                                 축하의 미래를 경험하세요.
                             </p>
-                            <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4 max-w-md">
+                            <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-2 max-w-md">
                                 웨딩, 개업, 기업 행사를 위한 차세대 축하 솔루션.<br />
                                 시들지 않는 아름다움과 첨단 기술의 완벽한 조화.
                             </p>
@@ -142,7 +142,7 @@ export default function WhyChoose() {
 
             {/* 섹션 2: Features (세이지) */}
             <div
-                className="flex-[30] px-6 lg:px-8 flex items-center border-t-2 border-gray-400/30"
+                className="flex-[30] px-6 lg:px-8 pt-6 lg:pt-8 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30"
                 style={{
                     background: '#D0DCD0',
                 }}
@@ -153,7 +153,7 @@ export default function WhyChoose() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8"
+                        className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-5"
                     >
                         {FEATURES.map((feature, idx) => (
                             <motion.div
@@ -199,7 +199,7 @@ export default function WhyChoose() {
 
             {/* 섹션 3: Specs (민트) */}
             <div
-                className="flex-[25] px-6 lg:px-8 flex items-center border-t-2 border-gray-400/30"
+                className="flex-[25] px-6 lg:px-8 pt-5 lg:pt-6 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30"
                 style={{
                     background: '#B8D8C8',
                 }}
@@ -210,7 +210,7 @@ export default function WhyChoose() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6"
+                        className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4"
                     >
                         {SPECS.map((spec, idx) => (
                             <motion.div

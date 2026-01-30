@@ -271,19 +271,14 @@ export default function ProductsPage() {
 
             <main>
                 {/* Section 1: Hero */}
-                <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
-                    {/* Background Effects */}
-                    <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[#E66B33] rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none" />
-                    <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-300 rounded-full mix-blend-multiply filter blur-[120px] opacity-15 pointer-events-none" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-100 rounded-full mix-blend-multiply filter blur-[150px] opacity-20 pointer-events-none" />
-
+                <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-white pt-24">
                     <div className="relative z-10 container mx-auto px-4 text-center">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
                         >
-                            <span className="inline-block px-4 py-1.5 rounded-full border border-[#E66B33]/30 bg-white/50 backdrop-blur-sm text-[#E66B33] text-sm font-bold tracking-wider mb-6">
+                            <span className="inline-block px-4 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-gray-600 text-sm font-bold tracking-wider mb-6">
                                 SERVICE GUIDE
                             </span>
                         </motion.div>
@@ -297,7 +292,7 @@ export default function ProductsPage() {
                         >
                             서비스
                             <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E66B33] via-pink-500 to-purple-600">
+                            <span className="text-gray-400">
                                 상세 안내
                             </span>
                         </motion.h1>
@@ -306,7 +301,7 @@ export default function ProductsPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4, duration: 0.8 }}
-                            className="text-lg md:text-2xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed mb-8"
+                            className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto font-light leading-relaxed mb-10"
                         >
                             Digital Hologram Wreaths의 모든 것을 알려드립니다.
                             <br />
@@ -321,7 +316,7 @@ export default function ProductsPage() {
                         >
                             <Link
                                 href="/ai-hologram"
-                                className="group inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white bg-[#0a0a0a] rounded-full hover:bg-[#E66B33] transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                                className="group inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-gray-900 rounded-full hover:bg-gray-800 transition-all duration-300"
                             >
                                 바로 시작하기
                                 <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,7 +325,7 @@ export default function ProductsPage() {
                             </Link>
                             <Link
                                 href="#comparison"
-                                className="px-10 py-5 text-lg font-bold text-gray-700 bg-white border-2 border-gray-100 rounded-full hover:border-gray-300 hover:bg-gray-50 transition-all duration-300"
+                                className="px-8 py-4 text-base font-bold text-gray-600 bg-white border-2 border-gray-200 rounded-full hover:border-gray-300 hover:bg-gray-50 transition-all duration-300"
                             >
                                 자세히 알아보기
                             </Link>
@@ -339,20 +334,20 @@ export default function ProductsPage() {
                 </section>
 
                 {/* Section 2: Traditional vs Hologram Comparison */}
-                <section id="comparison" className="bg-slate-50 py-20 lg:py-32">
-                    <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
+                <section id="comparison" className="bg-gray-50 py-20 lg:py-28">
+                    <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
-                            className="text-center mb-16"
+                            className="text-center mb-12"
                         >
-                            <span className="text-[#E66B33] font-bold tracking-wider text-sm uppercase mb-2 block">WHY HOLOGRAM?</span>
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
+                            <span className="text-gray-500 font-bold tracking-wider text-sm uppercase mb-2 block">WHY HOLOGRAM?</span>
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
                                 전통 화환 vs 홀로그램 화환
                             </h2>
-                            <p className="text-gray-600 max-w-2xl mx-auto">
+                            <p className="text-gray-500 max-w-2xl mx-auto">
                                 왜 많은 분들이 홀로그램 화환을 선택하는지 비교해보세요
                             </p>
                         </motion.div>
@@ -362,13 +357,13 @@ export default function ProductsPage() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
-                            className="bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100"
+                            className="bg-white rounded-2xl overflow-hidden border border-gray-200"
                         >
                             {/* Table Header */}
                             <div className="grid grid-cols-3 bg-gray-50 border-b border-gray-200">
-                                <div className="p-6 text-center font-bold text-gray-500">비교 항목</div>
-                                <div className="p-6 text-center font-bold text-gray-400 border-l border-gray-200">전통 화환</div>
-                                <div className="p-6 text-center font-bold text-[#E66B33] border-l border-gray-200 bg-[#E66B33]/5">홀로그램 화환</div>
+                                <div className="p-5 text-center font-bold text-gray-500 text-sm">비교 항목</div>
+                                <div className="p-5 text-center font-bold text-gray-400 border-l border-gray-200 text-sm">전통 화환</div>
+                                <div className="p-5 text-center font-bold text-gray-900 border-l border-gray-200 bg-gray-100 text-sm">홀로그램 화환</div>
                             </div>
 
                             {/* Table Body */}
@@ -381,10 +376,10 @@ export default function ProductsPage() {
                                     transition={{ delay: idx * 0.05, duration: 0.4 }}
                                     className={`grid grid-cols-3 ${idx !== COMPARISON_DATA.length - 1 ? 'border-b border-gray-100' : ''}`}
                                 >
-                                    <div className="p-5 font-medium text-gray-900 flex items-center">{row.feature}</div>
-                                    <div className="p-5 text-gray-500 border-l border-gray-100 flex items-center text-sm">{row.traditional}</div>
-                                    <div className="p-5 text-gray-900 border-l border-gray-100 bg-[#E66B33]/5 flex items-center text-sm font-medium">
-                                        <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="p-4 font-medium text-gray-900 flex items-center text-sm">{row.feature}</div>
+                                    <div className="p-4 text-gray-400 border-l border-gray-100 flex items-center text-sm">{row.traditional}</div>
+                                    <div className="p-4 text-gray-900 border-l border-gray-100 bg-gray-50 flex items-center text-sm font-medium">
+                                        <svg className="w-4 h-4 text-gray-900 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
                                         {row.hologram}
@@ -396,25 +391,25 @@ export default function ProductsPage() {
                 </section>
 
                 {/* Section 3: Service Modes Detailed */}
-                <section className="bg-white py-20 lg:py-32">
-                    <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
+                <section className="bg-white py-20 lg:py-28">
+                    <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
-                            className="text-center mb-16"
+                            className="text-center mb-12"
                         >
-                            <span className="text-[#E66B33] font-bold tracking-wider text-sm uppercase mb-2 block">SERVICE MODES</span>
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
+                            <span className="text-gray-500 font-bold tracking-wider text-sm uppercase mb-2 block">SERVICE MODES</span>
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
                                 서비스 모드 상세 비교
                             </h2>
-                            <p className="text-gray-600 max-w-2xl mx-auto">
+                            <p className="text-gray-500 max-w-2xl mx-auto">
                                 상황과 목적에 맞는 최적의 서비스를 선택하세요
                             </p>
                         </motion.div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {SERVICE_MODES_DETAILED.map((mode, idx) => (
                                 <motion.div
                                     key={mode.id}
@@ -422,60 +417,60 @@ export default function ProductsPage() {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: idx * 0.2, duration: 0.6 }}
-                                    className={`relative bg-white rounded-3xl p-8 border-2 ${mode.borderColor} hover:shadow-2xl transition-all duration-500`}
+                                    className={`relative bg-white rounded-2xl p-6 lg:p-8 border ${mode.popular ? 'border-gray-900 border-2' : 'border-gray-200'} hover:shadow-lg transition-all duration-300`}
                                 >
                                     {mode.popular && (
-                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                                            <span className="px-4 py-1.5 bg-[#E66B33] text-white text-xs font-bold rounded-full shadow-lg">
+                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                                            <span className="px-3 py-1 bg-gray-900 text-white text-xs font-bold rounded-full">
                                                 MOST POPULAR
                                             </span>
                                         </div>
                                     )}
 
                                     {/* Header */}
-                                    <div className="flex items-start justify-between mb-6">
+                                    <div className="flex items-start justify-between mb-5">
                                         <div>
-                                            <h3 className="text-2xl font-black text-gray-900">{mode.title}</h3>
-                                            <p className="text-sm text-gray-500">{mode.subtitle}</p>
+                                            <h3 className="text-xl font-black text-gray-900">{mode.title}</h3>
+                                            <p className="text-sm text-gray-400">{mode.subtitle}</p>
                                         </div>
-                                        <div className={`relative w-16 h-16 rounded-2xl ${mode.bgColor} flex items-center justify-center overflow-hidden`}>
+                                        <div className="relative w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden">
                                             <Image src={mode.icon} alt={mode.title} fill className="object-contain p-2" />
                                         </div>
                                     </div>
 
                                     {/* Price */}
                                     <div className="mb-4 pb-4 border-b border-gray-100">
-                                        <span className="text-4xl font-black text-gray-900">{mode.price}</span>
-                                        <span className="text-sm text-gray-500 ml-2">{mode.priceNote}</span>
+                                        <span className="text-3xl font-black text-gray-900">{mode.price}</span>
+                                        <span className="text-sm text-gray-400 ml-2">{mode.priceNote}</span>
                                     </div>
 
                                     {/* Best For */}
-                                    <div className="mb-6 p-4 rounded-xl" style={{ backgroundColor: `${mode.color}10` }}>
-                                        <p className="text-sm font-medium" style={{ color: mode.color }}>
-                                            <span className="font-bold">추천 대상:</span> {mode.bestFor}
+                                    <div className="mb-5 p-3 rounded-lg bg-gray-50">
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-bold text-gray-900">추천 대상:</span> {mode.bestFor}
                                         </p>
                                     </div>
 
                                     {/* Features */}
-                                    <div className="space-y-3 mb-6">
+                                    <div className="space-y-2 mb-5">
                                         {mode.features.map((feature, fidx) => (
                                             <div key={fidx} className="flex justify-between items-start py-2 border-b border-gray-50">
                                                 <div>
-                                                    <span className="text-gray-700 font-medium">{feature.label}</span>
+                                                    <span className="text-gray-700 font-medium text-sm">{feature.label}</span>
                                                     <p className="text-xs text-gray-400">{feature.detail}</p>
                                                 </div>
-                                                <span className="font-bold text-gray-900">{feature.value}</span>
+                                                <span className="font-bold text-gray-900 text-sm">{feature.value}</span>
                                             </div>
                                         ))}
                                     </div>
 
                                     {/* Use Cases */}
-                                    <div className="mb-6">
-                                        <h4 className="text-sm font-bold text-gray-700 mb-3">이런 경우에 추천해요</h4>
-                                        <div className="space-y-2">
+                                    <div className="mb-5">
+                                        <h4 className="text-sm font-bold text-gray-700 mb-2">이런 경우에 추천해요</h4>
+                                        <div className="space-y-1.5">
                                             {mode.useCases.map((useCase, uidx) => (
-                                                <div key={uidx} className="flex items-start gap-2 text-sm text-gray-600">
-                                                    <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: mode.color }} />
+                                                <div key={uidx} className="flex items-start gap-2 text-sm text-gray-500">
+                                                    <div className="w-1 h-1 rounded-full mt-2 flex-shrink-0 bg-gray-400" />
                                                     {useCase}
                                                 </div>
                                             ))}
@@ -485,8 +480,8 @@ export default function ProductsPage() {
                                     {/* CTA */}
                                     <Link
                                         href="/ai-hologram"
-                                        className={`block w-full py-4 rounded-xl font-bold text-center transition-all duration-300 ${mode.popular
-                                            ? 'bg-[#E66B33] text-white hover:bg-[#d45a28]'
+                                        className={`block w-full py-3.5 rounded-lg font-bold text-center transition-all duration-300 ${mode.popular
+                                            ? 'bg-gray-900 text-white hover:bg-gray-800'
                                             : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                             }`}
                                     >
@@ -499,33 +494,33 @@ export default function ProductsPage() {
                 </section>
 
                 {/* Section 4: Event Categories Detailed */}
-                <section className="bg-slate-50 py-20 lg:py-32">
-                    <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
+                <section className="bg-gray-50 py-20 lg:py-28">
+                    <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
-                            className="text-center mb-16"
+                            className="text-center mb-12"
                         >
-                            <span className="text-[#E66B33] font-bold tracking-wider text-sm uppercase mb-2 block">EVENT TYPES</span>
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
+                            <span className="text-gray-500 font-bold tracking-wider text-sm uppercase mb-2 block">EVENT TYPES</span>
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
                                 이벤트별 상세 안내
                             </h2>
-                            <p className="text-gray-600 max-w-2xl mx-auto">
+                            <p className="text-gray-500 max-w-2xl mx-auto">
                                 각 이벤트에 최적화된 템플릿과 옵션을 확인하세요
                             </p>
                         </motion.div>
 
                         {/* Category Tabs */}
-                        <div className="flex justify-center gap-4 mb-12">
+                        <div className="flex justify-center gap-3 mb-10">
                             {EVENT_CATEGORIES_DETAILED.map((cat) => (
                                 <button
                                     key={cat.id}
                                     onClick={() => setActiveCategory(cat)}
-                                    className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${activeCategory.id === cat.id
-                                        ? 'bg-[#E66B33] text-white shadow-lg'
-                                        : 'bg-white text-gray-600 hover:bg-gray-100'
+                                    className={`px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300 ${activeCategory.id === cat.id
+                                        ? 'bg-gray-900 text-white'
+                                        : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
                                         }`}
                                 >
                                     {cat.title}
@@ -539,58 +534,58 @@ export default function ProductsPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100"
+                            className="bg-white rounded-2xl overflow-hidden border border-gray-200"
                         >
                             <div className="grid grid-cols-1 lg:grid-cols-2">
                                 {/* Image */}
-                                <div className="relative h-64 lg:h-auto min-h-[400px]">
+                                <div className="relative h-64 lg:h-auto min-h-[350px]">
                                     <Image
                                         src={activeCategory.image}
                                         alt={activeCategory.title}
                                         fill
                                         className="object-cover"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent lg:bg-gradient-to-t lg:from-black/50 lg:to-transparent" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent lg:bg-gradient-to-t lg:from-black/60 lg:to-transparent" />
                                     <div className="absolute bottom-6 left-6 lg:bottom-8 lg:left-8">
-                                        <h3 className="text-3xl lg:text-4xl font-black text-white mb-2">{activeCategory.title}</h3>
-                                        <p className="text-white/80">{activeCategory.subtitle}</p>
+                                        <h3 className="text-2xl lg:text-3xl font-black text-white mb-1">{activeCategory.title}</h3>
+                                        <p className="text-white/70 text-sm">{activeCategory.subtitle}</p>
                                     </div>
                                 </div>
 
                                 {/* Content */}
-                                <div className="p-8 lg:p-10">
-                                    <p className="text-gray-600 mb-8 leading-relaxed">{activeCategory.longDescription}</p>
+                                <div className="p-6 lg:p-8">
+                                    <p className="text-gray-500 mb-6 leading-relaxed text-sm">{activeCategory.longDescription}</p>
 
                                     {/* Features */}
-                                    <h4 className="font-bold text-gray-900 mb-4">주요 기능</h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                                    <h4 className="font-bold text-gray-900 mb-3 text-sm">주요 기능</h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                                         {activeCategory.features.map((feature, idx) => (
-                                            <div key={idx} className="p-4 bg-gray-50 rounded-xl">
-                                                <h5 className="font-bold text-gray-900 mb-1">{feature.title}</h5>
-                                                <p className="text-sm text-gray-500">{feature.desc}</p>
+                                            <div key={idx} className="p-3 bg-gray-50 rounded-lg">
+                                                <h5 className="font-bold text-gray-900 mb-0.5 text-sm">{feature.title}</h5>
+                                                <p className="text-xs text-gray-500">{feature.desc}</p>
                                             </div>
                                         ))}
                                     </div>
 
                                     {/* Template Options */}
-                                    <h4 className="font-bold text-gray-900 mb-4">제공 템플릿</h4>
-                                    <div className="flex flex-wrap gap-2 mb-8">
+                                    <h4 className="font-bold text-gray-900 mb-3 text-sm">제공 템플릿</h4>
+                                    <div className="flex flex-wrap gap-2 mb-6">
                                         {activeCategory.templateOptions.map((template, idx) => (
-                                            <span key={idx} className="px-4 py-2 bg-[#E66B33]/10 text-[#E66B33] rounded-full text-sm font-medium">
+                                            <span key={idx} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                                                 {template}
                                             </span>
                                         ))}
                                     </div>
 
                                     {/* CTA */}
-                                    <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                                    <div className="flex items-center justify-between pt-5 border-t border-gray-100">
                                         <div>
-                                            <p className="text-sm text-gray-500">평균 예산</p>
-                                            <p className="text-2xl font-black text-gray-900">{activeCategory.avgBudget}</p>
+                                            <p className="text-xs text-gray-400">평균 예산</p>
+                                            <p className="text-xl font-black text-gray-900">{activeCategory.avgBudget}</p>
                                         </div>
                                         <Link
                                             href="/ai-hologram"
-                                            className="px-8 py-4 bg-[#E66B33] text-white font-bold rounded-xl hover:bg-[#d45a28] transition-colors"
+                                            className="px-6 py-3 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800 transition-colors text-sm"
                                         >
                                             지금 만들기
                                         </Link>
@@ -602,25 +597,25 @@ export default function ProductsPage() {
                 </section>
 
                 {/* Section 5: Pricing Details */}
-                <section className="bg-white py-20 lg:py-32">
+                <section className="bg-white py-20 lg:py-28">
                     <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
-                            className="text-center mb-16"
+                            className="text-center mb-12"
                         >
-                            <span className="text-[#E66B33] font-bold tracking-wider text-sm uppercase mb-2 block">PRICING</span>
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
+                            <span className="text-gray-500 font-bold tracking-wider text-sm uppercase mb-2 block">PRICING</span>
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
                                 상세 가격 안내
                             </h2>
-                            <p className="text-gray-600 max-w-2xl mx-auto">
+                            <p className="text-gray-500 max-w-2xl mx-auto">
                                 투명한 가격 정책으로 예산 계획을 도와드립니다
                             </p>
                         </motion.div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                             {Object.entries(PRICING_DETAILS).map(([key, category], idx) => (
                                 <motion.div
                                     key={key}
@@ -628,19 +623,19 @@ export default function ProductsPage() {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: idx * 0.1, duration: 0.5 }}
-                                    className="bg-gray-50 rounded-2xl p-6 border border-gray-100"
+                                    className="bg-gray-50 rounded-xl p-5 border border-gray-100"
                                 >
-                                    <h3 className="text-lg font-black text-gray-900 mb-6 pb-4 border-b border-gray-200">
+                                    <h3 className="text-base font-black text-gray-900 mb-5 pb-3 border-b border-gray-200">
                                         {category.title}
                                     </h3>
-                                    <div className="space-y-4">
+                                    <div className="space-y-3">
                                         {category.items.map((item, iidx) => (
                                             <div key={iidx} className="flex justify-between items-start">
                                                 <div>
-                                                    <p className="font-medium text-gray-900">{item.name}</p>
-                                                    <p className="text-xs text-gray-500">{item.note}</p>
+                                                    <p className="font-medium text-gray-900 text-sm">{item.name}</p>
+                                                    <p className="text-xs text-gray-400">{item.note}</p>
                                                 </div>
-                                                <span className="font-bold text-[#E66B33] whitespace-nowrap ml-4">{item.price}</span>
+                                                <span className="font-bold text-gray-900 whitespace-nowrap ml-4 text-sm">{item.price}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -653,13 +648,13 @@ export default function ProductsPage() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="mt-8 p-6 bg-[#E66B33]/5 rounded-2xl border border-[#E66B33]/20 text-center"
+                            className="mt-6 p-5 bg-gray-50 rounded-xl border border-gray-200 text-center"
                         >
-                            <p className="text-gray-700">
-                                <span className="font-bold text-[#E66B33]">기업 고객 특별 프로그램:</span>{' '}
+                            <p className="text-gray-600 text-sm">
+                                <span className="font-bold text-gray-900">기업 고객 특별 프로그램:</span>{' '}
                                 10개 이상 대량 주문 시 최대 30% 할인 | 연간 계약 시 추가 혜택 제공
                             </p>
-                            <Link href="/contact" className="inline-block mt-4 text-[#E66B33] font-bold hover:underline">
+                            <Link href="/contact" className="inline-block mt-3 text-gray-900 font-bold hover:underline text-sm">
                                 기업 상담 문의하기 →
                             </Link>
                         </motion.div>
@@ -667,25 +662,25 @@ export default function ProductsPage() {
                 </section>
 
                 {/* Section 6: Tech Specs Detailed */}
-                <section className="bg-slate-900 text-white py-20 lg:py-32">
-                    <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
+                <section className="bg-gray-50 py-20 lg:py-28">
+                    <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
-                            className="text-center mb-16"
+                            className="text-center mb-12"
                         >
-                            <span className="text-[#E66B33] font-bold tracking-wider text-sm uppercase mb-2 block">SPECIFICATIONS</span>
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
+                            <span className="text-gray-500 font-bold tracking-wider text-sm uppercase mb-2 block">SPECIFICATIONS</span>
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
                                 기술 사양
                             </h2>
-                            <p className="text-gray-400 max-w-2xl mx-auto">
+                            <p className="text-gray-500 max-w-2xl mx-auto">
                                 LED 홀로그램 팬의 상세 스펙을 확인하세요
                             </p>
                         </motion.div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {TECH_SPECS_DETAILED.map((category, idx) => (
                                 <motion.div
                                     key={idx}
@@ -693,16 +688,16 @@ export default function ProductsPage() {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: idx * 0.1, duration: 0.5 }}
-                                    className="bg-slate-800 rounded-2xl p-6 border border-slate-700"
+                                    className="bg-white rounded-xl p-5 border border-gray-200"
                                 >
-                                    <h3 className="text-[#E66B33] font-bold mb-6 pb-4 border-b border-slate-700">
+                                    <h3 className="text-gray-900 font-bold mb-4 pb-3 border-b border-gray-100 text-sm">
                                         {category.category}
                                     </h3>
-                                    <div className="space-y-4">
+                                    <div className="space-y-3">
                                         {category.specs.map((spec, sidx) => (
                                             <div key={sidx} className="flex justify-between">
-                                                <span className="text-gray-400 text-sm">{spec.label}</span>
-                                                <span className="text-white font-medium text-sm">{spec.value}</span>
+                                                <span className="text-gray-400 text-xs">{spec.label}</span>
+                                                <span className="text-gray-900 font-medium text-xs">{spec.value}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -716,29 +711,29 @@ export default function ProductsPage() {
                 <Testimonials />
 
                 {/* Section 7: FAQ */}
-                <section className="bg-white py-20 lg:py-32">
-                    <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
+                <section className="bg-white py-20 lg:py-28">
+                    <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
-                            className="text-center mb-16"
+                            className="text-center mb-12"
                         >
-                            <span className="text-[#E66B33] font-bold tracking-wider text-sm uppercase mb-2 block">FAQ</span>
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
+                            <span className="text-gray-500 font-bold tracking-wider text-sm uppercase mb-2 block">FAQ</span>
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
                                 자주 묻는 질문
                             </h2>
-                            <p className="text-gray-600 max-w-2xl mx-auto">
+                            <p className="text-gray-500 max-w-2xl mx-auto">
                                 궁금한 점이 있으신가요? 여기서 답을 찾아보세요.
                             </p>
                         </motion.div>
 
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             {FAQ_DATA.map((category, cidx) => (
                                 <div key={cidx}>
-                                    <h3 className="text-lg font-bold text-[#E66B33] mb-4">{category.category}</h3>
-                                    <div className="space-y-3">
+                                    <h3 className="text-sm font-bold text-gray-900 mb-3">{category.category}</h3>
+                                    <div className="space-y-2">
                                         {category.questions.map((faq, fidx) => {
                                             const faqId = `${cidx}-${fidx}`;
                                             const isOpen = openFaqIndex === faqId;
@@ -748,15 +743,15 @@ export default function ProductsPage() {
                                                     initial={{ opacity: 0 }}
                                                     whileInView={{ opacity: 1 }}
                                                     viewport={{ once: true }}
-                                                    className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100"
+                                                    className="bg-gray-50 rounded-lg overflow-hidden border border-gray-100"
                                                 >
                                                     <button
                                                         onClick={() => toggleFaq(faqId)}
-                                                        className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-100 transition-colors"
+                                                        className="w-full px-5 py-4 text-left flex items-center justify-between hover:bg-gray-100 transition-colors"
                                                     >
-                                                        <span className="font-bold text-gray-900 pr-4">{faq.q}</span>
+                                                        <span className="font-medium text-gray-900 pr-4 text-sm">{faq.q}</span>
                                                         <svg
-                                                            className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                                                            className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
                                                             fill="none"
                                                             stroke="currentColor"
                                                             viewBox="0 0 24 24"
@@ -768,9 +763,9 @@ export default function ProductsPage() {
                                                         <motion.div
                                                             initial={{ height: 0, opacity: 0 }}
                                                             animate={{ height: 'auto', opacity: 1 }}
-                                                            className="px-6 pb-5"
+                                                            className="px-5 pb-4"
                                                         >
-                                                            <p className="text-gray-600 leading-relaxed">{faq.a}</p>
+                                                            <p className="text-gray-500 leading-relaxed text-sm">{faq.a}</p>
                                                         </motion.div>
                                                     )}
                                                 </motion.div>
@@ -782,11 +777,11 @@ export default function ProductsPage() {
                         </div>
 
                         {/* More Questions */}
-                        <div className="mt-12 text-center">
-                            <p className="text-gray-600 mb-4">원하는 답을 찾지 못하셨나요?</p>
+                        <div className="mt-10 text-center">
+                            <p className="text-gray-500 mb-3 text-sm">원하는 답을 찾지 못하셨나요?</p>
                             <Link
                                 href="/contact"
-                                className="inline-flex items-center gap-2 text-[#E66B33] font-bold hover:gap-3 transition-all"
+                                className="inline-flex items-center gap-2 text-gray-900 font-bold hover:gap-3 transition-all text-sm"
                             >
                                 직접 문의하기
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -798,14 +793,8 @@ export default function ProductsPage() {
                 </section>
 
                 {/* Section 8: Final CTA */}
-                <section className="bg-gradient-to-br from-[#E66B33] to-orange-600 py-20 lg:py-32 text-white relative overflow-hidden">
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-                        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-                    </div>
-
-                    <div className="container mx-auto px-4 lg:px-8 max-w-4xl relative z-10">
+                <section className="bg-gray-900 py-20 lg:py-28 text-white">
+                    <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -813,18 +802,18 @@ export default function ProductsPage() {
                             transition={{ duration: 0.8 }}
                             className="text-center"
                         >
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-6" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
+                            <h2 className="text-3xl md:text-4xl font-black mb-5" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>
                                 이제 직접 경험해보세요
                             </h2>
-                            <p className="text-xl text-white/90 max-w-2xl mx-auto mb-10">
+                            <p className="text-lg text-gray-400 max-w-xl mx-auto mb-8">
                                 기본 템플릿은 무료입니다.<br />
                                 지금 바로 나만의 홀로그램 화환을 만들어보세요.
                             </p>
 
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Link
                                     href="/ai-hologram"
-                                    className="group inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-[#E66B33] bg-white rounded-full hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                                    className="group inline-flex items-center justify-center px-8 py-4 text-base font-bold text-gray-900 bg-white rounded-full hover:bg-gray-100 transition-all duration-300"
                                 >
                                     무료로 시작하기
                                     <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -833,7 +822,7 @@ export default function ProductsPage() {
                                 </Link>
                                 <Link
                                     href="/contact"
-                                    className="px-10 py-5 text-lg font-bold text-white border-2 border-white/50 rounded-full hover:bg-white/10 transition-all duration-300"
+                                    className="px-8 py-4 text-base font-bold text-white border border-gray-700 rounded-full hover:bg-gray-800 transition-all duration-300"
                                 >
                                     상담 문의
                                 </Link>

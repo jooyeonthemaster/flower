@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <!-- 외부 원 -->
+  <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="3"/>
+  <!-- 72 텍스트 -->
+  <text x="40" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="currentColor">72</text>
+  <!-- Hour 텍스트 -->
+  <text x="40" y="54" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="currentColor">Hour</text>
+</svg>

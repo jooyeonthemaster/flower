@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <!-- 외부 원 -->
+  <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="3"/>
+  <!-- 빌딩 아이콘 -->
+  <rect x="28" y="28" width="24" height="28" stroke="currentColor" stroke-width="2.5" rx="2"/>
+  <line x1="34" y1="34" x2="34" y2="38" stroke="currentColor" stroke-width="2"/>
+  <line x1="40" y1="34" x2="40" y2="38" stroke="currentColor" stroke-width="2"/>
+  <line x1="46" y1="34" x2="46" y2="38" stroke="currentColor" stroke-width="2"/>
+  <line x1="34" y1="42" x2="34" y2="46" stroke="currentColor" stroke-width="2"/>
+  <line x1="40" y1="42" x2="40" y2="46" stroke="currentColor" stroke-width="2"/>
+  <line x1="46" y1="42" x2="46" y2="46" stroke="currentColor" stroke-width="2"/>
+  <rect x="36" y="50" width="8" height="6" stroke="currentColor" stroke-width="1.5"/>
+</svg>

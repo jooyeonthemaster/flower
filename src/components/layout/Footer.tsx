@@ -43,18 +43,18 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-white text-gray-900 relative overflow-hidden border-t border-gray-200">
+    <footer className="bg-white text-gray-900 relative overflow-hidden border-t border-gray-200 h-full flex flex-col">
 
       {/* 메인 footer 콘텐츠 */}
-      <div className="pt-20 pb-12">
+      <div className="pt-40 lg:pt-48 pb-12">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
 
           {/* 상단 섹션: 로고 및 설명 */}
-          <div className="mb-16 pb-16 border-b border-gray-200">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="mb-10 pb-10 border-b border-gray-200">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
               {/* 왼쪽: 브랜드 정보 */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center">
                     <span className="text-white font-bold text-xl">디</span>
@@ -97,9 +97,9 @@ export default function Footer() {
               </div>
 
               {/* 오른쪽: 빠른 연락 */}
-              <div className="bg-gray-50 rounded-2xl p-8 space-y-4 border border-gray-100">
-                <h4 className="text-lg font-semibold mb-4 text-gray-900">빠른 상담 문의</h4>
-                <p className="text-gray-500 text-sm mb-6">
+              <div className="space-y-3">
+                <h4 className="text-lg font-semibold mb-2 text-gray-900">빠른 상담 문의</h4>
+                <p className="text-gray-500 text-sm mb-4">
                   전문 상담사가 고객님의 요구사항에 맞는 최적의 솔루션을 제안해드립니다.
                 </p>
                 <Link
@@ -113,14 +113,14 @@ export default function Footer() {
           </div>
 
           {/* 중간 섹션: 링크 그리드 */}
-          <div className="mb-16">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {footerSections.map((section, index) => (
-                <div key={index} className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-900">
+                <div key={index} className="space-y-3">
+                  <h4 className="text-base font-semibold text-gray-900">
                     {section.title}
                   </h4>
-                  <ul className="space-y-3">
+                  <ul className="space-y-2">
                     {section.links.map((link, linkIndex) => (
                       <li key={linkIndex}>
                         <Link
@@ -140,8 +140,8 @@ export default function Footer() {
       </div>
 
       {/* 하단 섹션: 저작권 및 추가 정보 */}
-      <div className="border-t border-gray-200 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
+      <div className="border-t border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-3">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
 
             {/* 저작권 및 사업자 정보 */}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <!-- 외부 원 -->
+  <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="3"/>
+  <!-- 8K 텍스트 -->
+  <text x="40" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="currentColor">8K</text>
+</svg>

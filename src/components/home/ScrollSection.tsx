@@ -47,7 +47,7 @@ export default function ScrollSection({
                         opacity,
                         transformOrigin: 'center bottom',
                     }}
-                    className={`w-full h-full origin-bottom ${className}`}
+                    className={`w-full h-full origin-bottom rounded-[60px] overflow-hidden ${className}`}
                 >
                     {children}
                 </motion.div>

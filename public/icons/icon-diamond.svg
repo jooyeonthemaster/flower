@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 다이아몬드 상단 -->
+  <path d="M12 24h40l-20 32-20-32z"/>
+  <!-- 다이아몬드 상단 면 -->
+  <path d="M12 24l8-12h24l8 12"/>
+  <!-- 내부 선 -->
+  <path d="M20 12l4 12"/>
+  <path d="M44 12l-4 12"/>
+  <path d="M32 24v32"/>
+  <path d="M16 24l16 32 16-32"/>
+</svg>

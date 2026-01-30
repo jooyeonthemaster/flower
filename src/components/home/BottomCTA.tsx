@@ -43,13 +43,13 @@ export default function BottomCTA() {
         <section className="w-full h-full flex flex-col">
             {/* Top Section - CTA */}
             <div
-                className="flex-[50] relative px-4 lg:px-8 overflow-hidden flex items-center"
+                className="flex-[50] relative px-4 lg:px-8 pt-14 lg:pt-20 pb-4 lg:pb-6 overflow-hidden flex items-center"
                 style={{
                     background: '#A0D0C0',
                 }}
             >
                 <div className="container mx-auto max-w-6xl w-full">
-                    <div className="flex flex-col md:flex-row gap-6 lg:gap-10 items-center">
+                    <div className="flex flex-col md:flex-row gap-4 lg:gap-6 items-center">
                         {/* Left: Title & CTA */}
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
@@ -58,17 +58,17 @@ export default function BottomCTA() {
                             transition={{ duration: 0.8 }}
                             className="w-full md:w-1/2 text-center md:text-left"
                         >
-                            <span className="inline-block px-4 py-1.5 bg-white/80 text-gray-700 text-xs font-bold rounded-full mb-3 border border-gray-200">
+                            <span className="inline-block px-4 py-1.5 bg-white/80 text-gray-700 text-xs font-bold rounded-full mb-2 border border-gray-200">
                                 START NOW
                             </span>
                             <h2
-                                className="text-3xl md:text-4xl lg:text-5xl font-black mb-3 leading-tight text-gray-900"
+                                className="text-3xl md:text-4xl lg:text-5xl font-black mb-1 leading-tight text-gray-900"
                                 style={{ fontFamily: "'Noto Sans KR', sans-serif" }}
                             >
                                 지금 바로 전문 서비스를<br />
                                 <span className="text-teal-600">경험하세요</span>
                             </h2>
-                            <p className="text-gray-600 text-sm md:text-base mb-4">
+                            <p className="text-gray-600 text-sm md:text-base mb-2">
                                 Digital Hologram Wreaths 솔루션으로<br />
                                 특별한 순간을 더욱 빛나게 만드세요
                             </p>
@@ -95,16 +95,16 @@ export default function BottomCTA() {
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
-                            className="w-full md:w-1/2 bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl p-5 shadow-sm"
+                            className="w-full md:w-1/2"
                         >
-                            <h3 className="text-center font-bold text-sm mb-4 text-gray-900">고객 전용 혜택</h3>
+                            <h3 className="font-black text-lg md:text-xl mb-4 text-gray-800">고객 전용 혜택</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                                 {BENEFITS.map((benefit, idx) => (
                                     <div key={idx} className="flex gap-3 items-start">
-                                        <div className="w-1.5 h-1.5 bg-teal-500 mt-1.5 rounded-full flex-shrink-0" />
+                                        <div className="w-2 h-2 bg-gray-800 mt-1.5 rounded-full flex-shrink-0" />
                                         <div>
-                                            <h4 className="font-bold text-gray-900 mb-0.5 text-sm">{benefit.title}</h4>
-                                            <p className="text-xs text-gray-500">{benefit.desc}</p>
+                                            <h4 className="font-bold text-gray-800 mb-0.5 text-base">{benefit.title}</h4>
+                                            <p className="text-sm text-gray-700">{benefit.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -116,7 +116,7 @@ export default function BottomCTA() {
 
             {/* Bottom Section - Feature Cards */}
             <div
-                className="flex-[50] px-4 lg:px-8 flex items-center border-t-2 border-gray-400/30"
+                className="flex-[50] px-4 lg:px-8 pt-8 lg:pt-10 pb-6 lg:pb-8 flex items-center border-t-2 border-gray-400/30"
                 style={{
                     background: '#88C8B8',
                 }}
@@ -126,7 +126,7 @@ export default function BottomCTA() {
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
-                        className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6"
+                        className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4"
                     >
                         {FEATURES.map((feature, idx) => (
                             <motion.div
@@ -135,10 +135,10 @@ export default function BottomCTA() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="flex flex-col items-center text-center p-4 md:p-6 rounded-2xl bg-white/70 hover:bg-white/90 hover:shadow-lg transition-all duration-300"
+                                className="flex flex-col items-center text-center p-2 md:p-3"
                             >
                                 {/* Icon */}
-                                <div className="relative w-12 h-12 md:w-16 md:h-16 mb-3">
+                                <div className="relative w-10 h-10 md:w-14 md:h-14 mb-2">
                                     <Image
                                         src={feature.icon}
                                         alt={feature.title}
@@ -149,19 +149,19 @@ export default function BottomCTA() {
 
                                 {/* Korean Title */}
                                 <h3
-                                    className="text-sm md:text-base font-bold text-gray-900 mb-0.5"
+                                    className="text-base md:text-lg font-black text-gray-800 mb-0.5"
                                     style={{ fontFamily: "'Noto Sans KR', sans-serif" }}
                                 >
                                     {feature.title}
                                 </h3>
 
                                 {/* English Title */}
-                                <div className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                                <div className="text-[10px] md:text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
                                     {feature.titleEn}
                                 </div>
 
                                 {/* Description - Hidden on mobile */}
-                                <p className="text-gray-500 text-xs leading-relaxed hidden md:block">
+                                <p className="text-gray-700 text-sm leading-relaxed hidden md:block">
                                     {feature.desc}
                                 </p>
                             </motion.div>
@@ -169,7 +169,7 @@ export default function BottomCTA() {
                     </motion.div>
 
                     {/* Footer */}
-                    <div className="mt-6 pt-4 border-t border-white/30 text-center text-gray-700 text-xs">
+                    <div className="mt-4 pt-3 border-t border-white/30 text-center text-gray-700 text-xs">
                         &copy; 2024 Digital Wreaths. All rights reserved.
                     </div>
                 </div>

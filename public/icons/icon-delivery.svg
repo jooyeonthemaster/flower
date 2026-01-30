@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <!-- 외부 원 -->
+  <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="3"/>
+  <!-- 트럭 아이콘 -->
+  <rect x="20" y="32" width="26" height="18" rx="2" stroke="currentColor" stroke-width="2.5"/>
+  <path d="M46 38H54C55.105 38 56 38.895 56 40V48C56 49.105 55.105 50 54 50H46" stroke="currentColor" stroke-width="2.5"/>
+  <circle cx="30" cy="52" r="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="50" cy="52" r="4" stroke="currentColor" stroke-width="2"/>
+</svg>

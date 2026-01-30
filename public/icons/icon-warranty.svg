@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <!-- 외부 원 -->
+  <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="3"/>
+  <!-- 방패 체크 아이콘 -->
+  <path d="M40 22L26 28V40C26 50 32 56 40 58C48 56 54 50 54 40V28L40 22Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M33 40L38 45L48 35" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

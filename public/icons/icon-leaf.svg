@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 잎 모양 -->
+  <path d="M32 56c0-24 16-40 24-44c-8 4-24 8-32 20C16 44 8 36 8 24c8 4 16 8 24 32z"/>
+  <!-- 줄기 -->
+  <path d="M32 56V32"/>
+  <!-- 잎맥 -->
+  <path d="M24 40c4-4 8-8 8-16"/>
+</svg>
