@@ -139,7 +139,10 @@ export default function WhyChoose() {
 
             {/* 섹션 2: Features (세이지) */}
             <div
-                className="flex-[30] px-6 lg:px-8 pt-6 lg:pt-8 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30 bg-moss-green/30"
+                className="flex-[30] px-6 lg:px-8 pt-6 lg:pt-8 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30"
+                style={{
+                    background: '#D0DCD0',
+                }}
             >
                 <div className="container mx-auto max-w-7xl">
                     <motion.div
@@ -193,7 +196,10 @@ export default function WhyChoose() {
 
             {/* 섹션 3: Specs (민트) */}
             <div
-                className="flex-[25] px-6 lg:px-8 pt-5 lg:pt-6 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30 bg-dusty-rose/30"
+                className="flex-[25] px-6 lg:px-8 pt-5 lg:pt-6 pb-3 lg:pb-4 flex items-center border-t-2 border-gray-400/30"
+                style={{
+                    background: '#B8D8C8',
+                }}
             >
                 <div className="container mx-auto max-w-7xl">
                     <motion.div

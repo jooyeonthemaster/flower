@@ -43,7 +43,10 @@ export default function BottomCTA() {
         <section className="w-full h-full flex flex-col">
             {/* Top Section - CTA */}
             <div
-                className="flex-[50] relative px-4 lg:px-8 pt-14 lg:pt-20 pb-4 lg:pb-6 overflow-hidden flex items-center bg-moss-green"
+                className="flex-[50] relative px-4 lg:px-8 pt-14 lg:pt-20 pb-4 lg:pb-6 overflow-hidden flex items-center"
+                style={{
+                    background: '#A0D0C0',
+                }}
             >
                 <div className="container mx-auto max-w-6xl w-full">
                     <div className="flex flex-col md:flex-row gap-4 lg:gap-6 items-center">
@@ -113,7 +116,10 @@ export default function BottomCTA() {
 
             {/* Bottom Section - Feature Cards */}
             <div
-                className="flex-[50] px-4 lg:px-8 pt-8 lg:pt-10 pb-6 lg:pb-8 flex items-center border-t-2 border-gray-400/30 bg-dusty-rose"
+                className="flex-[50] px-4 lg:px-8 pt-8 lg:pt-10 pb-6 lg:pb-8 flex items-center border-t-2 border-gray-400/30"
+                style={{
+                    background: '#88C8B8',
+                }}
             >
                 <div className="container mx-auto max-w-6xl w-full">
                     <motion.div

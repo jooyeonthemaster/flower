@@ -52,7 +52,7 @@ export default function Hero() {
                     transition={{ duration: 0.8 }}
                     className="mb-6"
                 >
-                    <span className="inline-block px-4 py-1.5 rounded-full border border-[#E66B33]/30 bg-white/50 backdrop-blur-sm text-[#E66B33] text-sm font-bold tracking-wider shadow-sm">
+                    <span className="inline-block px-4 py-1.5 rounded-full border border-[#E66B33]/30 bg-white/90 text-[#E66B33] text-sm font-bold tracking-wider shadow-sm">
                         ✨ Premium AI Hologram Service
                     </span>
                 </motion.div>
@@ -66,7 +66,7 @@ export default function Hero() {
                 >
                     영원히 기억될
                     <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E66B33] via-pink-500 to-dusty-rose animate-gradient">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E66B33] via-pink-500 to-purple-600 animate-gradient">
                         빛나는 순간
                     </span>
                 </motion.h1>
