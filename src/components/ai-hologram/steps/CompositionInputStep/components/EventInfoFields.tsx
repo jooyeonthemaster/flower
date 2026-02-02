@@ -1,3 +1,5 @@
+'use client'
+
 import { EventInfo } from '../types';
 
 // 공통 input 스타일

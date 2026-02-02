@@ -4,6 +4,8 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import { useAuth } from '@/contexts/AuthContext';
 
+export const dynamic = 'force-dynamic';
+
 export default function AdminLayout({
   children,
 }: {

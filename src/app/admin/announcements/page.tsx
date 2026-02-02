@@ -215,11 +215,10 @@ export default function AdminAnnouncementsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => togglePin(announcement)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          announcement.isPinned
-                            ? 'bg-blue-100 text-blue-600'
-                            : 'bg-gray-100 text-gray-400 hover:text-gray-600'
-                        }`}
+                        className={`p-2 rounded-lg transition-colors ${announcement.isPinned
+                          ? 'bg-blue-100 text-blue-600'
+                          : 'bg-gray-100 text-gray-400 hover:text-gray-600'
+                          }`}
                         title={announcement.isPinned ? '고정 해제' : '고정'}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -228,11 +227,10 @@ export default function AdminAnnouncementsPage() {
                       </button>
                       <button
                         onClick={() => togglePublish(announcement)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          announcement.isPublished
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-gray-100 text-gray-400 hover:text-gray-600'
-                        }`}
+                        className={`p-2 rounded-lg transition-colors ${announcement.isPublished
+                          ? 'bg-green-100 text-green-600'
+                          : 'bg-gray-100 text-gray-400 hover:text-gray-600'
+                          }`}
                         title={announcement.isPublished ? '발행 취소' : '발행'}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

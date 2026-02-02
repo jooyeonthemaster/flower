@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AdminRequest, AdminRequestStatus, AdminRequestPriority } from '@/types/firestore';
+import Badge, { BadgeVariant } from '@/components/ui/Badge';
 
 export default function AdminRequestsPage() {
   const { user } = useAuth();
@@ -35,6 +36,7 @@ export default function AdminRequestsPage() {
       }
 
       const response = await fetch(`/api/admin-requests?${params}`);
+
       if (response.ok) {
         const data = await response.json();
         setRequests(data.requests || []);
@@ -75,13 +77,14 @@ export default function AdminRequestsPage() {
     }
   };
 
-  const getStatusConfig = (status: string) => {
-    const config: Record<string, { label: string; className: string }> = {
-      pending: { label: '대기', className: 'bg-yellow-100 text-yellow-700' },
-      reviewing: { label: '검토 중', className: 'bg-blue-100 text-blue-700' },
-      approved: { label: '승인', className: 'bg-green-100 text-green-700' },
-      rejected: { label: '거절', className: 'bg-red-100 text-red-700' },
-      completed: { label: '완료', className: 'bg-gray-100 text-gray-700' },
+
+  const getStatusConfig = (status: string): { label: string; variant: BadgeVariant } => {
+    const config: Record<string, { label: string; variant: BadgeVariant }> = {
+      pending: { label: '대기', variant: 'pending' },
+      reviewing: { label: '검토 중', variant: 'warning' },
+      approved: { label: '승인', variant: 'success' },
+      rejected: { label: '거절', variant: 'error' },
+      completed: { label: '완료', variant: 'neutral' },
     };
     return config[status] || config.pending;
   };
@@ -139,11 +142,10 @@ export default function AdminRequestsPage() {
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              filter === status
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === status
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+              }`}
           >
             {status === 'all' ? '전체' : getStatusConfig(status).label}
             <span className="ml-2 px-2 py-0.5 rounded-full text-xs bg-gray-200">
@@ -194,9 +196,9 @@ export default function AdminRequestsPage() {
                         <p className="text-xs text-gray-500">{request.userEmail}</p>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        <Badge variant="neutral">
                           {getRequestTypeLabel(request.requestType)}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`text-sm ${priorityConfig.className}`}>
@@ -204,9 +206,9 @@ export default function AdminRequestsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusConfig.className}`}>
+                        <Badge variant={statusConfig.variant}>
                           {statusConfig.label}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {new Date(request.createdAt).toLocaleDateString('ko-KR')}

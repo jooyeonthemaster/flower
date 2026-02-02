@@ -4,6 +4,8 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import MyPageSidebar from '@/components/mypage/MyPageSidebar';
 import Header from '@/components/layout/Header';
 
+export const dynamic = 'force-dynamic';
+
 export default function MyPageLayout({
   children,
 }: {

@@ -141,8 +141,8 @@ export async function renderWithRemotion(
       referenceImageSrc,
     },
     browserExecutable: chromiumPath,
-    timeoutInMilliseconds: 1200000, // 1200초 (20분) - 복잡한 이펙트 렌더링용
-    concurrency: 4, // HTTP URL 방식 복원으로 메모리 문제 해결됨 → 4로 복원
+    timeoutInMilliseconds: 1200000, // 1200초
+    concurrency: 8, // [Optimized] 4 -> 8 (병렬 처리 증가로 속도 향상)
     onProgress: ({ progress }) => {
       if (Math.round(progress * 100) % 10 === 0) {
         console.log(`Rendering: ${Math.round(progress * 100)}%`);

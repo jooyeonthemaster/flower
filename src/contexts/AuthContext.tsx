@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import {
   User,
   signInWithPopup,
@@ -22,6 +22,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshUserProfile: () => Promise<void>;
+  getUserIdToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -178,7 +179,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => unsubscribe();
   }, [fetchOrCreateUserProfile]);
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     try {
       setLoading(true);
       await signInWithPopup(auth, googleProvider);
@@ -187,9 +188,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       setLoading(true);
       await firebaseSignOut(auth);
@@ -199,20 +200,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // 환경 변수에서 직접 관리자 체크 (Firestore 업데이트 실패해도 관리자 인정)
-  const isAdmin = userProfile?.role === 'admin' || ADMIN_EMAILS.includes(user?.email || '');
+  const isAdmin = useMemo(
+    () => userProfile?.role === 'admin' || ADMIN_EMAILS.includes(user?.email || ''),
+    [userProfile?.role, user?.email]
+  );
 
-  const value = {
-    user,
-    userProfile,
-    loading,
-    isAdmin,
-    signInWithGoogle,
-    signOut,
-    refreshUserProfile
-  };
+  // 현재 사용자의 ID 토큰 반환
+  const getUserIdToken = useCallback(async () => {
+    if (!user) return null;
+    try {
+      // forceRefresh: true로 설정하여 최신 토큰 보장 (선택사항)
+      return await user.getIdToken();
+    } catch (error) {
+      console.error('토큰 가져오기 실패:', error);
+      return null;
+    }
+  }, [user]);
+
+  const value = useMemo(
+    () => ({
+      user,
+      userProfile,
+      loading,
+      isAdmin,
+      signInWithGoogle,
+      signOut,
+      refreshUserProfile,
+      getUserIdToken
+    }),
+    [user, userProfile, loading, isAdmin, signInWithGoogle, signOut, refreshUserProfile, getUserIdToken]
+  );
 
   return (
     <AuthContext.Provider value={value}>

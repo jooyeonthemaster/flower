@@ -35,6 +35,7 @@
     "puppeteer-core": "^24.35.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-hot-toast": "^2.6.0",
     "remotion": "^4.0.404",
     "three": "^0.182.0",
     "troika-three-text": "^0.52.4"

@@ -1,3 +1,5 @@
+'use client'
+
 import { useRef, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Text3DSceneProps } from '../types';

@@ -11,7 +11,7 @@ const EVENT_TYPES = [
         label: '웨딩',
         labelEn: 'Wedding',
         desc: '결혼식을 빛내는 프리미엄 홀로그램',
-        image: '/wedding.png',
+        image: '/wedding.jpg',
         icon: '/icons/icon-wedding.svg',
     },
     {
@@ -19,7 +19,7 @@ const EVENT_TYPES = [
         label: '개업',
         labelEn: 'Opening',
         desc: '성공적인 시작을 알리는 특별한 축하',
-        image: '/opening.png',
+        image: '/opening.jpg',
         icon: '/icons/icon-opening.svg',
     },
     {
@@ -27,7 +27,7 @@ const EVENT_TYPES = [
         label: '기업',
         labelEn: 'Corporate',
         desc: '비즈니스 행사를 위한 격조 있는 연출',
-        image: '/corporate.png',
+        image: '/corporate.jpg',
         icon: '/icons/icon-corporate.svg',
     },
 ];

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 const menuItems = [
@@ -50,6 +51,15 @@ const menuItems = [
       </svg>
     ),
   },
+  {
+    name: '문의 관리',
+    href: '/admin/inquiries',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+      </svg>
+    ),
+  },
 ];
 
 export default function AdminSidebar() {
@@ -58,14 +68,17 @@ export default function AdminSidebar() {
   return (
     <div className="w-64 min-h-screen bg-cream text-black flex flex-col relative border-r-2 border-gray-200">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
-        <Link href="/admin" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-orange flex items-center justify-center">
-            <span className="text-xl text-white">✦</span>
-          </div>
-          <div>
-            <p className="font-bold">Digital Hologram</p>
-            <p className="text-xs text-gray-600">관리자 패널</p>
+      <div className="p-6 border-b border-gray-200 bg-white">
+        <Link href="/admin" className="block">
+          <div className="flex flex-col items-start gap-1">
+            <Image
+              src="/images/logo.png"
+              alt="Digital Hologram"
+              width={140}
+              height={50}
+              className="h-10 w-auto object-contain"
+            />
+            <p className="text-xs text-gray-600 font-medium ml-1">관리자 패널</p>
           </div>
         </Link>
       </div>
@@ -81,11 +94,10 @@ export default function AdminSidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive
-                      ? 'bg-orange text-white shadow-md'
-                      : 'text-gray-700 hover:bg-warm-gray/20 hover:text-black'
-                  }`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
+                    ? 'bg-orange text-white shadow-md'
+                    : 'text-gray-700 hover:bg-warm-gray/20 hover:text-black'
+                    }`}
                 >
                   {item.icon}
                   <span className="font-medium">{item.name}</span>

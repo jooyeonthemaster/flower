@@ -1,3 +1,5 @@
+'use client'
+
 import { categories } from '../constants/categories';
 
 // Premium 모드 색상

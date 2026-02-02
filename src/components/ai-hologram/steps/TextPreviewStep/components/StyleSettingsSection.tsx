@@ -1,3 +1,5 @@
+'use client'
+
 import { CustomSettings } from '../types';
 import { availableEffects, letterEffects, fontOptions, positionLabels } from '../constants/styleOptions';
 import ColorPaletteGrid from './ColorPaletteGrid';

@@ -1,3 +1,5 @@
+'use client'
+
 import { generateColorPalette } from '../utils/colorPalette';
 
 // Standard 모드 색상

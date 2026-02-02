@@ -1,11 +1,16 @@
+'use client';
+
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import Image from 'next/image';
+
+export const dynamic = 'force-dynamic';
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <main className="pt-20">
         {/* 헤더 섹션 */}
         <section className="bg-cream py-20 border-b-4 border-orange">
@@ -28,14 +33,14 @@ export default function AboutPage() {
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">디지털화환</h2>
                 <p className="text-gray-600 leading-relaxed mb-6">
-                  디지털화환은 2024년 설립된 혁신적인 기술 기업으로, 전통적인 화환 문화에 
+                  디지털화환은 2024년 설립된 혁신적인 기술 기업으로, 전통적인 화환 문화에
                   최첨단 홀로그램 기술을 접목하여 새로운 추모 및 축하 문화를 만들어가고 있습니다.
                 </p>
                 <p className="text-gray-600 leading-relaxed mb-6">
-                  우리는 디지털 기술의 무한한 가능성을 통해 더욱 의미 있고 지속 가능한 
+                  우리는 디지털 기술의 무한한 가능성을 통해 더욱 의미 있고 지속 가능한
                   기념 방식을 제공하며, 고객의 소중한 순간을 영원히 간직할 수 있도록 돕습니다.
                 </p>
-                
+
                 <div className="grid grid-cols-2 gap-6">
                   <div className="text-center p-4 bg-white rounded-lg shadow-md border-2 border-orange/20">
                     <h3 className="text-2xl font-bold text-orange mb-2">2024</h3>
@@ -49,10 +54,16 @@ export default function AboutPage() {
               </div>
 
               <div className="relative">
-                <div className="bg-cream rounded-2xl p-8 h-96 flex items-center justify-center border-2 border-gray-200">
+                <div className="bg-white rounded-2xl p-8 h-96 flex items-center justify-center border-2 border-gray-200">
                   <div className="text-center">
-                    <div className="w-24 h-24 bg-orange rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                      <span className="text-white font-bold text-3xl">디</span>
+                    <div className="flex flex-col items-center justify-center mb-6">
+                      <Image
+                        src="/images/logo.png"
+                        alt="디지털화환"
+                        width={200}
+                        height={80}
+                        className="h-20 w-auto object-contain"
+                      />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">디지털화환</h3>
                     <p className="text-gray-600">Digital Hologram Wreaths</p>
@@ -86,7 +97,7 @@ export default function AboutPage() {
                   <h3 className="text-2xl font-semibold text-orange">비전</h3>
                 </div>
                 <p className="text-gray-700 leading-relaxed text-center">
-                  디지털 기술을 통해 전통적인 추모 및 축하 문화를 혁신하여, 
+                  디지털 기술을 통해 전통적인 추모 및 축하 문화를 혁신하여,
                   더욱 의미 있고 지속 가능한 기념 문화를 선도하는 글로벌 기업이 되겠습니다.
                 </p>
               </div>
@@ -102,7 +113,7 @@ export default function AboutPage() {
                   <h3 className="text-2xl font-semibold text-dusty-rose">미션</h3>
                 </div>
                 <p className="text-gray-700 leading-relaxed text-center">
-                  첨단 홀로그램 기술을 활용하여 고객의 소중한 순간을 아름답게 기념하고, 
+                  첨단 홀로그램 기술을 활용하여 고객의 소중한 순간을 아름답게 기념하고,
                   환경 친화적이면서도 감동적인 디지털 화환 솔루션을 제공합니다.
                 </p>
               </div>
@@ -215,7 +226,7 @@ export default function AboutPage() {
                       <div className="py-2">
                         <span className="text-gray-600 block mb-1">사업장 주소</span>
                         <span className="font-semibold text-sm">
-                          서울특별시 중구 을지로 지하 220,<br/>
+                          서울특별시 중구 을지로 지하 220,<br />
                           지하2층 청년창업소누리 A-8호
                         </span>
                       </div>
@@ -269,7 +280,7 @@ export default function AboutPage() {
 
             <div className="relative">
               <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-orange"></div>
-              
+
               <div className="space-y-12">
                 <div className="relative flex items-center">
                   <div className="flex-1 text-right pr-8">
@@ -318,7 +329,7 @@ export default function AboutPage() {
             <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
               디지털화환과 함께 새로운 기념 문화를 만들어가실 파트너를 찾습니다.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a
                 href="/contact"

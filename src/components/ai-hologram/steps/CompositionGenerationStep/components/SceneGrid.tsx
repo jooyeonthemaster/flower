@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image';
 import { GeneratedDualFrame } from '../../CompositionImagePreviewStep';
 import { GenerationPhase, SceneProgress } from '../types';

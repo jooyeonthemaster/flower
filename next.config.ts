@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
         hostname: 'lh3.googleusercontent.com',
       },
     ],
+    qualities: [75, 90],
   },
   // Vercel 서버리스에서 ffmpeg-static 바이너리 포함 (핵심!)
   // Next.js가 빌드 시 바이너리를 제외하지 않도록 명시적 선언

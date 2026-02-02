@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Hero() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -31,16 +32,17 @@ export default function Hero() {
             className="relative min-h-screen bg-white text-gray-900 overflow-hidden flex flex-col items-center justify-center"
             onMouseMove={handleMouseMove}
         >
-            {/* Static Background Image */}
-            <div
-                className="absolute inset-0 z-0 opacity-100"
-                style={{
-                    backgroundImage: 'url(/images/home-hero-bg.png)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'bottom center',
-                    backgroundRepeat: 'no-repeat',
-                }}
-            />
+            {/* Static Background Image - Next.js Image 최적화 (자동 WebP 변환) */}
+            <div className="absolute inset-0 z-0 opacity-100">
+                <Image
+                    src="/images/home-hero-bg.png"
+                    alt="Digital hologram wreaths hero background"
+                    fill
+                    priority
+                    quality={90}
+                    className="object-cover object-bottom"
+                />
+            </div>
             {/* Optional Overlay for text readability if needed */}
             {/* <div className="absolute inset-0 bg-white/30 z-0" /> */}
 

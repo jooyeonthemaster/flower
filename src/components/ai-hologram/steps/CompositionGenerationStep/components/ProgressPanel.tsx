@@ -1,3 +1,5 @@
+'use client'
+
 import { GenerationPhase, SceneProgress } from '../types';
 
 // Premium 모드 색상

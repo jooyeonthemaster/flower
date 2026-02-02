@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { AnnouncementCategory } from '@/types/firestore';
 
+export const dynamic = 'force-dynamic';
+
 export default function NewAnnouncementPage() {
   const router = useRouter();
   const { user } = useAuth();

@@ -1,10 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 export default function ContactPage() {
+  const { user } = useAuth();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,7 +19,6 @@ export default function ContactPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const inquiryTypes = [
     '일반문의',
@@ -36,11 +39,31 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
+    const loadingToast = toast.loading('문의를 접수하고 있습니다...');
+
     try {
-      // 실제 구현에서는 API 호출
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 시뮬레이션
-      setSubmitStatus('success');
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          userId: user?.uid,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || '문의 접수에 실패했습니다.');
+      }
+
+      toast.success('문의가 성공적으로 접수되었습니다. 빠른 시간 내에 연락드리겠습니다.', {
+        id: loadingToast,
+      });
+
       setFormData({
         name: '',
         email: '',
@@ -49,8 +72,12 @@ export default function ContactPage() {
         inquiryType: '일반문의',
         message: ''
       });
-    } catch {
-      setSubmitStatus('error');
+    } catch (error) {
+      console.error('문의 접수 오류:', error);
+      const errorMessage = error instanceof Error ? error.message : '문의 접수 중 오류가 발생했습니다.';
+      toast.error(errorMessage, {
+        id: loadingToast,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -132,28 +159,6 @@ export default function ContactPage() {
             </div>
 
             <div className="bg-white rounded-2xl shadow-lg p-8">
-              {submitStatus === 'success' && (
-                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <p className="text-green-800">문의가 성공적으로 접수되었습니다. 빠른 시간 내에 연락드리겠습니다.</p>
-                  </div>
-                </div>
-              )}
-
-              {submitStatus === 'error' && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <p className="text-red-800">문의 접수 중 오류가 발생했습니다. 다시 시도해 주세요.</p>
-                  </div>
-                </div>
-              )}
-
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>

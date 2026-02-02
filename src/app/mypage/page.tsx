@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { Video, AdminRequest } from '@/types/firestore';
 
+export const dynamic = 'force-dynamic';
+
 export default function MyPageDashboard() {
   const { user, userProfile } = useAuth();
   const [recentVideos, setRecentVideos] = useState<Video[]>([]);

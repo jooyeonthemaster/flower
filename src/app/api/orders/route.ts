@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, isUserAdmin } from '@/lib/firebase-admin';
+import { verifyToken } from '@/lib/auth-utils';
 
 // GET: 주문 목록 조회
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
-    const adminId = searchParams.get('adminId');
+    const adminId = searchParams.get('adminId'); // [ROLLBACK] Restored
     const isAdminView = searchParams.get('isAdminView') === 'true';
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '100');
@@ -16,21 +17,19 @@ export async function GET(request: NextRequest) {
 
     // 관리자 뷰인 경우
     if (isAdminView) {
+      // [SECURITY] Reverted
+      // const authResult = await verifyToken(request);
+
+      // [ROLLBACK] Old logic restored
       // 관리자 권한 검증
       if (!adminId) {
-        return NextResponse.json(
-          { error: 'adminId가 필요합니다.' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'adminId가 필요합니다.' }, { status: 400 });
       }
-
       const isAdmin = await isUserAdmin(adminId);
       if (!isAdmin) {
-        return NextResponse.json(
-          { error: '관리자 권한이 필요합니다.' },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
       }
+
 
       // 모든 주문 조회
       const snapshot = await db.collection('orders').get();

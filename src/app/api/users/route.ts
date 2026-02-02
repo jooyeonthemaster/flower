@@ -1,30 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, isUserAdmin } from '@/lib/firebase-admin';
+import { verifyToken } from '@/lib/auth-utils';
 
 // GET: 사용자 목록 조회 (관리자 전용)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const adminId = searchParams.get('adminId');
+    // const adminId = searchParams.get('adminId'); // [SECURITY] Deprecated: ID based auth
+
+    // [SECURITY] Token based auth
+    const authResult = await verifyToken(request);
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
     const limit = parseInt(searchParams.get('limit') || '200');
     const offset = parseInt(searchParams.get('offset') || '0');
     const search = searchParams.get('search') || '';
 
-    // 관리자 권한 검증
+    /* 
+    // [ROLLBACK] Old logic
     if (!adminId) {
-      return NextResponse.json(
-        { error: 'adminId가 필요합니다.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'adminId가 필요합니다.' }, { status: 400 });
     }
-
     const isAdmin = await isUserAdmin(adminId);
     if (!isAdmin) {
-      return NextResponse.json(
-        { error: '관리자 권한이 필요합니다.' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
+    */
 
     const db = getAdminDb();
     const snapshot = await db.collection('users').get();
@@ -92,23 +95,26 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { adminId, userId, role } = body;
+    const { userId, role } = body;
+    // const { adminId, userId, role } = body; // [SECURITY] Deprecated
 
+    // [SECURITY] Token based auth
+    const authResult = await verifyToken(request);
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
+    /*
+    // [ROLLBACK] Old Logic
     // 관리자 권한 검증
     if (!adminId) {
-      return NextResponse.json(
-        { error: 'adminId가 필요합니다.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'adminId가 필요합니다.' }, { status: 400 });
     }
-
     const isAdmin = await isUserAdmin(adminId);
     if (!isAdmin) {
-      return NextResponse.json(
-        { error: '관리자 권한이 필요합니다.' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
+    */
 
     if (!userId || !role) {
       return NextResponse.json(

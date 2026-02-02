@@ -1,3 +1,5 @@
+'use client'
+
 import { getKeywordsForCategory } from '../constants/keywordMessages';
 import { sceneLabels } from '../constants/previewImages';
 

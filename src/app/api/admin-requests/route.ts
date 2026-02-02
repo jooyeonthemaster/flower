@@ -104,16 +104,19 @@ export async function GET(request: NextRequest) {
       query = query.where('userId', '==', userId);
     } else {
       // 관리자 뷰인 경우 권한 확인
+
+      // [SECURITY] Reverted
+      // const authResult = await verifyToken(request);
+
+      // [ROLLBACK] Old Logic Restored
       if (adminId) {
         const isAdmin = await isUserAdmin(adminId);
         if (!isAdmin) {
-          return NextResponse.json(
-            { error: '관리자 권한이 필요합니다.' },
-            { status: 403 }
-          );
+          return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
         }
       }
     }
+
 
     if (status) {
       query = query.where('status', '==', status);

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Announcement, AnnouncementCategory } from '@/types/firestore';
+import Badge, { BadgeVariant } from '@/components/ui/Badge';
 
 export default function NoticePage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -30,12 +31,12 @@ export default function NoticePage() {
     }
   };
 
-  const getCategoryConfig = (category: AnnouncementCategory) => {
-    const config: Record<AnnouncementCategory, { label: string; className: string }> = {
-      notice: { label: '공지', className: 'bg-orange/20 text-orange' },
-      update: { label: '업데이트', className: 'bg-green-100 text-green-700' },
-      event: { label: '이벤트', className: 'bg-moss-green/20 text-moss-green' },
-      maintenance: { label: '점검', className: 'bg-orange-100 text-orange-700' },
+  const getCategoryConfig = (category: AnnouncementCategory): { label: string; variant: BadgeVariant } => {
+    const config: Record<AnnouncementCategory, { label: string; variant: BadgeVariant }> = {
+      notice: { label: '공지', variant: 'warning' },
+      update: { label: '업데이트', variant: 'success' },
+      event: { label: '이벤트', variant: 'info' },
+      maintenance: { label: '점검', variant: 'error' },
     };
     return config[category] || config.notice;
   };
@@ -113,13 +114,13 @@ export default function NoticePage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-3">
                               {announcement.isPinned && (
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+                                <Badge variant="error">
                                   📌 중요
-                                </span>
+                                </Badge>
                               )}
-                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${categoryConfig.className}`}>
+                              <Badge variant={categoryConfig.variant}>
                                 {categoryConfig.label}
-                              </span>
+                              </Badge>
                             </div>
                             <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-orange transition-colors">
                               {announcement.title}

@@ -88,20 +88,17 @@ export async function POST(request: NextRequest) {
       isPinned = false,
     } = body;
 
+    // [SECURITY] Reverted
+    // const authResult = await verifyToken(request);
+
+    // [ROLLBACK] Old Logic Restored
     // 관리자 권한 확인
     if (!adminId) {
-      return NextResponse.json(
-        { error: 'adminId가 필요합니다.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'adminId가 필요합니다.' }, { status: 400 });
     }
-
     const isAdmin = await isUserAdmin(adminId);
     if (!isAdmin) {
-      return NextResponse.json(
-        { error: '관리자 권한이 필요합니다.' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 });
     }
 
     if (!title || !content) {
@@ -115,6 +112,7 @@ export async function POST(request: NextRequest) {
 
     // 작성자 정보 가져오기
     const adminDoc = await db.collection('users').doc(adminId).get();
+    // const adminDoc = await db.collection('users').doc(uid).get();
     const adminData = adminDoc.data();
 
     const announcementData = {

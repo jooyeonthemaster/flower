@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types/firestore';
 
@@ -20,43 +20,54 @@ interface UserData {
 }
 
 export default function AdminUsersPage() {
-  const { user } = useAuth();
+  const { user, getUserIdToken } = useAuth();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [lastDoc, setLastDoc] = useState<string | null>(null);
+  const [filter, setFilter] = useState<UserRole | 'all'>('all');
+
+  const fetchUsers = useCallback(async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        adminId: user.uid,
+        limit: '50',
+      });
+      if (lastDoc) {
+        params.append('offset', users.length.toString());
+      }
+      if (filter !== 'all') {
+        params.append('role', filter);
+      }
+
+      const response = await fetch(`/api/users?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setUsers(prev => lastDoc ? [...prev, ...data.users] : data.users);
+        setLastDoc(data.lastDocId);
+      }
+    } catch (error) {
+      console.error('사용자 목록 조회 오류:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, lastDoc, filter, users.length]);
 
   useEffect(() => {
     if (user) {
       fetchUsers();
     }
-  }, [user]);
+  }, [user, fetchUsers]);
 
-  const fetchUsers = async () => {
+  const updateUserRole = useCallback(async (userId: string, newRole: UserRole) => {
     if (!user) return;
 
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/users?adminId=${user.uid}`);
-      const data = await response.json();
-
-      if (data.success) {
-        setUsers(data.users);
-      } else {
-        setUsers([]);
-      }
-    } catch {
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateUserRole = async (userId: string, newRole: UserRole) => {
-    if (!user) return;
-
-    setUpdating(true);
     try {
       const response = await fetch('/api/users', {
         method: 'PATCH',
@@ -70,34 +81,23 @@ export default function AdminUsersPage() {
         }),
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setUsers((prev) =>
-          prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
-        );
-
-        if (selectedUser?.id === userId) {
-          setSelectedUser((prev) => (prev ? { ...prev, role: newRole } : null));
-        }
-      } else {
-        alert(data.error || '역할 변경에 실패했습니다.');
-      }
-    } catch {
       alert('역할 변경에 실패했습니다.');
     } finally {
       setUpdating(false);
     }
-  };
+  }, [user, selectedUser, getUserIdToken]);
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = useMemo(
+    () => users.filter(
+      (user) =>
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+    ),
+    [users, searchTerm]
   );
 
-  const totalSpentAll = users.reduce((sum, u) => sum + u.totalSpent, 0);
-  const adminCount = users.filter((u) => u.role === 'admin').length;
+  const totalSpentAll = useMemo(() => users.reduce((sum, u) => sum + u.totalSpent, 0), [users]);
+  const adminCount = useMemo(() => users.filter((u) => u.role === 'admin').length, [users]);
 
   return (
     <div className="space-y-6">
@@ -207,11 +207,10 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          userData.role === 'admin'
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${userData.role === 'admin'
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-600'
+                          }`}
                       >
                         {userData.role === 'admin' ? '관리자' : '일반'}
                       </span>
@@ -334,11 +333,10 @@ export default function AdminUsersPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-gray-700">현재 역할:</span>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      selectedUser.role === 'admin'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${selectedUser.role === 'admin'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-gray-100 text-gray-600'
+                      }`}
                   >
                     {selectedUser.role === 'admin' ? '관리자' : '일반 사용자'}
                   </span>

@@ -1,3 +1,5 @@
+'use client'
+
 import { SceneData } from '../../MultiSceneStep';
 import { getKeywordsForCategory, keywordMessageSets } from '../constants/keywordMessages';
 

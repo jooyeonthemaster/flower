@@ -39,17 +39,31 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const response = await fetch(`/api/dashboard/stats?adminId=${user.uid}`);
+
+      // [SECURITY] Reverted
+      /*
+      const token = await getUserIdToken();
+      if (!token) throw new Error('인증 토큰을 가져올 수 없습니다.');
+      const response = await fetch('/api/dashboard/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      */
+
       const data = await response.json();
 
       if (data.success) {
         setStats(data.stats);
       }
-    } catch {
+    } catch (error) {
+      console.error('Failed to fetch dashboard stats:', error);
       // API 호출 실패 - 기본값 유지
     } finally {
       setLoading(false);
     }
   };
+
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; className: string }> = {

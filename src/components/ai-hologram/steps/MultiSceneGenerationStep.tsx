@@ -24,7 +24,7 @@ const getTemplateImagePath = (category: string, style: string): string => {
 };
 
 // Firebase Storage 템플릿 영상 URL
-const STORAGE_BASE_URL = `https://storage.googleapis.com/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'flower-63624.firebasestorage.app'}`;
+const STORAGE_BASE_URL = `https://storage.googleapis.com/${(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'flower-63624.firebasestorage.app').trim()}`;
 
 const getTemplateVideoPath = (category: string, style: string): string => {
   // Firebase Storage에서 템플릿 영상 로드
@@ -144,9 +144,9 @@ export default function MultiSceneGenerationStep({
     return {
       renderer: {
         ...DEFAULT_RENDERER_CONFIG,
-        width: 1080,
-        height: 1080,
-        fps: 30,
+        width: 720,
+        height: 720,
+        fps: 24,
         duration: texts.length * 5,
       },
       textStyle: {
@@ -200,7 +200,7 @@ export default function MultiSceneGenerationStep({
           width: renderConfig.renderer.width,
           height: renderConfig.renderer.height,
           fps: renderConfig.renderer.fps,
-          bitrate: 5_000_000,
+          bitrate: 3_000_000,
           codec: 'avc1',
         },
         (progress) => {
@@ -241,19 +241,35 @@ export default function MultiSceneGenerationStep({
     formData.append('file', blob, 'hologram-video.mp4');
     formData.append('folder', 'generated-videos');
 
-    const response = await fetch('/api/upload-video', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const response = await fetch('/api/upload-video', {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (!response.ok) {
-      // 업로드 실패 시 Blob URL 반환 (로컬 다운로드용)
-      console.warn('Firebase upload failed, using blob URL');
-      return URL.createObjectURL(blob);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Firebase 업로드 실패 (${response.status}): ${errorText}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success || !result.url) {
+        throw new Error('업로드 응답에 URL이 없습니다');
+      }
+
+      console.log('Firebase 업로드 완료:', result.url);
+      return result.url;
+
+    } catch (error) {
+      console.error('Firebase 업로드 오류:', error);
+      // Blob URL 반환하지 않고 에러 전파
+      throw new Error(
+        `영상 업로드에 실패했습니다. 네트워크 연결을 확인하고 다시 시도해주세요.\n\n${
+          error instanceof Error ? error.message : '알 수 없는 오류'
+        }`
+      );
     }
-
-    const result = await response.json();
-    return result.url;
   };
 
   // 생성 시작

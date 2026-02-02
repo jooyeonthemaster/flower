@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import Badge, { BadgeVariant } from '@/components/ui/Badge';
 
 interface Order {
   id: string;
@@ -27,13 +28,7 @@ export default function AdminOrdersPage() {
   const [filter, setFilter] = useState<'all' | 'paid' | 'pending' | 'refunded'>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchOrders();
-    }
-  }, [user, filter]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -60,20 +55,26 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, filter]);
 
-  const getStatusConfig = (status: string) => {
-    const config: Record<string, { label: string; className: string }> = {
-      pending: { label: '대기', className: 'bg-yellow-100 text-yellow-700' },
-      paid: { label: '결제완료', className: 'bg-green-100 text-green-700' },
-      failed: { label: '실패', className: 'bg-red-100 text-red-700' },
-      refunded: { label: '환불', className: 'bg-purple-100 text-purple-700' },
-      cancelled: { label: '취소', className: 'bg-gray-100 text-gray-700' },
+  useEffect(() => {
+    if (user) {
+      fetchOrders();
+    }
+  }, [user, fetchOrders]);
+
+  const getStatusConfig = useCallback((status: string): { label: string; variant: BadgeVariant } => {
+    const config: Record<string, { label: string; variant: BadgeVariant }> = {
+      pending: { label: '대기', variant: 'pending' },
+      paid: { label: '결제완료', variant: 'success' },
+      failed: { label: '실패', variant: 'error' },
+      refunded: { label: '환불', variant: 'warning' },
+      cancelled: { label: '취소', variant: 'neutral' },
     };
     return config[status] || config.pending;
-  };
+  }, []);
 
-  const getPayMethodLabel = (method: string) => {
+  const getPayMethodLabel = useCallback((method: string) => {
     const labels: Record<string, string> = {
       CARD: '카드',
       VIRTUAL_ACCOUNT: '가상계좌',
@@ -81,18 +82,22 @@ export default function AdminOrdersPage() {
       MOBILE: '휴대폰',
     };
     return labels[method] || method;
-  };
+  }, []);
 
-  const totalRevenue = orders
-    .filter((o) => o.status === 'paid')
-    .reduce((sum, o) => sum + o.amount, 0);
+  const totalRevenue = useMemo(
+    () => orders.filter((o) => o.status === 'paid').reduce((sum, o) => sum + o.amount, 0),
+    [orders]
+  );
 
-  const filterCounts = {
-    all: orders.length,
-    paid: orders.filter((o) => o.status === 'paid').length,
-    pending: orders.filter((o) => o.status === 'pending').length,
-    refunded: orders.filter((o) => o.status === 'refunded').length,
-  };
+  const filterCounts = useMemo(
+    () => ({
+      all: orders.length,
+      paid: orders.filter((o) => o.status === 'paid').length,
+      pending: orders.filter((o) => o.status === 'pending').length,
+      refunded: orders.filter((o) => o.status === 'refunded').length,
+    }),
+    [orders]
+  );
 
   return (
     <div className="space-y-6">
@@ -125,11 +130,10 @@ export default function AdminOrdersPage() {
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              filter === status
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === status
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+              }`}
           >
             {status === 'all' ? '전체' : getStatusConfig(status).label}
             <span className="ml-2 px-2 py-0.5 rounded-full text-xs bg-gray-200">
@@ -189,9 +193,9 @@ export default function AdminOrdersPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusConfig.className}`}>
+                        <Badge variant={statusConfig.variant}>
                           {statusConfig.label}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {new Date(order.createdAt).toLocaleDateString('ko-KR')}
@@ -271,9 +275,9 @@ export default function AdminOrdersPage() {
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <p className="text-sm text-gray-500 mb-1">결제 상태</p>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusConfig(selectedOrder.status).className}`}>
+                  <Badge variant={getStatusConfig(selectedOrder.status).variant}>
                     {getStatusConfig(selectedOrder.status).label}
-                  </span>
+                  </Badge>
                 </div>
               </div>
 

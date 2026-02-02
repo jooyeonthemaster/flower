@@ -96,15 +96,40 @@ export class FrameRenderer {
   async loadVideo(videoSrc: string): Promise<void> {
     const resolvedUrl = this.resolveUrl(videoSrc);
 
+    if (DEBUG) {
+      console.log('[FrameRenderer] loadVideo 시작:', {
+        videoSrc,
+        resolvedUrl,
+      });
+    }
+
     try {
       // fetch로 비디오 데이터 가져오기
       const response = await fetch(resolvedUrl);
+
+      if (DEBUG) {
+        console.log('[FrameRenderer] fetch 응답:', {
+          status: response.status,
+          statusText: response.statusText,
+          contentType: response.headers.get('content-type'),
+          contentLength: response.headers.get('content-length'),
+        });
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
+
+      if (DEBUG) {
+        console.log('[FrameRenderer] blob 생성 완료:', {
+          blobSize: blob.size,
+          blobType: blob.type,
+          blobUrl,
+        });
+      }
 
       return new Promise((resolve, reject) => {
         this.videoElement = document.createElement('video');
@@ -294,8 +319,8 @@ export class FrameRenderer {
       this.renderTextScene(currentScene, frameNumber);
     }
 
-    // 7. 시네마틱 오버레이 (노이즈, 스캔라인, 비네팅)
-    this.renderCinematicOverlays();
+    // 7. 시네마틱 오버레이 제거 (성능 저하 및 불필요한 효과)
+    // this.renderCinematicOverlays();
 
     // 8. ImageData 반환
     return ctx.getImageData(0, 0, width, height);

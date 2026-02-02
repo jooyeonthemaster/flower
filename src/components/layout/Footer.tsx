@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -55,14 +56,15 @@ export default function Footer() {
 
               {/* 왼쪽: 브랜드 정보 */}
               <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-xl">디</span>
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">디지털화환</h3>
-                    <p className="text-gray-500 text-sm">Digital Hologram Wreaths</p>
-                  </div>
+                <div className="flex flex-col items-start gap-2">
+                  <Image
+                    src="/images/logo.png"
+                    alt="디지털화환"
+                    width={150}
+                    height={60}
+                    className="h-14 w-auto object-contain"
+                  />
+                  <p className="text-gray-500 text-sm pl-1">Digital Hologram Wreaths</p>
                 </div>
 
                 <p className="text-gray-500 leading-relaxed max-w-lg">
