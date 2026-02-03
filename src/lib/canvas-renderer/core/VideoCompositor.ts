@@ -122,6 +122,32 @@ export class VideoCompositor {
   }
 
   /**
+   * 모든 프레임 렌더링 (최적화 버전 - Seek 제거)
+   * Streaming 방식으로 메모리 효율적
+   */
+  async *renderAllFramesOptimized(
+    onProgress?: ExportProgressCallback
+  ): AsyncGenerator<ImageData, void, unknown> {
+    const totalFrames = this.frameRenderer.getTotalFrames();
+
+    // Sequential rendering으로 seek 제거
+    for await (const imageData of this.frameRenderer.renderAllFramesSequential(
+      (current, total) => {
+        if (onProgress) {
+          onProgress({
+            phase: 'rendering',
+            current,
+            total,
+            percentage: Math.round((current / total) * 100),
+          });
+        }
+      }
+    )) {
+      yield imageData;
+    }
+  }
+
+  /**
    * 설정 업데이트
    */
   updateConfig(newConfig: Partial<RenderConfig>): void {

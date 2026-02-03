@@ -184,13 +184,53 @@ export default function MultiSceneGenerationStep({
       await compositor.initialize();
       setOverallProgress(20);
 
-      // Phase 2: 프레임 렌더링
+      // Phase 2: 프레임 렌더링 (Sequential Playback - Seek 제거)
       setCurrentPhase('rendering');
-      const frames = await compositor.renderAllFrames((progress) => {
-        if (progress.phase === 'rendering') {
-          setOverallProgress(20 + progress.percentage * 0.4); // 20-60%
+
+      let frames: ImageData[];
+      try {
+        // 타임아웃 설정
+        const renderTimeout = 600000; // 10분 (버퍼링 안정성 향상)
+        const startTime = Date.now();
+
+        // 최적화 버전 시도 (Sequential Playback)
+        const frameStream = compositor.renderAllFramesOptimized((progress) => {
+          if (progress.phase === 'rendering') {
+            setOverallProgress(20 + progress.percentage * 0.4); // 20-60%
+          }
+        });
+
+        // 프레임 수집 with 타임아웃
+        frames = [];
+        const expectedFrames = compositor.frameRenderer.getTotalFrames();
+
+        for await (const imageData of frameStream) {
+          // 타임아웃 체크
+          if (Date.now() - startTime > renderTimeout) {
+            throw new Error(
+              `Rendering timeout: collected ${frames.length}/${expectedFrames} frames in ${Math.round((Date.now() - startTime) / 1000)}s`
+            );
+          }
+
+          frames.push(imageData);
         }
-      });
+
+        // 프레임 정합성 검증
+        if (frames.length < expectedFrames) {
+          throw new Error(`Incomplete render: expected ${expectedFrames} frames, got ${frames.length}`);
+        }
+
+        console.log(`✅ Sequential rendering succeeded: ${frames.length} frames in ${Math.round((Date.now() - startTime) / 1000)}s`);
+
+      } catch (error) {
+        // Fallback: 기존 방식 (Seek 사용)
+        console.warn('Sequential rendering failed, falling back to seek method:', error);
+        frames = await compositor.renderAllFrames((progress) => {
+          if (progress.phase === 'rendering') {
+            setOverallProgress(20 + progress.percentage * 0.4);
+          }
+        });
+      }
 
       // Phase 3: MP4 인코딩
       setCurrentPhase('encoding');

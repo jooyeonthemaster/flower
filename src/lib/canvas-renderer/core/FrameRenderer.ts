@@ -137,15 +137,68 @@ export class FrameRenderer {
         this.videoElement.playsInline = true;
         this.videoElement.preload = 'auto';
 
+        // HAVE_ENOUGH_DATA (readyState >= 4) + buffered 95% 대기 - 완전 로드 보장
+        const waitForFullyLoaded = () => {
+          return new Promise<void>((resolveReady) => {
+            const check = () => {
+              const video = this.videoElement!;
+
+              // readyState 4 (HAVE_ENOUGH_DATA) 확인
+              if (video.readyState < 4) {
+                return; // 아직 부족
+              }
+
+              // buffered 범위 확인 (전체 duration 커버 여부)
+              if (video.buffered.length > 0) {
+                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                const duration = video.duration;
+
+                // 전체 비디오의 95% 이상 버퍼링되면 OK
+                if (bufferedEnd >= duration * 0.95) {
+                  video.removeEventListener('canplaythrough', check);
+                  video.removeEventListener('progress', check);
+                  resolveReady();
+                }
+              }
+            };
+
+            // 즉시 체크
+            check();
+
+            // 이벤트 리스너 등록
+            this.videoElement!.addEventListener('canplaythrough', check);
+            this.videoElement!.addEventListener('progress', check);
+          });
+        };
+
         const timeout = setTimeout(() => {
           reject(new Error(`Video load timeout: ${videoSrc}`));
         }, 30000);
 
-        this.videoElement.onloadeddata = () => {
+        Promise.race([
+          waitForFullyLoaded(),
+          new Promise<void>((_, rejectTimeout) =>
+            setTimeout(() => rejectTimeout(new Error('Video full load timeout (readyState 4 + buffered 95%)')), 30000)
+          )
+        ]).then(() => {
           clearTimeout(timeout);
           this.videoReady = true;
+
+          if (DEBUG) {
+            console.log('[FrameRenderer] Video fully loaded:', {
+              readyState: this.videoElement!.readyState,
+              bufferedEnd: this.videoElement!.buffered.length > 0
+                ? this.videoElement!.buffered.end(0).toFixed(3)
+                : '0',
+              duration: this.videoElement!.duration.toFixed(3),
+            });
+          }
+
           resolve();
-        };
+        }).catch((error) => {
+          clearTimeout(timeout);
+          reject(error);
+        });
 
         this.videoElement.onerror = () => {
           clearTimeout(timeout);
@@ -610,6 +663,327 @@ export class FrameRenderer {
    */
   getTotalFrames(): number {
     return this.config.renderer.duration * this.config.renderer.fps;
+  }
+
+  /**
+   * 모든 프레임을 순차 재생으로 렌더링 (Seek 최적화)
+   * @returns AsyncGenerator로 프레임 스트리밍
+   */
+  async *renderAllFramesSequential(
+    onProgress?: (current: number, total: number) => void
+  ): AsyncGenerator<ImageData, void, unknown> {
+    if (!this.videoElement || !this.videoReady) {
+      throw new Error('Video not loaded');
+    }
+
+    const totalFrames = this.getTotalFrames();
+
+    // 비디오를 처음부터 재생 (0.3배속으로 천천히 재생하여 프레임 처리 시간 확보)
+    this.videoElement.currentTime = 0;
+    this.videoElement.playbackRate = 0.3;
+
+    // requestVideoFrameCallback 지원 확인
+    const supportsVideoFrameCallback = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
+
+    if (supportsVideoFrameCallback) {
+      // Native API 사용 (정확함)
+      yield* this.renderWithVideoFrameCallback(totalFrames, onProgress);
+    } else {
+      // Fallback: requestAnimationFrame
+      yield* this.renderWithAnimationFrame(totalFrames, onProgress);
+    }
+  }
+
+  /**
+   * requestVideoFrameCallback 사용 렌더링 (적응형 타임아웃 + 버퍼 모니터링)
+   */
+  private async *renderWithVideoFrameCallback(
+    totalFrames: number,
+    onProgress?: (current: number, total: number) => void
+  ): AsyncGenerator<ImageData, void, unknown> {
+    const video = this.videoElement!;
+    const frameDuration = 1000 / this.config.renderer.fps;
+
+    // 동적 타임아웃 계산
+    const baseTimeout = 5000;
+    const bufferMargin = 3000;
+    const dynamicTimeout = Math.max(
+      baseTimeout,
+      (frameDuration * 2) + bufferMargin
+    );
+
+    // play() 예외 처리
+    try {
+      await video.play();
+    } catch (error) {
+      throw new Error(`Failed to play video: ${error}`);
+    }
+
+    // playing 상태 확인
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Video play timeout - not in playing state'));
+      }, 5000);
+
+      const onPlaying = () => {
+        clearTimeout(timeout);
+        video.removeEventListener('playing', onPlaying);
+        resolve();
+      };
+
+      if (!video.paused && video.readyState >= 3) {
+        clearTimeout(timeout);
+        resolve();
+      } else {
+        video.addEventListener('playing', onPlaying);
+      }
+    });
+
+    // 프레임 렌더링
+    for (let i = 0; i < totalFrames; i++) {
+      // 비디오 일시정지 체크
+      if (video.paused) {
+        throw new Error(`Video playback paused at frame ${i}/${totalFrames}`);
+      }
+
+      // 비디오 종료 체크 - 종료된 경우 마지막 프레임 재사용
+      if (video.ended) {
+        if (DEBUG) {
+          console.warn(`[Frame ${i}] Video ended, using last frame for remaining ${totalFrames - i} frames`);
+        }
+
+        // requestVideoFrameCallback 없이 바로 렌더링 (마지막 프레임 재사용)
+        const imageData = this.renderFrameWithoutVideoSeek(i);
+
+        if (onProgress) {
+          onProgress(i + 1, totalFrames);
+        }
+
+        yield imageData;
+        continue; // 다음 프레임으로 (requestVideoFrameCallback 건너뛰기)
+      }
+
+      // 버퍼 상태 모니터링
+      const bufferStatus = this.checkBufferHealth(video, i);
+
+      if (bufferStatus.isStalled) {
+        try {
+          await this.waitForBufferRecovery(video, baseTimeout);
+        } catch (error) {
+          // 버퍼 회복 실패 시에도 진행 시도 (타임아웃 증가)
+          console.warn(`Buffer recovery timeout at frame ${i}, continuing...`);
+        }
+      }
+
+      // 프레임당 동적 타임아웃
+      const frameTimeout = baseTimeout + (bufferStatus.stalledDuration || 0);
+
+      // requestVideoFrameCallback with adaptive timeout
+      try {
+        await Promise.race([
+          new Promise<void>(resolve => {
+            (video as any).requestVideoFrameCallback(() => resolve());
+          }),
+          new Promise<void>((_, reject) =>
+            setTimeout(() => reject(new Error(`Frame ${i} callback timeout`)), frameTimeout)
+          )
+        ]);
+      } catch (error) {
+        // ✅ 마지막 프레임 또는 비디오 종료 체크
+        const isLastFrames = i >= totalFrames - 5; // 마지막 5프레임
+        const isNearEnd = video.currentTime >= video.duration - 0.1; // duration 0.1초 이내
+
+        if (video.ended || isLastFrames || isNearEnd) {
+          if (DEBUG) {
+            console.warn(
+              `[Frame ${i}/${totalFrames}] Video near end ` +
+              `(ended: ${video.ended}, currentTime: ${video.currentTime.toFixed(3)}s/${video.duration.toFixed(3)}s), ` +
+              `using last frame`
+            );
+          }
+          const imageData = this.renderFrameWithoutVideoSeek(i);
+          if (onProgress) {
+            onProgress(i + 1, totalFrames);
+          }
+          yield imageData;
+          continue;
+        }
+        throw new Error(`requestVideoFrameCallback failed at frame ${i}: ${error}`);
+      }
+
+      // 프레임 렌더링
+      const imageData = this.renderFrameWithoutVideoSeek(i);
+
+      if (onProgress) {
+        onProgress(i + 1, totalFrames);
+      }
+
+      yield imageData;
+    }
+
+    video.pause();
+  }
+
+  /**
+   * requestAnimationFrame Fallback
+   */
+  private async *renderWithAnimationFrame(
+    totalFrames: number,
+    onProgress?: (current: number, total: number) => void
+  ): AsyncGenerator<ImageData, void, unknown> {
+    const video = this.videoElement!;
+    const { fps } = this.config.renderer;
+
+    await video.play();
+
+    // playing 상태 확인
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Video play timeout')), 5000);
+      const onPlaying = () => {
+        clearTimeout(timeout);
+        video.removeEventListener('playing', onPlaying);
+        resolve();
+      };
+
+      if (!video.paused && video.readyState >= 3) {
+        clearTimeout(timeout);
+        resolve();
+      } else {
+        video.addEventListener('playing', onPlaying);
+      }
+    });
+
+    for (let i = 0; i < totalFrames; i++) {
+      const targetTime = i / fps;
+      const frameDuration = 1000 / fps;
+      const maxWaitTime = frameDuration * 2 + 3000; // 2프레임 + 3초 여유
+      const startTime = Date.now();
+
+      // Loop 탈출 조건 개선
+      while (video.currentTime < targetTime - 0.001) { // 0.001초 허용 오차
+        // 타임아웃 체크
+        if (Date.now() - startTime > maxWaitTime) {
+          throw new Error(
+            `Frame ${i} timeout: video stuck at ${video.currentTime.toFixed(3)}s (target: ${targetTime.toFixed(3)}s)`
+          );
+        }
+
+        // 비디오 중지 감지
+        if (video.paused || video.ended) {
+          throw new Error(`Video playback stopped at frame ${i}`);
+        }
+
+        await new Promise(resolve => requestAnimationFrame(resolve));
+      }
+
+      // 프레임 렌더링
+      const imageData = this.renderFrameWithoutVideoSeek(i);
+
+      if (onProgress) {
+        onProgress(i + 1, totalFrames);
+      }
+
+      yield imageData;
+    }
+
+    video.pause();
+  }
+
+  /**
+   * Video Seek 없이 프레임 렌더링
+   */
+  private renderFrameWithoutVideoSeek(frameNumber: number): ImageData {
+    const { width, height, backgroundColor } = this.config.renderer;
+    const ctx = this.ctx;
+
+    // 1. 배경 클리어
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. 비디오 프레임 그리기 (이미 올바른 시간에 있음)
+    if (this.videoElement && this.videoReady) {
+      ctx.drawImage(this.videoElement, 0, 0, width, height);
+    }
+
+    // 3. 다크 오버레이
+    this.renderDarkOverlay();
+
+    // 4. 참조 이미지
+    if (this.referenceImage) {
+      this.renderReferenceImage();
+    }
+
+    // 5. 텍스트 렌더링
+    const currentScene = this.textScenes.find(
+      scene => frameNumber >= scene.startFrame && frameNumber < scene.endFrame
+    );
+
+    if (currentScene) {
+      this.renderTextScene(currentScene, frameNumber);
+    }
+
+    // 6. ImageData 반환
+    return ctx.getImageData(0, 0, width, height);
+  }
+
+  /**
+   * 버퍼 상태 체크
+   */
+  private checkBufferHealth(video: HTMLVideoElement, frameIndex: number) {
+    const currentTime = video.currentTime;
+    const buffered = video.buffered;
+    let isStalled = false;
+    let stalledDuration = 0;
+
+    let isCurrentTimeBuffered = false;
+    for (let i = 0; i < buffered.length; i++) {
+      if (currentTime >= buffered.start(i) && currentTime < buffered.end(i)) {
+        isCurrentTimeBuffered = true;
+        break;
+      }
+    }
+
+    if (!isCurrentTimeBuffered && buffered.length > 0) {
+      isStalled = true;
+      const lastBufferEnd = buffered.end(buffered.length - 1);
+      const gapSize = currentTime - lastBufferEnd;
+      stalledDuration = Math.min(gapSize * 1000, 5000);
+    }
+
+    return { isStalled, stalledDuration };
+  }
+
+  /**
+   * 버퍼 회복 대기
+   */
+  private async waitForBufferRecovery(
+    video: HTMLVideoElement,
+    timeout: number
+  ): Promise<void> {
+    const startTime = Date.now();
+
+    return new Promise<void>((resolve, reject) => {
+      const checkBuffer = () => {
+        const currentTime = video.currentTime;
+        const buffered = video.buffered;
+
+        for (let i = 0; i < buffered.length; i++) {
+          if (currentTime >= buffered.start(i) && currentTime < buffered.end(i)) {
+            resolve();
+            return;
+          }
+        }
+
+        if (Date.now() - startTime > timeout) {
+          reject(new Error('Buffer recovery timeout'));
+          return;
+        }
+
+        setTimeout(checkBuffer, 100);
+      };
+
+      checkBuffer();
+    });
   }
 
   /**
