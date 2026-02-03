@@ -14,8 +14,6 @@ import {
   type CharEffectMode,
 } from '@/lib/canvas-renderer';
 import { createMP4FromFrames, createMP4FromFrameStream, checkWebCodecsSupport } from '@/lib/video-encoder';
-import { storage } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // Standard 모드 색상
 const STANDARD_COLOR = '#8A9A5B';
@@ -301,31 +299,36 @@ export default function MultiSceneGenerationStep({
     }
   }, [isWebCodecsSupported, createRenderConfig, onComplete]);
 
-  // Firebase Storage 업로드 (클라이언트 직접 업로드)
+  // Firebase Storage 업로드 (API 라우트 사용)
   const uploadToFirebase = async (blob: Blob): Promise<string> => {
     try {
-      // 파일명 생성
-      const timestamp = Date.now();
-      const randomId = Math.random().toString(36).substring(2, 8);
-      const filename = `generated-videos/hologram-${timestamp}-${randomId}.mp4`;
-
-      console.log('[Upload] Starting direct upload to Firebase Storage:', filename);
+      console.log('[Upload] Starting upload via API route');
       console.log('[Upload] File size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
-      // Firebase Storage 참조 생성
-      const storageRef = ref(storage, filename);
+      // FormData 생성
+      const formData = new FormData();
+      formData.append('file', blob, 'hologram-video.mp4');
+      formData.append('folder', 'generated-videos');
 
-      // 업로드 (메타데이터 포함)
-      const metadata = {
-        contentType: 'video/mp4',
-      };
-      await uploadBytes(storageRef, blob, metadata);
+      // API 라우트로 업로드
+      const response = await fetch('/api/upload-video', {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Public URL 생성
-      const downloadUrl = await getDownloadURL(storageRef);
-      console.log('[Upload] Firebase 업로드 완료:', downloadUrl);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Upload failed (${response.status}): ${errorText}`);
+      }
 
-      return downloadUrl;
+      const result = await response.json();
+
+      if (!result.success || !result.url) {
+        throw new Error('Invalid response from upload API');
+      }
+
+      console.log('[Upload] Firebase 업로드 완료:', result.url);
+      return result.url;
     } catch (error) {
       console.error('[Upload] Firebase 업로드 오류:', error);
       throw new Error(
