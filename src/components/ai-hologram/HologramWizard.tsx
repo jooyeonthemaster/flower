@@ -8,8 +8,7 @@ import MultiSceneStep, { SceneData } from './steps/MultiSceneStep';
 import TextPreviewStep, { CustomSettings } from './steps/TextPreviewStep';
 import MultiSceneGenerationStep from './steps/MultiSceneGenerationStep';
 import CompositionInputStep, { CompositionData } from './steps/CompositionInputStep';
-import CompositionImagePreviewStep, { GeneratedDualFrame } from './steps/CompositionImagePreviewStep';
-import CompositionGenerationStep from './steps/CompositionGenerationStep/index';
+import CompositionImagePreviewStep from './steps/CompositionImagePreviewStep';
 import ModeSelectLanding from './ModeSelectLanding';
 import { FanProgressCompact } from './components/FanProgressIndicator';
 import FanSpinTransition from './transitions/FanSpinTransition';
@@ -38,7 +37,6 @@ export default function HologramWizard() {
 
   // Composition 모드용 상태
   const [compositionData, setCompositionData] = useState<CompositionData | null>(null);
-  const [compositionFrames, setCompositionFrames] = useState<GeneratedDualFrame[] | null>(null);
   const [compositionMessages, setCompositionMessages] = useState<string[] | null>(null);
 
   // Background morph hook
@@ -89,15 +87,10 @@ export default function HologramWizard() {
     goToStep(1);
   };
 
-  const handleCompositionImageComplete = (frames: GeneratedDualFrame[]) => {
-    setCompositionFrames(frames);
-    goToStep(2);
-  };
-
   const handleCompositionGenerationComplete = (videoUrl: string, messages: string[]) => {
     setFinalVideoUrl(videoUrl);
     setCompositionMessages(messages);
-    goToStep(3);
+    goToStep(2); // Step 3 → Step 2
   };
 
   const handleReset = () => {
@@ -113,14 +106,13 @@ export default function HologramWizard() {
       setSceneData(null);
       setFinalVideoUrl('');
       setCompositionData(null);
-      setCompositionFrames(null);
       setCompositionMessages(null);
       setIsExiting(false);
     }, 550);
   };
 
   // Step labels
-  const stepLabels = ['설정 입력', '미리보기', '생성 중', '완료'];
+  const stepLabels = ['설정 입력', '생성 중', '완료'];
   // exit 애니메이션 중에는 이전 모드 사용
   const activeMode = isExiting ? exitingMode : mode;
   const isPremium = activeMode === 'composition';
@@ -177,20 +169,11 @@ export default function HologramWizard() {
           return compositionData ? (
             <CompositionImagePreviewStep
               data={compositionData}
-              onNext={handleCompositionImageComplete}
+              onNext={handleCompositionGenerationComplete}
               onBack={() => goToStep(0)}
             />
           ) : null;
         case 2:
-          return compositionData && compositionFrames ? (
-            <CompositionGenerationStep
-              data={compositionData}
-              generatedFrames={compositionFrames}
-              onComplete={handleCompositionGenerationComplete}
-              onBack={() => goToStep(1)}
-            />
-          ) : null;
-        case 3:
           return (
             <ResultStep
               videoUrl={finalVideoUrl}
@@ -242,7 +225,7 @@ export default function HologramWizard() {
             <div className="hidden md:flex items-center gap-4">
               <FanProgressCompact
                 currentStep={step}
-                totalSteps={4}
+                totalSteps={3}
                 isPremium={isPremium}
               />
             </div>
@@ -265,7 +248,7 @@ export default function HologramWizard() {
           <div className="md:hidden flex items-center justify-center py-3 border-b border-gray-200/50">
             <FanProgressCompact
               currentStep={step}
-              totalSteps={4}
+              totalSteps={3}
               isPremium={isPremium}
             />
             <span className={`ml-3 text-sm font-medium ${isDark ? 'text-white' : 'text-gray-700'}`}>

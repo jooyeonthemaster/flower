@@ -13,7 +13,7 @@ import {
   type TextPosition,
   type CharEffectMode,
 } from '@/lib/canvas-renderer';
-import { createMP4FromFrames, checkWebCodecsSupport } from '@/lib/video-encoder';
+import { createMP4FromFrames, createMP4FromFrameStream, checkWebCodecsSupport } from '@/lib/video-encoder';
 
 // Standard 모드 색상
 const STANDARD_COLOR = '#8A9A5B';
@@ -144,9 +144,9 @@ export default function MultiSceneGenerationStep({
     return {
       renderer: {
         ...DEFAULT_RENDERER_CONFIG,
-        width: 720,
-        height: 720,
-        fps: 24,
+        width: 1080,
+        height: 1080,
+        fps: 30,
         duration: texts.length * 5,
       },
       textStyle: {
@@ -184,73 +184,97 @@ export default function MultiSceneGenerationStep({
       await compositor.initialize();
       setOverallProgress(20);
 
-      // Phase 2: 프레임 렌더링 (Sequential Playback - Seek 제거)
+      // Phase 2 & 3: 프레임 렌더링 및 인코딩 (Streaming Pipeline)
       setCurrentPhase('rendering');
 
-      let frames: ImageData[];
+      let blob: Blob;
       try {
         // 타임아웃 설정
         const renderTimeout = 600000; // 10분 (버퍼링 안정성 향상)
         const startTime = Date.now();
 
-        // 최적화 버전 시도 (Sequential Playback)
+        // 최적화 버전 시도 (Sequential Playback + Streaming Encoding)
         const frameStream = compositor.renderAllFramesOptimized((progress) => {
           if (progress.phase === 'rendering') {
             setOverallProgress(20 + progress.percentage * 0.4); // 20-60%
           }
         });
 
-        // 프레임 수집 with 타임아웃
-        frames = [];
         const expectedFrames = compositor.getTotalFrames();
+        const encoderConfig = {
+          width: renderConfig.renderer.width,
+          height: renderConfig.renderer.height,
+          fps: renderConfig.renderer.fps,
+          bitrate: 5_000_000,
+          codec: 'avc1' as const,
+        };
 
-        for await (const imageData of frameStream) {
-          // 타임아웃 체크
-          if (Date.now() - startTime > renderTimeout) {
-            throw new Error(
-              `Rendering timeout: collected ${frames.length}/${expectedFrames} frames in ${Math.round((Date.now() - startTime) / 1000)}s`
-            );
+        console.log(`🚀 Starting streaming pipeline: ${expectedFrames} frames`);
+
+        // ✅ 스트리밍 방식: 프레임을 즉시 인코딩 (메모리 절약)
+        setCurrentPhase('encoding');
+
+        let lastProgressTime = Date.now();
+        blob = await createMP4FromFrameStream(
+          frameStream,
+          expectedFrames,
+          encoderConfig,
+          (progress) => {
+            // 타임아웃 체크
+            if (Date.now() - startTime > renderTimeout) {
+              throw new Error(
+                `Rendering timeout at ${progress.currentFrame}/${expectedFrames} frames`
+              );
+            }
+
+            // 진행률 업데이트
+            if (progress.phase === 'encoding') {
+              setOverallProgress(60 + progress.percentage * 0.25); // 60-85%
+            } else if (progress.phase === 'muxing') {
+              setOverallProgress(85 + progress.percentage * 0.05); // 85-90%
+            }
+
+            // 주기적 로깅 (매 5초)
+            const now = Date.now();
+            if (now - lastProgressTime > 5000) {
+              console.log(`📊 Streaming progress: ${progress.currentFrame}/${expectedFrames} (${progress.percentage}%)`);
+              lastProgressTime = now;
+            }
           }
+        );
 
-          frames.push(imageData);
-        }
-
-        // 프레임 정합성 검증
-        if (frames.length < expectedFrames) {
-          throw new Error(`Incomplete render: expected ${expectedFrames} frames, got ${frames.length}`);
-        }
-
-        console.log(`✅ Sequential rendering succeeded: ${frames.length} frames in ${Math.round((Date.now() - startTime) / 1000)}s`);
+        console.log(`✅ Streaming pipeline succeeded in ${Math.round((Date.now() - startTime) / 1000)}s`);
 
       } catch (error) {
-        // Fallback: 기존 방식 (Seek 사용)
-        console.warn('Sequential rendering failed, falling back to seek method:', error);
-        frames = await compositor.renderAllFrames((progress) => {
+        // Fallback: 기존 방식 (Seek + Batch Encoding)
+        console.warn('⚠️ Streaming pipeline failed, falling back to batch method:', error);
+        setCurrentPhase('rendering');
+
+        const frames = await compositor.renderAllFrames((progress) => {
           if (progress.phase === 'rendering') {
             setOverallProgress(20 + progress.percentage * 0.4);
           }
         });
-      }
 
-      // Phase 3: MP4 인코딩
-      setCurrentPhase('encoding');
-      const blob = await createMP4FromFrames(
-        frames,
-        {
-          width: renderConfig.renderer.width,
-          height: renderConfig.renderer.height,
-          fps: renderConfig.renderer.fps,
-          bitrate: 3_000_000,
-          codec: 'avc1',
-        },
-        (progress) => {
-          if (progress.phase === 'encoding') {
-            setOverallProgress(60 + progress.percentage * 0.25); // 60-85%
-          } else if (progress.phase === 'muxing') {
-            setOverallProgress(85 + progress.percentage * 0.05); // 85-90%
+        setCurrentPhase('encoding');
+        blob = await createMP4FromFrames(
+          frames,
+          {
+            width: renderConfig.renderer.width,
+            height: renderConfig.renderer.height,
+            fps: renderConfig.renderer.fps,
+            bitrate: 5_000_000,
+            codec: 'avc1',
+          },
+          (progress) => {
+            if (progress.phase === 'encoding') {
+              setOverallProgress(60 + progress.percentage * 0.25); // 60-85%
+            } else if (progress.phase === 'muxing') {
+              setOverallProgress(85 + progress.percentage * 0.05); // 85-90%
+            }
           }
-        }
-      );
+        );
+      }
 
       // Phase 4: Firebase 업로드
       setCurrentPhase('uploading');

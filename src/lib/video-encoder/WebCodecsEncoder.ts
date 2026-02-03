@@ -13,8 +13,8 @@ import type {
 
 // 기본 설정
 const DEFAULT_CONFIG: EncoderConfig = {
-  width: 720,
-  height: 720,
+  width: 1080,
+  height: 1080,
   fps: 30,
   bitrate: 5_000_000, // 5 Mbps
   codec: 'avc1',
@@ -198,6 +198,85 @@ export class WebCodecsEncoder {
     await this.encoder?.flush();
 
     return { chunks: this.encodedChunks, metadata: this.encodedMetadata };
+  }
+
+  /**
+   * 프레임 스트림 인코딩 (메모리 최적화)
+   * AsyncGenerator로 프레임을 받아 즉시 인코딩하고 chunk를 콜백으로 전달
+   */
+  async encodeFrameStream(
+    frameGenerator: AsyncGenerator<ImageData, void, unknown>,
+    totalFrames: number,
+    onProgress?: EncodingProgressCallback,
+    onChunk?: (chunk: EncodedVideoChunk, metadata?: EncodedVideoChunkMetadata) => void
+  ): Promise<void> {
+    let frameIndex = 0;
+    let pendingChunks: { chunk: EncodedVideoChunk; metadata?: EncodedVideoChunkMetadata }[] = [];
+
+    // chunk handler를 임시로 교체
+    const originalHandler = this.handleEncodedChunk.bind(this);
+    (this as any).handleEncodedChunk = (chunk: EncodedVideoChunk, metadata?: EncodedVideoChunkMetadata) => {
+      // 콜백이 있으면 즉시 전달
+      if (onChunk) {
+        onChunk(chunk, metadata);
+      } else {
+        // 콜백이 없으면 임시 버퍼에 저장
+        pendingChunks.push({ chunk, metadata });
+      }
+    };
+
+    try {
+      for await (const imageData of frameGenerator) {
+        // ImageData를 ImageBitmap으로 변환
+        const bitmap = await createImageBitmap(imageData);
+
+        // VideoFrame 생성
+        const timestamp = (frameIndex * 1_000_000) / this.config.fps;
+        const frame = new VideoFrame(bitmap, {
+          timestamp,
+          duration: 1_000_000 / this.config.fps,
+        });
+
+        // 인코딩
+        const keyFrame = frameIndex % (this.config.fps * 2) === 0;
+        this.encoder!.encode(frame, { keyFrame });
+
+        // 리소스 정리
+        frame.close();
+        bitmap.close();
+
+        // 진행 상황 콜백
+        if (onProgress) {
+          onProgress({
+            phase: 'encoding',
+            currentFrame: frameIndex + 1,
+            totalFrames,
+            percentage: Math.round(((frameIndex + 1) / totalFrames) * 100),
+          });
+        }
+
+        frameIndex++;
+
+        // encoder 큐가 가득 차지 않도록 대기
+        if (this.encoder!.encodeQueueSize > 5) {
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+      }
+
+      // 인코딩 완료 대기
+      await this.encoder!.flush();
+
+      // 남은 pending chunks 전달
+      if (onChunk && pendingChunks.length > 0) {
+        for (const { chunk, metadata } of pendingChunks) {
+          onChunk(chunk, metadata);
+        }
+        pendingChunks = [];
+      }
+    } finally {
+      // 원래 handler 복원
+      (this as any).handleEncodedChunk = originalHandler;
+    }
   }
 
   /**

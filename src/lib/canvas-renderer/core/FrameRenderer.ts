@@ -741,11 +741,6 @@ export class FrameRenderer {
 
     // 프레임 렌더링
     for (let i = 0; i < totalFrames; i++) {
-      // 비디오 일시정지 체크
-      if (video.paused) {
-        throw new Error(`Video playback paused at frame ${i}/${totalFrames}`);
-      }
-
       // 비디오 종료 체크 - 종료된 경우 마지막 프레임 재사용
       if (video.ended) {
         if (DEBUG) {

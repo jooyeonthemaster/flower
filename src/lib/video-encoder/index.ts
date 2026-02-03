@@ -21,4 +21,5 @@ export {
 export {
   MP4MuxerWrapper,
   createMP4FromFrames,
+  createMP4FromFrameStream,
 } from './MP4Muxer';

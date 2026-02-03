@@ -146,4 +146,66 @@ export async function createMP4FromFrames(
   return blob;
 }
 
+/**
+ * ImageData 스트림을 MP4 Blob으로 변환 (스트리밍 - 메모리 최적화)
+ */
+export async function createMP4FromFrameStream(
+  frameGenerator: AsyncGenerator<ImageData, void, unknown>,
+  totalFrames: number,
+  config: EncoderConfig,
+  onProgress?: EncodingProgressCallback
+): Promise<Blob> {
+  const { WebCodecsEncoder } = await import('./WebCodecsEncoder');
+
+  // 1. 인코더 초기화
+  const encoder = new WebCodecsEncoder(config);
+  const initialized = await encoder.initialize();
+
+  if (!initialized) {
+    throw new Error('Failed to initialize encoder');
+  }
+
+  // 2. Muxer 초기화
+  const muxer = new MP4MuxerWrapper(config);
+  muxer.initialize();
+
+  if (onProgress) {
+    onProgress({
+      phase: 'initializing',
+      currentFrame: 0,
+      totalFrames,
+      percentage: 0,
+    });
+  }
+
+  // 3. 프레임 스트리밍 인코딩 및 Muxing
+  await encoder.encodeFrameStream(
+    frameGenerator,
+    totalFrames,
+    onProgress,
+    (chunk, metadata) => {
+      // 인코딩된 청크를 즉시 muxer에 전달
+      muxer.addVideoChunk(chunk, metadata);
+    }
+  );
+
+  // 4. 완료
+  const blob = muxer.finalize();
+
+  // 5. 정리
+  await encoder.dispose();
+  muxer.dispose();
+
+  if (onProgress) {
+    onProgress({
+      phase: 'complete',
+      currentFrame: totalFrames,
+      totalFrames,
+      percentage: 100,
+    });
+  }
+
+  return blob;
+}
+
 export default MP4MuxerWrapper;
