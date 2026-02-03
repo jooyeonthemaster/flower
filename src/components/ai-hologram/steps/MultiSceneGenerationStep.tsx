@@ -14,6 +14,9 @@ import {
   type CharEffectMode,
 } from '@/lib/canvas-renderer';
 import { createMP4FromFrames, createMP4FromFrameStream, checkWebCodecsSupport } from '@/lib/video-encoder';
+import { storage, auth } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { signInAnonymously } from 'firebase/auth';
 
 // Standard 모드 색상
 const STANDARD_COLOR = '#8A9A5B';
@@ -299,53 +302,59 @@ export default function MultiSceneGenerationStep({
     }
   }, [isWebCodecsSupported, createRenderConfig, onComplete]);
 
-  // Firebase Storage 업로드 (Base64 JSON 방식 - AI 버전과 동일)
+  // Firebase Storage 직접 업로드 (AI 영상 합성 방식 적용)
   const uploadToFirebase = async (blob: Blob): Promise<string> => {
     try {
-      console.log('[Upload] Starting upload via API route (Base64)');
-      console.log('[Upload] File size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
+      console.log('[Upload] Starting direct Firebase upload');
+      console.log(`[Upload] Video size: ${(blob.size / 1024 / 1024).toFixed(2)}MB`);
 
-      // Blob을 Base64로 변환
-      const base64Data = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const result = reader.result as string;
-          resolve(result);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-
-      console.log('[Upload] Base64 encoding complete, sending to API...');
-
-      // JSON으로 API 라우트 호출 (Base64 데이터 전송)
-      const response = await fetch('/api/upload-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          videoDataUrl: base64Data,
-          folder: 'generated-videos',
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Upload failed (${response.status}): ${errorText}`);
+      // Step 1: 익명 인증 (이미 로그인되어 있으면 skip)
+      if (!auth.currentUser) {
+        console.log('[Upload] Signing in anonymously...');
+        await signInAnonymously(auth);
+        console.log('[Upload] Anonymous sign-in complete');
+      } else {
+        console.log('[Upload] Already signed in:', auth.currentUser.uid);
       }
 
-      const result = await response.json();
+      // Step 2: 파일명 생성 (AI 합성과 동일한 패턴)
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 8);
+      const filename = `generated-videos/hologram-${timestamp}-${randomId}.mp4`;
 
-      if (!result.success || !result.url) {
-        throw new Error('Invalid response from upload API');
-      }
+      // Step 3: Firebase Storage 참조 생성
+      const storageRef = ref(storage, filename);
 
-      console.log('[Upload] Firebase 업로드 완료:', result.url);
-      return result.url;
+      // Step 4: 직접 업로드 (Vercel 제한 회피)
+      const metadata = {
+        contentType: 'video/mp4',
+      };
+
+      console.log(`[Upload] Uploading to ${filename}...`);
+      await uploadBytes(storageRef, blob, metadata);
+      console.log('[Upload] Upload complete');
+
+      // Step 5: Public URL 획득
+      const downloadUrl = await getDownloadURL(storageRef);
+      console.log('[Upload] Firebase URL:', downloadUrl);
+
+      return downloadUrl;
     } catch (error) {
-      console.error('[Upload] Firebase 업로드 오류:', error);
+      console.error('[Upload] Firebase upload failed:', error);
+
+      // 에러 메시지 개선
+      if (error instanceof Error) {
+        if (error.message.includes('unauthorized') || error.message.includes('permission-denied')) {
+          throw new Error(
+            '업로드 권한이 없습니다. Firebase Storage Rules를 확인해주세요.\n\n' +
+            '에러: ' + error.message
+          );
+        }
+      }
+
       throw new Error(
         `영상 업로드에 실패했습니다. 네트워크 연결을 확인하고 다시 시도해주세요.\n\n${
-          error instanceof Error ? error.message : '알 수 없는 오류'
+          error instanceof Error ? error.message : String(error)
         }`
       );
     }
