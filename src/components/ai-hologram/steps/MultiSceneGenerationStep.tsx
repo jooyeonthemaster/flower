@@ -202,7 +202,7 @@ export default function MultiSceneGenerationStep({
 
         // 프레임 수집 with 타임아웃
         frames = [];
-        const expectedFrames = compositor.frameRenderer.getTotalFrames();
+        const expectedFrames = compositor.getTotalFrames();
 
         for await (const imageData of frameStream) {
           // 타임아웃 체크
