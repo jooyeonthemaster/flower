@@ -197,7 +197,7 @@ export default function CompositionImagePreviewStep({ data, onNext, onBack }: Co
           const response = await fetch('/api/ai/generate-background', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, category: data.category, style: data.style }),
+            body: JSON.stringify({ category: data.category, style: data.style }),
           });
 
           if (!response.ok) {
@@ -237,8 +237,8 @@ export default function CompositionImagePreviewStep({ data, onNext, onBack }: Co
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              message,
-              backgroundUrl: backgroundUrls[idx],
+              text: message,
+              backgroundImage: backgroundUrls[idx],
               category: data.category,
               style: data.style,
             }),
@@ -264,8 +264,8 @@ export default function CompositionImagePreviewStep({ data, onNext, onBack }: Co
           });
 
           return {
-            startFrameUrl: result.startFrameUrl,
-            endFrameUrl: result.endFrameUrl,
+            startFrameUrl: backgroundUrls[idx],  // 배경 이미지 (텍스트 없음)
+            endFrameUrl: result.imageUrl,        // 텍스트 프레임 (배경 + 텍스트)
             message,
           };
         } catch (error) {
