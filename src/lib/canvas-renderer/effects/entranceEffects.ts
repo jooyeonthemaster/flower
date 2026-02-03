@@ -12,21 +12,24 @@ import { interpolate, Easing } from '../utils/mathUtils';
  */
 export function applyTypewriter(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, text } = ctx;
 
   // 2초 동안 타이핑
+  const typewriterDuration = fps * 2;
   const typewriterChars = Math.floor(
     interpolate(
       localFrame,
-      [0, fps * 2],
+      [0, typewriterDuration],
       [0, text.length],
       { extrapolateRight: 'clamp' }
     )
   );
 
-  result.displayText = text.slice(0, typewriterChars);
+  // fadeout 시에는 전체 텍스트 표시
+  result.displayText = fadeoutFactor < 1 ? text : text.slice(0, typewriterChars);
 }
 
 /**

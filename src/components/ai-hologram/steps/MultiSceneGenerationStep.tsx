@@ -299,21 +299,33 @@ export default function MultiSceneGenerationStep({
     }
   }, [isWebCodecsSupported, createRenderConfig, onComplete]);
 
-  // Firebase Storage 업로드 (API 라우트 사용)
+  // Firebase Storage 업로드 (Base64 JSON 방식 - AI 버전과 동일)
   const uploadToFirebase = async (blob: Blob): Promise<string> => {
     try {
-      console.log('[Upload] Starting upload via API route');
+      console.log('[Upload] Starting upload via API route (Base64)');
       console.log('[Upload] File size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
-      // FormData 생성
-      const formData = new FormData();
-      formData.append('file', blob, 'hologram-video.mp4');
-      formData.append('folder', 'generated-videos');
+      // Blob을 Base64로 변환
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          resolve(result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
 
-      // API 라우트로 업로드
+      console.log('[Upload] Base64 encoding complete, sending to API...');
+
+      // JSON으로 API 라우트 호출 (Base64 데이터 전송)
       const response = await fetch('/api/upload-video', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          videoDataUrl: base64Data,
+          folder: 'generated-videos',
+        }),
       });
 
       if (!response.ok) {

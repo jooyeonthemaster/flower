@@ -10,6 +10,7 @@ import { interpolate, Easing, random } from '../utils/mathUtils';
  * 글자별 이펙트인지 확인
  */
 export const LETTER_EFFECTS = [
+  'typewriter',
   'letterDrop',
   'letterWave',
   'letterBounce',
@@ -32,7 +33,8 @@ export function isLetterEffect(effect: string): boolean {
  */
 export function applyLetterDrop(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, charIndex = 0, totalChars = 1, height } = ctx;
 
@@ -43,9 +45,10 @@ export function applyLetterDrop(
   const progress = Math.min(adjustedFrame / dropDuration, 1);
   const easedProgress = Easing.easeOutBounce(progress);
 
-  // 위에서 떨어짐
+  // 위에서 떨어짐 (진입 완료 후 fadeout 적용)
   const startY = -height * 0.3;
-  result.translateY += interpolate(easedProgress, [0, 1], [startY, 0]);
+  const dropOffset = interpolate(easedProgress, [0, 1], [startY, 0]);
+  result.translateY += dropOffset * (progress < 1 ? 1 : fadeoutFactor);
   result.opacity *= progress > 0 ? 1 : 0;
 }
 
@@ -55,14 +58,15 @@ export function applyLetterDrop(
 export function applyLetterWave(
   ctx: EffectContext,
   result: EffectResult,
-  repeatPhase: number
+  repeatPhase: number,
+  fadeoutFactor: number = 1
 ): void {
   const { charIndex = 0, height } = ctx;
 
   const phaseOffset = charIndex * 0.5;
   const waveY = Math.sin(repeatPhase + phaseOffset) * height * 0.05;
 
-  result.translateY += waveY;
+  result.translateY += waveY * fadeoutFactor;
 }
 
 /**
@@ -71,14 +75,15 @@ export function applyLetterWave(
 export function applyLetterBounce(
   ctx: EffectContext,
   result: EffectResult,
-  repeatPhase: number
+  repeatPhase: number,
+  fadeoutFactor: number = 1
 ): void {
   const { charIndex = 0, height } = ctx;
 
   const phaseOffset = charIndex * 0.8;
   const bounceY = Math.abs(Math.sin(repeatPhase + phaseOffset)) * height * 0.08;
 
-  result.translateY -= bounceY;
+  result.translateY -= bounceY * fadeoutFactor;
 }
 
 /**
@@ -86,7 +91,8 @@ export function applyLetterBounce(
  */
 export function applyLetterSpin(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, charIndex = 0 } = ctx;
 
@@ -97,11 +103,11 @@ export function applyLetterSpin(
   const progress = Math.min(adjustedFrame / spinDuration, 1);
   const easedProgress = Easing.easeOutCubic(progress);
 
-  // 회전하며 등장
+  // 회전하며 등장 (진입 완료 후 fadeout 적용)
   const rotation = interpolate(easedProgress, [0, 1], [360, 0]);
   const scale = interpolate(easedProgress, [0, 1], [0, 1]);
 
-  result.rotateZ += rotation;
+  result.rotateZ += rotation * (progress < 1 ? 1 : fadeoutFactor);
   result.scale *= scale;
   result.opacity *= progress > 0 ? 1 : 0;
 }
@@ -111,7 +117,8 @@ export function applyLetterSpin(
  */
 export function applyLetterScatter(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, charIndex = 0, seed, width, height } = ctx;
 
@@ -126,8 +133,11 @@ export function applyLetterScatter(
   const startX = Math.cos(angle) * distance;
   const startY = Math.sin(angle) * distance;
 
-  result.translateX += interpolate(easedProgress, [0, 1], [startX, 0]);
-  result.translateY += interpolate(easedProgress, [0, 1], [startY, 0]);
+  // 흩어진 곳에서 모여듦 (진입 완료 후 fadeout 적용)
+  const offsetX = interpolate(easedProgress, [0, 1], [startX, 0]);
+  const offsetY = interpolate(easedProgress, [0, 1], [startY, 0]);
+  result.translateX += offsetX * (progress < 1 ? 1 : fadeoutFactor);
+  result.translateY += offsetY * (progress < 1 ? 1 : fadeoutFactor);
   result.opacity *= easedProgress;
 }
 
@@ -137,7 +147,8 @@ export function applyLetterScatter(
 export function applyLetterJump(
   ctx: EffectContext,
   result: EffectResult,
-  repeatPhase: number
+  repeatPhase: number,
+  fadeoutFactor: number = 1
 ): void {
   const { charIndex = 0, height } = ctx;
 
@@ -149,7 +160,7 @@ export function applyLetterJump(
     ? Math.sin(jumpPhase) * height * 0.1
     : 0;
 
-  result.translateY -= jumpY;
+  result.translateY -= jumpY * fadeoutFactor;
 }
 
 /**
@@ -157,7 +168,8 @@ export function applyLetterJump(
  */
 export function applyLetterZoom(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, charIndex = 0 } = ctx;
 
@@ -179,7 +191,8 @@ export function applyLetterZoom(
  */
 export function applyLetterFlip(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, charIndex = 0 } = ctx;
 
@@ -190,10 +203,10 @@ export function applyLetterFlip(
   const progress = Math.min(adjustedFrame / flipDuration, 1);
   const easedProgress = Easing.easeOutCubic(progress);
 
-  // Y축 회전 (카드 뒤집기)
+  // Y축 회전 (카드 뒤집기, 진입 완료 후 fadeout 적용)
   const rotateY = interpolate(easedProgress, [0, 1], [90, 0]);
 
-  result.rotateY += rotateY;
+  result.rotateY += rotateY * (progress < 1 ? 1 : fadeoutFactor);
   result.opacity *= progress > 0 ? (easedProgress > 0.5 ? 1 : 0) : 0;
 }
 
@@ -202,7 +215,8 @@ export function applyLetterFlip(
  */
 export function applyLetterSlide(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, charIndex = 0, width } = ctx;
 
@@ -213,9 +227,10 @@ export function applyLetterSlide(
   const progress = Math.min(adjustedFrame / slideDuration, 1);
   const easedProgress = Easing.easeOutCubic(progress);
 
-  // 오른쪽에서 슬라이드인
+  // 오른쪽에서 슬라이드인 (진입 완료 후 fadeout 적용)
   const startX = width * 0.3;
-  result.translateX += interpolate(easedProgress, [0, 1], [startX, 0]);
+  const offsetX = interpolate(easedProgress, [0, 1], [startX, 0]);
+  result.translateX += offsetX * (progress < 1 ? 1 : fadeoutFactor);
   result.opacity *= easedProgress;
 }
 
@@ -224,7 +239,8 @@ export function applyLetterSlide(
  */
 export function applyLetterPop(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, charIndex = 0 } = ctx;
 
@@ -247,7 +263,8 @@ export function applyLetterPop(
  */
 export function applyLetterRain(
   ctx: EffectContext,
-  result: EffectResult
+  result: EffectResult,
+  fadeoutFactor: number = 1
 ): void {
   const { localFrame, fps, charIndex = 0, seed, height } = ctx;
 
@@ -260,6 +277,7 @@ export function applyLetterRain(
   const easedProgress = Easing.easeOutQuad(progress);
 
   const startY = -height * 0.4;
-  result.translateY += interpolate(easedProgress, [0, 1], [startY, 0]);
+  const offsetY = interpolate(easedProgress, [0, 1], [startY, 0]);
+  result.translateY += offsetY * (progress < 1 ? 1 : fadeoutFactor);
   result.opacity *= progress > 0 ? easedProgress : 0;
 }

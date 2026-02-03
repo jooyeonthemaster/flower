@@ -28,22 +28,56 @@ export async function POST(req: NextRequest) {
   try {
     console.log('[Upload Video] API called');
 
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const folder = (formData.get('folder') as string) || 'generated-videos';
+    // Content-Type 확인하여 FormData 또는 JSON 처리
+    const contentType = req.headers.get('content-type') || '';
+    let buffer: Buffer;
+    let folder: string;
 
-    if (!file) {
-      console.error('[Upload Video] No file provided');
-      return NextResponse.json(
-        { success: false, error: '파일이 필요합니다.' },
-        { status: 400 }
-      );
+    if (contentType.includes('application/json')) {
+      // JSON (Base64) 방식 - AI 버전과 동일
+      const body = await req.json();
+      const { videoDataUrl, folder: requestFolder } = body;
+      folder = requestFolder || 'generated-videos';
+
+      if (!videoDataUrl) {
+        console.error('[Upload Video] No videoDataUrl provided');
+        return NextResponse.json(
+          { success: false, error: 'videoDataUrl이 필요합니다.' },
+          { status: 400 }
+        );
+      }
+
+      // Base64 디코딩
+      if (videoDataUrl.startsWith('data:')) {
+        const matches = videoDataUrl.match(/^data:video\/([^;]+);base64,(.+)$/);
+        if (!matches) {
+          throw new Error('Invalid video data URL format');
+        }
+        const base64Data = matches[2];
+        buffer = Buffer.from(base64Data, 'base64');
+        console.log('[Upload Video] Base64 decoded, size:', buffer.length, 'bytes');
+      } else {
+        throw new Error('videoDataUrl must be a data URL');
+      }
+    } else {
+      // FormData 방식 (기존 방식)
+      const formData = await req.formData();
+      const file = formData.get('file') as File | null;
+      folder = (formData.get('folder') as string) || 'generated-videos';
+
+      if (!file) {
+        console.error('[Upload Video] No file provided');
+        return NextResponse.json(
+          { success: false, error: '파일이 필요합니다.' },
+          { status: 400 }
+        );
+      }
+
+      // File을 Buffer로 변환
+      const arrayBuffer = await file.arrayBuffer();
+      buffer = Buffer.from(arrayBuffer);
+      console.log('[Upload Video] File size:', buffer.length, 'bytes');
     }
-
-    // File을 Buffer로 변환
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    console.log('[Upload Video] File size:', buffer.length, 'bytes');
 
     // 파일명 생성
     const timestamp = Date.now();

@@ -213,7 +213,7 @@ export function calculateEffects(
 
       // 진입 효과
       case 'typewriter':
-        applyTypewriter(ctx, result);
+        applyTypewriter(ctx, result, fadeoutFactor);
         break;
       case 'elastic':
         applyElastic(ctx, result);
@@ -221,37 +221,37 @@ export function calculateEffects(
 
       // 글자별 효과
       case 'letterDrop':
-        applyLetterDrop(ctx, result);
+        applyLetterDrop(ctx, result, fadeoutFactor);
         break;
       case 'letterWave':
-        applyLetterWave(ctx, result, repeatPhase);
+        applyLetterWave(ctx, result, repeatPhase, fadeoutFactor);
         break;
       case 'letterBounce':
-        applyLetterBounce(ctx, result, repeatPhase);
+        applyLetterBounce(ctx, result, repeatPhase, fadeoutFactor);
         break;
       case 'letterSpin':
-        applyLetterSpin(ctx, result);
+        applyLetterSpin(ctx, result, fadeoutFactor);
         break;
       case 'letterScatter':
-        applyLetterScatter(ctx, result);
+        applyLetterScatter(ctx, result, fadeoutFactor);
         break;
       case 'letterJump':
-        applyLetterJump(ctx, result, repeatPhase);
+        applyLetterJump(ctx, result, repeatPhase, fadeoutFactor);
         break;
       case 'letterZoom':
-        applyLetterZoom(ctx, result);
+        applyLetterZoom(ctx, result, fadeoutFactor);
         break;
       case 'letterFlip':
-        applyLetterFlip(ctx, result);
+        applyLetterFlip(ctx, result, fadeoutFactor);
         break;
       case 'letterSlide':
-        applyLetterSlide(ctx, result);
+        applyLetterSlide(ctx, result, fadeoutFactor);
         break;
       case 'letterPop':
-        applyLetterPop(ctx, result);
+        applyLetterPop(ctx, result, fadeoutFactor);
         break;
       case 'letterRain':
-        applyLetterRain(ctx, result);
+        applyLetterRain(ctx, result, fadeoutFactor);
         break;
     }
   }

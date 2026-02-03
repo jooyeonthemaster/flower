@@ -20,13 +20,13 @@ export const availableEffects = [
   { id: 'wave3d', name: '3D 웨이브' },
   { id: 'tumble', name: '텀블' },
   // 진입 이펙트
-  { id: 'typewriter', name: '타이핑' },
   { id: 'elastic', name: '탄성' },
 ];
 
 // 글자별 이펙트 (단일 선택)
 export const letterEffects = [
   { id: 'none', name: '없음' },
+  { id: 'typewriter', name: '타이핑' },
   { id: 'letterDrop', name: '글자 낙하' },
   { id: 'letterWave', name: '글자 물결' },
   { id: 'letterBounce', name: '글자 바운스' },
