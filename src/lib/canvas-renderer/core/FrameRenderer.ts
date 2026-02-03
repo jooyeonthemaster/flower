@@ -490,7 +490,9 @@ export class FrameRenderer {
     const positionY = this.calculatePositionY(scene.position, scene.seed);
 
     if (hasLetterEffect && totalChars > 0) {
-      // 글자별 이펙트 모드: 각 글자마다 개별 이펙트 계산
+      // 글자별 이펙트 모드: 이펙트를 일반/글자별로 분리
+      // letterEffect만 각 글자에 적용, 일반 이펙트는 전체 텍스트에 적용
+      const letterEffectsOnly = this.config.effects.filter(e => isLetterEffect(e));
       const charEffects: EffectResult[] = [];
 
       for (let i = 0; i < totalChars; i++) {
@@ -507,7 +509,8 @@ export class FrameRenderer {
           totalChars,
         };
 
-        const charEffect = calculateEffects(this.config.effects, effectContext);
+        // letterEffect만 적용 (일반 이펙트는 baseEffects에서 처리)
+        const charEffect = calculateEffects(letterEffectsOnly, effectContext);
 
         charEffects.push({
           ...charEffect,
@@ -529,9 +532,9 @@ export class FrameRenderer {
         glowColor: this.config.textStyle.glowColor,
       };
 
-      // 글자별 이펙트가 아닌 것만 적용
-      const nonLetterEffects = this.config.effects.filter(e => !isLetterEffect(e));
-      const baseEffects = calculateEffects(nonLetterEffects, baseContext);
+      // 일반 이펙트만 전체 텍스트에 적용
+      const generalEffects = this.config.effects.filter(e => !isLetterEffect(e));
+      const baseEffects = calculateEffects(generalEffects, baseContext);
 
       const finalBaseEffects: EffectResult = {
         ...baseEffects,

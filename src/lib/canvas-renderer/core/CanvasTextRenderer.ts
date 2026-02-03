@@ -160,13 +160,15 @@ export class CanvasTextRenderer {
 
       ctx.save();
 
-      // blur/hueRotate filter 적용 (글자별)
+      // blur/hueRotate filter 적용 (base + char 병합)
       const filters: string[] = [];
-      if (charEffect.blur > 0) {
-        filters.push(`blur(${charEffect.blur}px)`);
+      const totalBlur = baseEffects.blur + charEffect.blur;
+      if (totalBlur > 0) {
+        filters.push(`blur(${totalBlur}px)`);
       }
-      if (charEffect.hueRotate !== 0) {
-        filters.push(`hue-rotate(${charEffect.hueRotate}deg)`);
+      const totalHue = baseEffects.hueRotate + charEffect.hueRotate;
+      if (totalHue !== 0) {
+        filters.push(`hue-rotate(${totalHue}deg)`);
       }
       if (filters.length > 0) {
         ctx.filter = filters.join(' ');
@@ -185,6 +187,7 @@ export class CanvasTextRenderer {
 
       // 글자별 추가 변환 (Y 위치 포함)
       ctx.translate(pos.x + charEffect.translateX, pos.y + charEffect.translateY);
+      this.apply3DTransform(charEffect);
       ctx.rotate((charEffect.rotateZ * Math.PI) / 180);
       ctx.scale(charEffect.scale, charEffect.scale);
 
@@ -196,8 +199,25 @@ export class CanvasTextRenderer {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // 그림자 효과
-      this.applyTextShadow(char, style, charEffect);
+      // extraLayers 렌더링 (chromatic, glitch 등 - base + char 병합)
+      const allLayers = [
+        ...(baseEffects.extraLayers || []),
+        ...(charEffect.extraLayers || []),
+      ];
+      if (allLayers.length > 0) {
+        for (const layer of allLayers) {
+          ctx.save();
+          ctx.globalCompositeOperation = layer.blendMode;
+          ctx.globalAlpha = layer.opacity * baseEffects.opacity * charEffect.opacity;
+          ctx.fillStyle = layer.color;
+          ctx.fillText(char, layer.offsetX, layer.offsetY);
+          ctx.restore();
+        }
+      }
+
+      // 그림자 효과 (base + char 병합)
+      const mergedShadow = this.mergeShadows(baseEffects.textShadow, charEffect.textShadow);
+      this.applyTextShadow(char, style, { ...charEffect, textShadow: mergedShadow });
 
       // 글자 렌더링
       ctx.fillStyle = style.color;
@@ -413,6 +433,15 @@ export class CanvasTextRenderer {
     }
 
     ctx.restore();
+  }
+
+  /**
+   * Shadow 병합 (baseEffects와 charEffect의 textShadow 결합)
+   */
+  private mergeShadows(baseShadow: string, charShadow: string): string {
+    if (baseShadow === 'none') return charShadow;
+    if (charShadow === 'none') return baseShadow;
+    return `${baseShadow}, ${charShadow}`;
   }
 }
 

@@ -14,6 +14,8 @@ import {
   type CharEffectMode,
 } from '@/lib/canvas-renderer';
 import { createMP4FromFrames, createMP4FromFrameStream, checkWebCodecsSupport } from '@/lib/video-encoder';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // Standard 모드 색상
 const STANDARD_COLOR = '#8A9A5B';
@@ -299,35 +301,33 @@ export default function MultiSceneGenerationStep({
     }
   }, [isWebCodecsSupported, createRenderConfig, onComplete]);
 
-  // Firebase Storage 업로드
+  // Firebase Storage 업로드 (클라이언트 직접 업로드)
   const uploadToFirebase = async (blob: Blob): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', blob, 'hologram-video.mp4');
-    formData.append('folder', 'generated-videos');
-
     try {
-      const response = await fetch('/api/upload-video', {
-        method: 'POST',
-        body: formData,
-      });
+      // 파일명 생성
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 8);
+      const filename = `generated-videos/hologram-${timestamp}-${randomId}.mp4`;
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Firebase 업로드 실패 (${response.status}): ${errorText}`);
-      }
+      console.log('[Upload] Starting direct upload to Firebase Storage:', filename);
+      console.log('[Upload] File size:', (blob.size / 1024 / 1024).toFixed(2), 'MB');
 
-      const result = await response.json();
+      // Firebase Storage 참조 생성
+      const storageRef = ref(storage, filename);
 
-      if (!result.success || !result.url) {
-        throw new Error('업로드 응답에 URL이 없습니다');
-      }
+      // 업로드 (메타데이터 포함)
+      const metadata = {
+        contentType: 'video/mp4',
+      };
+      await uploadBytes(storageRef, blob, metadata);
 
-      console.log('Firebase 업로드 완료:', result.url);
-      return result.url;
+      // Public URL 생성
+      const downloadUrl = await getDownloadURL(storageRef);
+      console.log('[Upload] Firebase 업로드 완료:', downloadUrl);
 
+      return downloadUrl;
     } catch (error) {
-      console.error('Firebase 업로드 오류:', error);
-      // Blob URL 반환하지 않고 에러 전파
+      console.error('[Upload] Firebase 업로드 오류:', error);
       throw new Error(
         `영상 업로드에 실패했습니다. 네트워크 연결을 확인하고 다시 시도해주세요.\n\n${
           error instanceof Error ? error.message : '알 수 없는 오류'
