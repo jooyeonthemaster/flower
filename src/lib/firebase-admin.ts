@@ -45,12 +45,17 @@ function initializeFirebaseAdmin(): App {
     });
   }
 
-  // 방법 3: 기본 자격 증명 사용 (Cloud Run 등)
-  console.warn('Firebase Admin SDK: Using default credentials');
-  return initializeApp({
-    projectId,
-    storageBucket,
-  });
+  // 방법 3: Vercel 환경에서는 credential이 필수
+  // credential 없이 초기화하면 Storage/Firestore 접근 실패
+  const errorMessage =
+    'Firebase Admin 초기화 실패: 유효한 자격 증명을 찾을 수 없습니다.\n' +
+    '다음 중 하나를 설정해주세요:\n' +
+    '1. FIREBASE_SERVICE_ACCOUNT_KEY (전체 JSON)\n' +
+    '2. FIREBASE_PROJECT_ID + FIREBASE_PRIVATE_KEY + FIREBASE_CLIENT_EMAIL\n' +
+    '\nVercel 환경에서는 명시적 credential이 필수입니다.';
+
+  console.error(errorMessage);
+  throw new Error(errorMessage);
 }
 
 // 초기화 함수
