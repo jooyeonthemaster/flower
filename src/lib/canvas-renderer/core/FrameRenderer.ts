@@ -707,8 +707,8 @@ export class FrameRenderer {
     const video = this.videoElement!;
     const frameDuration = 1000 / this.config.renderer.fps;
 
-    // 동적 타임아웃 계산
-    const baseTimeout = 5000;
+    // 동적 타임아웃 계산 (첫 프레임은 더 오래 걸릴 수 있음)
+    const baseTimeout = 10000; // 10초로 증가
     const bufferMargin = 3000;
     const dynamicTimeout = Math.max(
       baseTimeout,
@@ -741,6 +741,18 @@ export class FrameRenderer {
         video.addEventListener('playing', onPlaying);
       }
     });
+
+    if (DEBUG) {
+      console.log('[Sequential Playback] Video playing started:', {
+        currentTime: video.currentTime.toFixed(3),
+        readyState: video.readyState,
+        paused: video.paused,
+        ended: video.ended,
+        playbackRate: video.playbackRate,
+        buffered: video.buffered.length > 0 ? `${video.buffered.end(0).toFixed(3)}s` : '0s',
+        duration: video.duration.toFixed(3),
+      });
+    }
 
     // 프레임 렌더링
     for (let i = 0; i < totalFrames; i++) {
@@ -776,11 +788,28 @@ export class FrameRenderer {
       // 프레임당 동적 타임아웃
       const frameTimeout = baseTimeout + (bufferStatus.stalledDuration || 0);
 
+      // 첫 프레임 진단 로깅
+      if (i === 0 && DEBUG) {
+        console.log('[Frame 0] Before requestVideoFrameCallback:', {
+          currentTime: video.currentTime.toFixed(3),
+          readyState: video.readyState,
+          paused: video.paused,
+          ended: video.ended,
+          buffered: video.buffered.length > 0 ? `${video.buffered.end(0).toFixed(3)}s` : '0s',
+          timeout: frameTimeout,
+        });
+      }
+
       // requestVideoFrameCallback with adaptive timeout
       try {
         await Promise.race([
           new Promise<void>(resolve => {
-            (video as any).requestVideoFrameCallback(() => resolve());
+            (video as any).requestVideoFrameCallback(() => {
+              if (i === 0 && DEBUG) {
+                console.log('[Frame 0] requestVideoFrameCallback called successfully');
+              }
+              resolve();
+            });
           }),
           new Promise<void>((_, reject) =>
             setTimeout(() => reject(new Error(`Frame ${i} callback timeout`)), frameTimeout)
