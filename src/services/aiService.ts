@@ -1,30 +1,4 @@
-export interface AIImageRequest {
-  prompt: string;
-  category: string;
-  style: string;
-  referenceImage?: string;
-  aspectRatio?: '16:9' | '1:1'; // 추가: 홀로그램용 1:1 지원
-}
-
-export interface AIImageResponse {
-  success: boolean;
-  imageUrl?: string;
-  error?: string;
-}
-
-export interface AIVideoRequest {
-  sourceImageUrl: string;
-  prompt?: string;
-  aspectRatio?: '16:9' | '1:1'; // 추가: 홀로그램용 1:1 지원
-}
-
-export interface AIVideoResponse {
-  success: boolean;
-  videoUrl?: string;
-  error?: string;
-}
-
-// 새로 추가: 영상 합성 요청/응답 타입
+// 영상 합성 요청/응답 타입
 export interface AIMergeVideosRequest {
   videoDataUrls: string[];
   outputRatio?: '16:9' | '1:1';
@@ -49,33 +23,7 @@ export interface SceneGenerationProgress {
 }
 
 export const aiService = {
-  async generateImage(data: AIImageRequest): Promise<AIImageResponse> {
-    try {
-      const response = await fetch('/api/ai/generate-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      return await response.json();
-    } catch {
-      return { success: false, error: 'Failed to generate image' };
-    }
-  },
-
-  async generateVideo(data: AIVideoRequest): Promise<AIVideoResponse> {
-    try {
-      const response = await fetch('/api/ai/generate-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      return await response.json();
-    } catch {
-      return { success: false, error: 'Failed to generate video' };
-    }
-  },
-
-  // 새로 추가: 영상 합성
+  // 영상 합성
   async mergeVideos(data: AIMergeVideosRequest): Promise<AIMergeVideosResponse> {
     try {
       const response = await fetch('/api/ai/merge-videos', {
@@ -89,22 +37,12 @@ export const aiService = {
     }
   },
 
-  // 새로 추가: 1:1 정사각형 이미지 생성 (홀로그램용)
-  async generateSquareImage(data: Omit<AIImageRequest, 'aspectRatio'>): Promise<AIImageResponse> {
-    return this.generateImage({ ...data, aspectRatio: '1:1' });
-  },
-
-  // 새로 추가: 1:1 정사각형 영상 생성 (홀로그램용)
-  async generateSquareVideo(data: Omit<AIVideoRequest, 'aspectRatio'>): Promise<AIVideoResponse> {
-    return this.generateVideo({ ...data, aspectRatio: '1:1' });
-  },
-
   // Higgsfield API로 영상 생성
   async generateVideoHiggsfield(data: {
     sourceImageUrl: string;
     prompt?: string;
     duration?: number;
-  }): Promise<AIVideoResponse> {
+  }): Promise<{ success: boolean; videoUrl?: string; error?: string }> {
     try {
       const response = await fetch('/api/ai/generate-video-higgsfield', {
         method: 'POST',
@@ -122,7 +60,7 @@ export const aiService = {
     videoDataUrl: string;
     loopCount?: number;
     outputRatio?: '16:9' | '1:1';
-  }): Promise<AIVideoResponse & { looped?: boolean; loopCount?: number; estimatedDuration?: number }> {
+  }): Promise<{ success: boolean; videoUrl?: string; error?: string; looped?: boolean; loopCount?: number; estimatedDuration?: number }> {
     try {
       const response = await fetch('/api/ai/loop-video', {
         method: 'POST',

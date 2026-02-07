@@ -38,17 +38,19 @@ export function applyLetterDrop(
 ): void {
   const { localFrame, fps, charIndex = 0, totalChars = 1, height } = ctx;
 
-  const delay = charIndex * 3; // 각 글자 3프레임 딜레이
-  const dropDuration = fps * 0.5; // 0.5초간 떨어짐
+  // 전체 글자가 1.5초 동안 순차적으로 떨어지도록 조정
+  const delayPerChar = (fps * 1.5) / Math.max(totalChars, 1);
+  const delay = charIndex * delayPerChar;
+  const dropDuration = fps * 1.0; // 각 글자는 1초간 떨어짐
   const adjustedFrame = Math.max(0, localFrame - delay);
 
   const progress = Math.min(adjustedFrame / dropDuration, 1);
   const easedProgress = Easing.easeOutBounce(progress);
 
-  // 위에서 떨어짐 (진입 완료 후 fadeout 적용)
+  // 위에서 떨어짐
   const startY = -height * 0.3;
   const dropOffset = interpolate(easedProgress, [0, 1], [startY, 0]);
-  result.translateY += dropOffset * (progress < 1 ? 1 : fadeoutFactor);
+  result.translateY += dropOffset * fadeoutFactor;
   result.opacity *= progress > 0 ? 1 : 0;
 }
 
@@ -94,20 +96,22 @@ export function applyLetterSpin(
   result: EffectResult,
   fadeoutFactor: number = 1
 ): void {
-  const { localFrame, fps, charIndex = 0 } = ctx;
+  const { localFrame, fps, charIndex = 0, totalChars = 1 } = ctx;
 
-  const delay = charIndex * 4;
-  const spinDuration = fps * 0.8;
+  // 전체 글자가 2초 동안 순차적으로 회전하며 등장
+  const delayPerChar = (fps * 2.0) / Math.max(totalChars, 1);
+  const delay = charIndex * delayPerChar;
+  const spinDuration = fps * 1.2;
   const adjustedFrame = Math.max(0, localFrame - delay);
 
   const progress = Math.min(adjustedFrame / spinDuration, 1);
   const easedProgress = Easing.easeOutCubic(progress);
 
-  // 회전하며 등장 (진입 완료 후 fadeout 적용)
+  // 회전하며 등장
   const rotation = interpolate(easedProgress, [0, 1], [360, 0]);
   const scale = interpolate(easedProgress, [0, 1], [0, 1]);
 
-  result.rotateZ += rotation * (progress < 1 ? 1 : fadeoutFactor);
+  result.rotateZ += rotation * fadeoutFactor;
   result.scale *= scale;
   result.opacity *= progress > 0 ? 1 : 0;
 }
@@ -122,7 +126,8 @@ export function applyLetterScatter(
 ): void {
   const { localFrame, fps, charIndex = 0, seed, width, height } = ctx;
 
-  const gatherDuration = fps * 1.2;
+  // 2초 동안 천천히 모여듦
+  const gatherDuration = fps * 2.0;
   const progress = Math.min(localFrame / gatherDuration, 1);
   const easedProgress = Easing.easeOutCubic(progress);
 
@@ -133,11 +138,11 @@ export function applyLetterScatter(
   const startX = Math.cos(angle) * distance;
   const startY = Math.sin(angle) * distance;
 
-  // 흩어진 곳에서 모여듦 (진입 완료 후 fadeout 적용)
+  // 흩어진 곳에서 모여듦
   const offsetX = interpolate(easedProgress, [0, 1], [startX, 0]);
   const offsetY = interpolate(easedProgress, [0, 1], [startY, 0]);
-  result.translateX += offsetX * (progress < 1 ? 1 : fadeoutFactor);
-  result.translateY += offsetY * (progress < 1 ? 1 : fadeoutFactor);
+  result.translateX += offsetX * fadeoutFactor;
+  result.translateY += offsetY * fadeoutFactor;
   result.opacity *= easedProgress;
 }
 
@@ -171,10 +176,12 @@ export function applyLetterZoom(
   result: EffectResult,
   fadeoutFactor: number = 1
 ): void {
-  const { localFrame, fps, charIndex = 0 } = ctx;
+  const { localFrame, fps, charIndex = 0, totalChars = 1 } = ctx;
 
-  const delay = charIndex * 3;
-  const zoomDuration = fps * 0.4;
+  // 전체 글자가 1.5초 동안 순차적으로 확대
+  const delayPerChar = (fps * 1.5) / Math.max(totalChars, 1);
+  const delay = charIndex * delayPerChar;
+  const zoomDuration = fps * 0.8;
   const adjustedFrame = Math.max(0, localFrame - delay);
 
   const progress = Math.min(adjustedFrame / zoomDuration, 1);
@@ -194,19 +201,21 @@ export function applyLetterFlip(
   result: EffectResult,
   fadeoutFactor: number = 1
 ): void {
-  const { localFrame, fps, charIndex = 0 } = ctx;
+  const { localFrame, fps, charIndex = 0, totalChars = 1 } = ctx;
 
-  const delay = charIndex * 4;
-  const flipDuration = fps * 0.5;
+  // 전체 글자가 2초 동안 순차적으로 뒤집힘
+  const delayPerChar = (fps * 2.0) / Math.max(totalChars, 1);
+  const delay = charIndex * delayPerChar;
+  const flipDuration = fps * 0.8;
   const adjustedFrame = Math.max(0, localFrame - delay);
 
   const progress = Math.min(adjustedFrame / flipDuration, 1);
   const easedProgress = Easing.easeOutCubic(progress);
 
-  // Y축 회전 (카드 뒤집기, 진입 완료 후 fadeout 적용)
+  // Y축 회전 (카드 뒤집기)
   const rotateY = interpolate(easedProgress, [0, 1], [90, 0]);
 
-  result.rotateY += rotateY * (progress < 1 ? 1 : fadeoutFactor);
+  result.rotateY += rotateY * fadeoutFactor;
   result.opacity *= progress > 0 ? (easedProgress > 0.5 ? 1 : 0) : 0;
 }
 
@@ -218,19 +227,21 @@ export function applyLetterSlide(
   result: EffectResult,
   fadeoutFactor: number = 1
 ): void {
-  const { localFrame, fps, charIndex = 0, width } = ctx;
+  const { localFrame, fps, charIndex = 0, totalChars = 1, width } = ctx;
 
-  const delay = charIndex * 2;
-  const slideDuration = fps * 0.4;
+  // 전체 글자가 1.5초 동안 순차적으로 슬라이드
+  const delayPerChar = (fps * 1.5) / Math.max(totalChars, 1);
+  const delay = charIndex * delayPerChar;
+  const slideDuration = fps * 0.8;
   const adjustedFrame = Math.max(0, localFrame - delay);
 
   const progress = Math.min(adjustedFrame / slideDuration, 1);
   const easedProgress = Easing.easeOutCubic(progress);
 
-  // 오른쪽에서 슬라이드인 (진입 완료 후 fadeout 적용)
+  // 오른쪽에서 슬라이드인
   const startX = width * 0.3;
   const offsetX = interpolate(easedProgress, [0, 1], [startX, 0]);
-  result.translateX += offsetX * (progress < 1 ? 1 : fadeoutFactor);
+  result.translateX += offsetX * fadeoutFactor;
   result.opacity *= easedProgress;
 }
 
@@ -242,10 +253,12 @@ export function applyLetterPop(
   result: EffectResult,
   fadeoutFactor: number = 1
 ): void {
-  const { localFrame, fps, charIndex = 0 } = ctx;
+  const { localFrame, fps, charIndex = 0, totalChars = 1 } = ctx;
 
-  const delay = charIndex * 3;
-  const popDuration = fps * 0.6;
+  // 전체 글자가 2초 동안 순차적으로 팡!
+  const delayPerChar = (fps * 2.0) / Math.max(totalChars, 1);
+  const delay = charIndex * delayPerChar;
+  const popDuration = fps * 1.0;
   const adjustedFrame = Math.max(0, localFrame - delay);
 
   const progress = Math.min(adjustedFrame / popDuration, 1);
@@ -268,9 +281,9 @@ export function applyLetterRain(
 ): void {
   const { localFrame, fps, charIndex = 0, seed, height } = ctx;
 
-  // 각 글자마다 랜덤 딜레이
-  const randomDelay = Math.floor(random(seed + charIndex * 7) * fps * 0.8);
-  const dropDuration = fps * 0.6;
+  // 각 글자마다 랜덤 딜레이 (2초 범위)
+  const randomDelay = Math.floor(random(seed + charIndex * 7) * fps * 2.0);
+  const dropDuration = fps * 1.0;
   const adjustedFrame = Math.max(0, localFrame - randomDelay);
 
   const progress = Math.min(adjustedFrame / dropDuration, 1);
@@ -278,6 +291,6 @@ export function applyLetterRain(
 
   const startY = -height * 0.4;
   const offsetY = interpolate(easedProgress, [0, 1], [startY, 0]);
-  result.translateY += offsetY * (progress < 1 ? 1 : fadeoutFactor);
+  result.translateY += offsetY * fadeoutFactor;
   result.opacity *= progress > 0 ? easedProgress : 0;
 }

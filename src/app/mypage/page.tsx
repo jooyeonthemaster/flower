@@ -12,6 +12,7 @@ export default function MyPageDashboard() {
   const [recentVideos, setRecentVideos] = useState<Video[]>([]);
   const [recentRequests, setRecentRequests] = useState<AdminRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -133,11 +134,36 @@ export default function MyPageDashboard() {
           ) : recentVideos.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {recentVideos.map((video) => (
-                <div key={video.id} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="aspect-video bg-gray-100 flex items-center justify-center">
-                    <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
+                <div key={video.id} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer" onClick={() => setSelectedVideo(video)}>
+                  <div className="aspect-video bg-gray-900 relative overflow-hidden">
+                    {video.videoUrl ? (
+                      <video
+                        src={video.videoUrl}
+                        className="w-full h-full object-cover"
+                        muted
+                        preload="metadata"
+                        onMouseOver={(e) => (e.target as HTMLVideoElement).play()}
+                        onMouseOut={(e) => {
+                          const vid = e.target as HTMLVideoElement;
+                          vid.pause();
+                          vid.currentTime = 0;
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    )}
+                    {/* Play Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                   <div className="p-4">
                     <p className="font-medium text-gray-900 truncate">{video.title}</p>
@@ -191,6 +217,42 @@ export default function MyPageDashboard() {
           )}
         </div>
       </div>
+
+      {/* Video Preview Modal */}
+      {selectedVideo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          onClick={() => setSelectedVideo(null)}
+        >
+          <div
+            className="relative max-w-4xl w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedVideo(null)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="bg-black rounded-2xl overflow-hidden">
+              <video
+                src={selectedVideo.videoUrl}
+                controls
+                autoPlay
+                className="w-full"
+              />
+            </div>
+            <div className="mt-4 text-center">
+              <p className="text-white font-medium">{selectedVideo.title}</p>
+              <p className="text-gray-400 text-sm mt-1">
+                {new Date(selectedVideo.createdAt).toLocaleDateString('ko-KR')}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

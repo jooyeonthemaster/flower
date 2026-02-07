@@ -1,8 +1,13 @@
 'use client'
 
+import { useState, useEffect } from 'react';
 import { CustomSettings } from '../types';
 import { availableEffects, letterEffects, fontOptions, positionLabels } from '../constants/styleOptions';
 import ColorPaletteGrid from './ColorPaletteGrid';
+import ConflictWarningPanel from './ConflictWarningPanel';
+import { detectConflicts } from '@/lib/canvas-renderer/effects/conflictDetector';
+import { EFFECT_PRESETS, type EffectPreset } from '../constants/effectPresets';
+import type { EffectType } from '@/lib/canvas-renderer/types';
 
 // Standard 모드 색상
 const STANDARD_COLOR = '#8A9A5B';
@@ -16,6 +21,7 @@ interface StyleSettingsSectionProps {
   showLetterEffectDropdown: boolean;
   showPositionDropdown: boolean;
   showFontDropdown: boolean;
+  showPresetsDropdown: boolean;
   onCustomSettingsChange: (settings: CustomSettings) => void;
   onToggleTextColorPalette: (show: boolean) => void;
   onToggleGlowColorPalette: (show: boolean) => void;
@@ -23,6 +29,7 @@ interface StyleSettingsSectionProps {
   onToggleLetterEffectDropdown: (show: boolean) => void;
   onTogglePositionDropdown: (show: boolean) => void;
   onToggleFontDropdown: (show: boolean) => void;
+  onTogglePresetsDropdown: (show: boolean) => void;
 }
 
 export default function StyleSettingsSection({
@@ -34,6 +41,7 @@ export default function StyleSettingsSection({
   showLetterEffectDropdown,
   showPositionDropdown,
   showFontDropdown,
+  showPresetsDropdown,
   onCustomSettingsChange,
   onToggleTextColorPalette,
   onToggleGlowColorPalette,
@@ -41,13 +49,71 @@ export default function StyleSettingsSection({
   onToggleLetterEffectDropdown,
   onTogglePositionDropdown,
   onToggleFontDropdown,
+  onTogglePresetsDropdown,
 }: StyleSettingsSectionProps) {
+  // 충돌 검증 상태
+  const [conflictResult, setConflictResult] = useState(detectConflicts([]));
+
+  // 이펙트 변경 시 실시간 충돌 검증
+  useEffect(() => {
+    const allEffects = [...customSettings.effects];
+    if (customSettings.letterEffect && customSettings.letterEffect !== 'none') {
+      allEffects.push(customSettings.letterEffect);
+    }
+    const result = detectConflicts(allEffects as EffectType[]);
+    setConflictResult(result);
+  }, [customSettings.effects, customSettings.letterEffect]);
+
+  // 프리셋 적용 핸들러
+  const handlePresetApply = (preset: EffectPreset) => {
+    onCustomSettingsChange({
+      ...customSettings,
+      effects: preset.effects as string[],
+      textColor: preset.textColor || customSettings.textColor,
+      glowColor: preset.glowColor || customSettings.glowColor,
+    });
+    onTogglePresetsDropdown(false);
+  };
+
+  // 이펙트 경고 아이콘 표시
+  const getEffectWarningIcon = (effectId: string) => {
+    if (!customSettings.effects.includes(effectId)) {
+      const testEffects = [...customSettings.effects, effectId];
+      if (customSettings.letterEffect && customSettings.letterEffect !== 'none') {
+        testEffects.push(customSettings.letterEffect);
+      }
+      const testResult = detectConflicts(testEffects as EffectType[]);
+      if (testResult.conflicts.some(c => c.severity === 'critical')) {
+        return '🚫';
+      }
+      if (testResult.conflicts.some(c => c.severity === 'danger')) {
+        return '⚠️';
+      }
+    }
+    return null;
+  };
+
   const toggleEffect = (effectId: string) => {
     const isSelected = customSettings.effects.includes(effectId);
     if (isSelected) {
       onCustomSettingsChange({ ...customSettings, effects: customSettings.effects.filter(e => e !== effectId) });
     } else {
       if (customSettings.effects.length >= 6) return;
+
+      // CRITICAL 충돌 체크
+      const testEffects = [...customSettings.effects, effectId];
+      if (customSettings.letterEffect && customSettings.letterEffect !== 'none') {
+        testEffects.push(customSettings.letterEffect);
+      }
+      const testResult = detectConflicts(testEffects as EffectType[]);
+      const hasCritical = testResult.conflicts.some(c => c.severity === 'critical');
+
+      if (hasCritical) {
+        const criticalConflict = testResult.conflicts.find(c => c.severity === 'critical');
+        alert(`⚠️ 이 효과를 추가하면 심각한 성능 문제가 발생할 수 있습니다.\n\n${criticalConflict?.rule.message}`);
+        return;
+      }
+
       onCustomSettingsChange({ ...customSettings, effects: [...customSettings.effects, effectId] });
     }
   };
@@ -186,16 +252,22 @@ export default function StyleSettingsSection({
           </button>
           {showEffectsDropdown && (
             <div className="absolute bottom-full left-0 right-0 mb-1 p-1 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-30 max-h-60 overflow-y-auto custom-scrollbar-light">
-              {availableEffects.map(({ id, name }) => (
-                <button
-                  key={id}
-                  onClick={() => toggleEffect(id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between ${customSettings.effects.includes(id) ? 'bg-[#8A9A5B]/10 text-[#8A9A5B] font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
-                >
-                  {name}
-                  {customSettings.effects.includes(id) && <span className="text-[#8A9A5B]">✓</span>}
-                </button>
-              ))}
+              {availableEffects.map(({ id, name }) => {
+                const warningIcon = getEffectWarningIcon(id);
+                return (
+                  <button
+                    key={id}
+                    onClick={() => toggleEffect(id)}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between ${customSettings.effects.includes(id) ? 'bg-[#8A9A5B]/10 text-[#8A9A5B] font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    <span className="flex items-center gap-2">
+                      {name}
+                      {warningIcon && <span>{warningIcon}</span>}
+                    </span>
+                    {customSettings.effects.includes(id) && <span className="text-[#8A9A5B]">✓</span>}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -227,6 +299,53 @@ export default function StyleSettingsSection({
             </div>
           )}
         </div>
+
+        {/* 추천 조합 */}
+        <div className="relative">
+          <label className="text-xs text-gray-600 font-bold block mb-1.5">추천 조합</label>
+          <button
+            onClick={() => onTogglePresetsDropdown(!showPresetsDropdown)}
+            className="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl hover:border-[#8A9A5B]/50 transition-all text-gray-900"
+          >
+            <span className="text-sm text-gray-700">조합 선택</span>
+            <span className="text-gray-400 text-xs">▼</span>
+          </button>
+          {showPresetsDropdown && (
+            <div className="absolute bottom-full left-0 right-0 mb-1 p-1 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-30 max-h-60 overflow-y-auto custom-scrollbar-light">
+              {EFFECT_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() => handlePresetApply(preset)}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-all"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-base">{preset.icon}</span>
+                    <span className="text-sm font-bold text-gray-900">{preset.name}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-1">{preset.description}</p>
+                  <div className="flex gap-1 flex-wrap">
+                    {preset.effects.slice(0, 3).map((effect, index) => (
+                      <span
+                        key={index}
+                        className="text-xs px-1.5 py-0.5 bg-gray-100 rounded text-gray-600"
+                      >
+                        {availableEffects.find(e => e.id === effect)?.name || effect}
+                      </span>
+                    ))}
+                    {preset.effects.length > 3 && (
+                      <span className="text-xs px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">
+                        +{preset.effects.length - 3}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 충돌 경고 패널 */}
+        <ConflictWarningPanel conflictResult={conflictResult} />
       </div>
     </div>
   );

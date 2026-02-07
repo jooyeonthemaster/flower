@@ -36,6 +36,7 @@ export default function ResultStep({
   eventInfo
 }: ResultStepProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const saveAttemptedRef = useRef(false);  // ✅ 중복 저장 방지 플래그
   const [isReversing, setIsReversing] = useState(false);
   const [playCount, setPlayCount] = useState(0);
   const { user, userProfile } = useAuth();
@@ -56,6 +57,13 @@ export default function ResultStep({
     if (savedVideoId) return savedVideoId;
     if (isSaving) return null;
 
+    // ✅ useRef로 중복 호출 방지
+    if (saveAttemptedRef.current) {
+      console.log('[ResultStep] Save already attempted, skipping');
+      return null;
+    }
+
+    saveAttemptedRef.current = true;  // 플래그 설정
     setIsSaving(true);
     setSaveError(null);
 
@@ -81,17 +89,24 @@ export default function ResultStep({
       }
 
       const data = await response.json();
+
+      // ✅ 중복 감지 시 로그만 출력
+      if (data.isDuplicate) {
+        console.log('[ResultStep] Duplicate video detected:', data.videoId);
+      }
+
       setSavedVideoId(data.videoId);
       console.log('영상 저장 완료:', data.videoId);
       return data.videoId;
     } catch (error) {
       console.error('영상 저장 오류:', error);
       setSaveError('영상 저장 중 오류가 발생했습니다.');
+      saveAttemptedRef.current = false;  // ✅ 에러 시 플래그 리셋 (재시도 가능)
       return null;
     } finally {
       setIsSaving(false);
     }
-  }, [user, videoUrl, savedVideoId, isSaving, isCompositionMode, category, style, scenes, eventInfo]);
+  }, [user, videoUrl, savedVideoId, isSaving]);
 
   // 영상 자동 저장 (최초 렌더링 시)
   useEffect(() => {

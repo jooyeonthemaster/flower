@@ -4,40 +4,282 @@ import { GoogleGenAI } from "@google/genai";
 // Vercel Pro plan: 최대 300초 (5분)
 export const maxDuration = 300;
 
-// 행사별 분위기 설정 (간결하게 - AI 창의성 존중)
-const categoryConfigs: Record<string, string> = {
-  wedding: "romantic, dreamy, warm and intimate atmosphere",
-  opening: "celebratory, energetic, grand and exciting atmosphere",
-  event: "sophisticated, premium, dramatic spotlight atmosphere",
+// 카테고리별 오브젝트 옵션 (간결화)
+const categoryObjects: Record<string, string[]> = {
+  wedding: [
+    'rose petals',
+    'silk ribbons',
+    'pearl strings',
+    'lace patterns',
+    'champagne bubbles',
+    'crystal hearts',
+    'butterflies',
+  ],
+  opening: [
+    'ribbon cascades',
+    'confetti pieces',
+    'prosperity coins',
+    'starburst effects',
+    'celebration streamers',
+    'firework sparks',
+    'lantern shapes',
+  ],
+  event: [
+    'crystal shapes',
+    'spotlight beams',
+    'prism effects',
+    'diamond shapes',
+    'geometric patterns',
+    'star shapes',
+    'trophy elements',
+  ],
 };
 
-// 6가지 조합별 색상 팔레트 (category + style)
-const colorPalettes: Record<string, string> = {
-  // Fancy 스타일 - 각각 다른 색상
-  'wedding-fancy': 'rose pink, magenta, soft coral, blush gold highlights',
-  'opening-fancy': 'rich gold, champagne, warm amber, bright white accents',
-  'event-fancy': 'royal purple, deep violet, electric cyan, silver highlights',
-
-  // Simple 스타일 - 부드럽고 일부 겹침 허용
-  'wedding-simple': 'soft pink, pearl white, gentle silver glow',
-  'opening-simple': 'warm cream, soft gold, clean white',
-  'event-simple': 'cool silver, soft blue-gray, elegant white',
+// 색상 팔레트 (카테고리 × 스타일별로 분리)
+const colorPalettes: Record<string, string[]> = {
+  wedding_fancy: [
+    'rose pink', 'champagne gold', 'soft lavender', 'silver',
+    'blush pink', 'ivory', 'peach', 'coral', 'dusty rose',
+    'mauve', 'pearl white', 'rose gold', 'pastel pink', 'light gold',
+  ],
+  wedding_simple: [
+    'pearl white', 'soft cream', 'pale blush', 'ivory',
+    'champagne', 'warm white', 'soft lavender', 'light rose gold',
+  ],
+  opening_fancy: [
+    'rich gold', 'crimson red', 'warm bronze', 'emerald green',
+    'jade', 'royal gold', 'deep red', 'bright gold', 'orange',
+    'sunny yellow', 'amber', 'copper', 'burnt orange', 'lime green',
+  ],
+  opening_simple: [
+    'warm gold', 'cream', 'champagne', 'white',
+    'soft bronze', 'elegant jade green', 'refined copper',
+  ],
+  event_fancy: [
+    'royal purple', 'deep violet', 'navy blue', 'crystal silver',
+    'burgundy', 'rose gold', 'deep teal', 'platinum', 'charcoal',
+    'electric blue', 'sapphire blue', 'white', 'midnight blue', 'indigo',
+  ],
+  event_simple: [
+    'navy blue', 'silver', 'deep purple', 'charcoal',
+    'platinum', 'sapphire', 'white', 'elegant indigo',
+  ],
 };
+
+// 프롬프트 생성 함수
+function generatePrompt(
+  category: string,
+  style: string,
+  selectedObjects: string[],
+  selectedColors: string[],
+  referenceInstruction: string
+): string {
+  const colorPalette = selectedColors.join(', ');
+
+  if (category === 'wedding' && style === 'fancy') {
+    return `Create a 1:1 SQUARE premium image with hologram-style effects for a wedding celebration.
+
+STYLE: Spectacular and romantic with rich visual effects, dramatic lighting, and luxurious elements
+
+COLOR PALETTE: ${colorPalette}
+
+VISUAL ELEMENTS - MUST BE CLEARLY VISIBLE:
+You MUST include these specific elements:
+${selectedObjects.map(obj => `- ${obj}`).join('\n')}
+
+EXECUTION REQUIREMENTS:
+- Each element MUST have clear, recognizable form with defined edges
+- DO NOT dissolve elements into pure abstract light - keep them distinct and visible
+- Layer elements at different depths for visual richness
+- Add elegant glow and particle effects AROUND elements, not replacing them
+- Premium quality but elements must remain clearly visible and recognizable
+- Balance between elegant styling and clear visibility
+
+TECHNICAL REQUIREMENTS:
+- Pure black (#000000) background
+- Leave CENTER AREA clear for text overlay
+- CRITICAL: ABSOLUTELY NO TEXT, WORDS, OR LETTERS of any kind anywhere in the image
+- Do not write "holographic", "background", "wedding" or any other words
+- 1:1 square ratio for LED hologram fan display
+- Ultra high quality, cinematic lighting, professional CGI
+
+${referenceInstruction}
+
+QUALITY GOAL: Luxurious, romantic, spectacular - with clearly visible design elements that are recognizable and distinct.`;
+  }
+
+  if (category === 'wedding' && style === 'simple') {
+    return `Create a 1:1 SQUARE elegant image with hologram-style effects for a wedding celebration.
+
+STYLE: Clean, refined, and minimal with soft lighting and sophisticated aesthetics
+
+COLOR PALETTE: ${colorPalette}
+
+VISUAL ELEMENT - MUST BE CLEARLY VISIBLE:
+You MUST include this specific element:
+${selectedObjects.map(obj => `- ${obj}`).join('\n')}
+
+EXECUTION REQUIREMENTS:
+- The element MUST be clearly visible with clean, defined form
+- Minimal, elegant approach - less is more
+- Subtle glow and soft lighting effects
+- Keep composition clean and uncluttered
+- Sophisticated simplicity with the element remaining recognizable
+
+TECHNICAL REQUIREMENTS:
+- Pure black (#000000) background
+- Leave CENTER AREA clear for text overlay
+- CRITICAL: ABSOLUTELY NO TEXT, WORDS, OR LETTERS of any kind anywhere in the image
+- Do not write any words at all
+- 1:1 square ratio for LED hologram fan display
+- Ultra high quality, soft lighting, professional quality
+
+${referenceInstruction}
+
+QUALITY GOAL: Elegant, refined, sophisticated simplicity with a clearly visible and recognizable design element.`;
+  }
+
+  if (category === 'opening' && style === 'fancy') {
+    return `Create a 1:1 SQUARE premium image with hologram-style effects for a grand opening celebration.
+
+STYLE: Bold, energetic, and spectacular with dynamic visual effects and celebratory elements
+
+COLOR PALETTE: ${colorPalette}
+
+VISUAL ELEMENTS - MUST BE CLEARLY VISIBLE:
+You MUST include these specific elements:
+${selectedObjects.map(obj => `- ${obj}`).join('\n')}
+
+EXECUTION REQUIREMENTS:
+- Each element MUST have clear, recognizable form with defined edges
+- DO NOT dissolve elements into pure abstract light - keep them distinct and visible
+- Create dynamic, energetic composition with movement
+- Add powerful glow and particle effects AROUND elements, not replacing them
+- Celebratory and bold but elements must remain clearly visible
+- Balance between dramatic effects and clear visibility
+
+TECHNICAL REQUIREMENTS:
+- Pure black (#000000) background
+- Leave CENTER AREA clear for text overlay
+- CRITICAL: ABSOLUTELY NO TEXT, WORDS, OR LETTERS of any kind anywhere in the image
+- Do not write any words at all
+- 1:1 square ratio for LED hologram fan display
+- Ultra high quality, dramatic lighting, professional CGI
+
+${referenceInstruction}
+
+QUALITY GOAL: Bold, prosperous, celebratory - with clearly visible design elements that convey success and prosperity.`;
+  }
+
+  if (category === 'opening' && style === 'simple') {
+    return `Create a 1:1 SQUARE elegant image with hologram-style effects for a business opening.
+
+STYLE: Clean, professional, and refined with sophisticated aesthetics
+
+COLOR PALETTE: ${colorPalette}
+
+VISUAL ELEMENT - MUST BE CLEARLY VISIBLE:
+You MUST include this specific element:
+${selectedObjects.map(obj => `- ${obj}`).join('\n')}
+
+EXECUTION REQUIREMENTS:
+- The element MUST be clearly visible with clean, defined form
+- Professional, elegant approach
+- Subtle glow and refined lighting
+- Keep composition clean and professional
+- Sophisticated minimalism with the element remaining recognizable
+
+TECHNICAL REQUIREMENTS:
+- Pure black (#000000) background
+- Leave CENTER AREA clear for text overlay
+- CRITICAL: ABSOLUTELY NO TEXT, WORDS, OR LETTERS of any kind anywhere in the image
+- Do not write any words at all
+- 1:1 square ratio for LED hologram fan display
+- Ultra high quality, refined lighting, professional quality
+
+${referenceInstruction}
+
+QUALITY GOAL: Professional, elegant, prosperous simplicity with a clearly visible design element.`;
+  }
+
+  if (category === 'event' && style === 'fancy') {
+    return `Create a 1:1 SQUARE premium image with hologram-style effects for a special event.
+
+STYLE: Dramatic, cinematic with rich visual effects and luxurious presentation
+
+COLOR PALETTE: ${colorPalette}
+
+VISUAL ELEMENTS - MUST BE CLEARLY VISIBLE:
+You MUST include these specific elements:
+${selectedObjects.map(obj => `- ${obj}`).join('\n')}
+
+EXECUTION REQUIREMENTS:
+- Each element MUST have clear, recognizable form with defined edges
+- DO NOT dissolve elements into pure abstract light - keep them distinct and visible
+- Create dramatic, cinematic composition
+- Add powerful glow and light effects AROUND elements, not replacing them
+- Luxurious and bold but elements must remain clearly visible
+- Balance between cinematic effects and clear visibility
+
+TECHNICAL REQUIREMENTS:
+- Pure black (#000000) background
+- Leave CENTER AREA clear for text overlay
+- CRITICAL: ABSOLUTELY NO TEXT, WORDS, OR LETTERS of any kind anywhere in the image
+- Do not write any words at all
+- 1:1 square ratio for LED hologram fan display
+- Ultra high quality, dramatic cinematic lighting, professional CGI
+
+${referenceInstruction}
+
+QUALITY GOAL: Dramatic, luxurious, prestigious - with clearly visible design elements that create impact.`;
+  }
+
+  // event + simple
+  return `Create a 1:1 SQUARE elegant image with hologram-style effects for a special event.
+
+STYLE: Clean, sophisticated, and refined with elegant aesthetics
+
+COLOR PALETTE: ${colorPalette}
+
+VISUAL ELEMENT - MUST BE CLEARLY VISIBLE:
+You MUST include this specific element:
+${selectedObjects.map(obj => `- ${obj}`).join('\n')}
+
+EXECUTION REQUIREMENTS:
+- The element MUST be clearly visible with clean, defined form
+- Elegant, professional approach
+- Subtle glow and refined lighting
+- Keep composition clean and sophisticated
+- Refined minimalism with the element remaining recognizable
+
+TECHNICAL REQUIREMENTS:
+- Pure black (#000000) background
+- Leave CENTER AREA clear for text overlay
+- CRITICAL: ABSOLUTELY NO TEXT, WORDS, OR LETTERS of any kind anywhere in the image
+- Do not write any words at all
+- 1:1 square ratio for LED hologram fan display
+- Ultra high quality, elegant lighting, professional quality
+
+${referenceInstruction}
+
+QUALITY GOAL: Sophisticated, elegant, prestigious simplicity with a clearly visible design element.`;
+}
 
 /**
  * 배경 이미지 생성 API (Google Gemini 사용)
- * 1:1 비율, 텍스트 없음 - 4분할 문제 해결을 위한 새 API
+ * 1:1 비율, 텍스트 없음
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { category, style, referenceImage } = body;
+    const { category, style, referenceImage, testMode } = body;
 
     // 디버그 로그
     console.log('=== GENERATE BACKGROUND (Google Gemini) ===');
     console.log('Category:', category);
     console.log('Style:', style);
     console.log('Reference Image Provided:', !!referenceImage);
+    console.log('Test Mode:', !!testMode);
 
     // Google Gemini API 키 확인
     const apiKey = process.env.GOOGLE_GENAI_API_KEY;
@@ -51,11 +293,24 @@ export async function POST(req: NextRequest) {
     // GoogleGenAI 클라이언트 초기화
     const ai = new GoogleGenAI({ apiKey });
 
-    // 카테고리 분위기 가져오기 (기본값 처리)
-    const safeCategory = categoryConfigs[category] ? category : 'event';
+    // 카테고리/스타일 확인 (기본값 처리)
+    const safeCategory = categoryObjects[category] ? category : 'event';
     const safeStyle = style === 'simple' ? 'simple' : 'fancy';
-    const categoryMood = categoryConfigs[safeCategory];
-    const colorPalette = colorPalettes[`${safeCategory}-${safeStyle}`] || colorPalettes['event-fancy'];
+
+    // 오브젝트 선택 (스타일에 따라 개수 다름)
+    const availableObjects = categoryObjects[safeCategory];
+    const numObjects = safeStyle === 'simple' ? 1 : (Math.floor(Math.random() * 2) + 2); // simple: 1개, fancy: 2-3개
+    const shuffledObjects = [...availableObjects].sort(() => Math.random() - 0.5);
+    const selectedObjects = shuffledObjects.slice(0, numObjects);
+
+    // 색상 선택 (스타일에 따라 개수 다름)
+    const colorPaletteKey = `${safeCategory}_${safeStyle}`;
+    const availableColors = colorPalettes[colorPaletteKey];
+    const numColors = safeStyle === 'simple'
+      ? (Math.floor(Math.random() * 2) + 1)  // simple: 1-2개
+      : (Math.floor(Math.random() * 2) + 2); // fancy: 2-3개
+    const shuffledColors = [...availableColors].sort(() => Math.random() - 0.5);
+    const selectedColors = shuffledColors.slice(0, numColors);
 
     // 참조 이미지 Base64 준비
     let referenceImageBase64: string | null = null;
@@ -98,28 +353,33 @@ The logo should blend harmoniously with the hologram style.
 Leave the center and bottom area clear for text overlay later.`
       : '';
 
-    // 배경 이미지 프롬프트 (텍스트 없음, 1:1 비율) - 간결하게
-    const backgroundPrompt = `Generate a 1:1 SQUARE holographic background image.
-
-MOOD: ${categoryMood}
-STYLE: ${safeStyle === 'simple' ? 'Clean, elegant, minimal with soft lighting' : 'Spectacular, dramatic with rich visual effects'}
-COLOR PALETTE: ${colorPalette}
-
-REQUIREMENTS:
-- Pure black (#000000) base
-- Abstract visual effects (light, particles, glow, energy) using the color palette above
-- Leave CENTER AREA clear for text overlay later
-- NO TEXT or letters anywhere
-- 1:1 square ratio
-
-AVOID: Specific objects like coins, flowers, hearts, balloons, ribbons. Keep effects abstract.
-
-${referenceInstruction}
-
-Quality: Ultra HD, professional CGI, cinematic lighting. For LED hologram fan display.`;
+    // 프롬프트 생성
+    const backgroundPrompt = generatePrompt(
+      safeCategory,
+      safeStyle,
+      selectedObjects,
+      selectedColors,
+      referenceInstruction
+    );
 
     console.log('Generating background image with Google Gemini...');
-    console.log('Prompt preview:', backgroundPrompt.substring(0, 300) + '...');
+    console.log('Selected Objects:', selectedObjects);
+    console.log('Selected Colors:', selectedColors);
+    console.log('Prompt preview:', backgroundPrompt.substring(0, 400) + '...');
+
+    // 테스트 모드: API 호출 없이 프롬프트만 반환
+    if (testMode) {
+      console.log('TEST MODE: Returning prompt without API call');
+      return NextResponse.json({
+        success: true,
+        testMode: true,
+        prompt: backgroundPrompt,
+        selectedObjects,
+        selectedColors,
+        category: safeCategory,
+        style: safeStyle,
+      });
+    }
 
     // Google Gemini API 요청 구성
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,7 +406,7 @@ Quality: Ultra HD, professional CGI, cinematic lighting. For LED hologram fan di
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
         imageConfig: {
-          aspectRatio: '1:1',  // 정사각형 비율로 변경
+          aspectRatio: '1:1',
           imageSize: '2K',
         },
       },

@@ -30,7 +30,7 @@ export default function TextPreviewStep({
     effects: [],
     letterEffect: 'none',
     textPosition: 'random' as const,
-    fontSize: 50,  // 1080p 기준
+    fontSize: 55,  // 1080p 기준
     fontFamily: "'Noto Sans KR', sans-serif",
   });
 
@@ -40,6 +40,7 @@ export default function TextPreviewStep({
   const [showLetterEffectDropdown, setShowLetterEffectDropdown] = useState(false);
   const [showPositionDropdown, setShowPositionDropdown] = useState(false);
   const [showFontDropdown, setShowFontDropdown] = useState(false);
+  const [showPresetsDropdown, setShowPresetsDropdown] = useState(false);
 
   useEffect(() => {
     const newVideoUrl = getTemplateVideoPath(sceneData.category, sceneData.style);
@@ -130,6 +131,7 @@ export default function TextPreviewStep({
                 showLetterEffectDropdown={showLetterEffectDropdown}
                 showPositionDropdown={showPositionDropdown}
                 showFontDropdown={showFontDropdown}
+                showPresetsDropdown={showPresetsDropdown}
                 onCustomSettingsChange={setCustomSettings}
                 onToggleTextColorPalette={setShowTextColorPalette}
                 onToggleGlowColorPalette={setShowGlowColorPalette}
@@ -137,6 +139,7 @@ export default function TextPreviewStep({
                 onToggleLetterEffectDropdown={setShowLetterEffectDropdown}
                 onTogglePositionDropdown={setShowPositionDropdown}
                 onToggleFontDropdown={setShowFontDropdown}
+                onTogglePresetsDropdown={setShowPresetsDropdown}
               />
             </div>
           </motion.div>

@@ -17,8 +17,8 @@ export function applyTypewriter(
 ): void {
   const { localFrame, fps, text } = ctx;
 
-  // 2초 동안 타이핑
-  const typewriterDuration = fps * 2;
+  // 3초 동안 천천히 타이핑
+  const typewriterDuration = fps * 3.0;
   const typewriterChars = Math.floor(
     interpolate(
       localFrame,

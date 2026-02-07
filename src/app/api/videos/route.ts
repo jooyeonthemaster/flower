@@ -3,6 +3,18 @@ import { getAdminDb, incrementUserStats } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type FirebaseFirestore from '@google-cloud/firestore';
 import { VideoDocument, VideoMode, VideoStatus, VideoSceneData } from '@/types/firestore';
+import crypto from 'crypto';
+
+/**
+ * userId + videoUrl로 deterministic document ID 생성
+ * Race condition 방지: 같은 조합은 항상 같은 ID 생성
+ */
+function generateVideoDocId(userId: string, videoUrl: string): string {
+  const hash = crypto.createHash('sha256')
+    .update(`${userId}_${videoUrl}`)
+    .digest('hex');
+  return `vid_${hash.substring(0, 28)}`; // 'vid_' prefix + 28자 = 32자
+}
 
 // POST: 새 영상 저장
 export async function POST(request: NextRequest) {
@@ -34,6 +46,23 @@ export async function POST(request: NextRequest) {
 
     const db = getAdminDb();
 
+    // ✅ Deterministic ID로 중복 방지 (Race Condition 완전 해결)
+    const docId = generateVideoDocId(userId, videoUrl);
+    const docRef = db.collection('videos').doc(docId);
+
+    // 이미 존재하는지 확인
+    const docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      console.log('[Videos API] Duplicate video detected (by deterministic ID):', docId);
+      return NextResponse.json({
+        success: true,
+        videoId: docId,
+        isDuplicate: true,
+        message: '이미 저장된 영상입니다.'
+      });
+    }
+
     // 영상 데이터 생성 (undefined 값은 제외)
     const videoData: Record<string, unknown> = {
       userId,
@@ -57,8 +86,10 @@ export async function POST(request: NextRequest) {
     if (sceneData !== undefined) videoData.sceneData = sceneData;
     if (orderId !== undefined) videoData.orderId = orderId;
 
-    // 영상 저장
-    const videoRef = await db.collection('videos').add(videoData);
+    // ✅ Deterministic ID로 새 영상 저장 (set 사용, race condition 완전 차단)
+    await docRef.set(videoData);
+
+    console.log('[Videos API] New video saved with deterministic ID:', docId);
 
     // 사용자 통계 업데이트
     try {
@@ -69,7 +100,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      videoId: videoRef.id,
+      videoId: docId,
+      isDuplicate: false
     });
   } catch (error) {
     console.error('영상 저장 API 오류:', error);
